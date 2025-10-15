@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>abcloset - Contabilidade</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="container">
+<h1>abcloset — Contabilidade Rápida</h1>
+
+
+<div class="cards">
+<section class="card">
+<h2>Vendi</h2>
+<input id="vendas_desc" placeholder="Descrição (ex: Body renda)" />
+<input id="vendas_val" placeholder="Valor (R$)" inputmode="decimal" />
+<button onclick="submit('vendas')">Registrar venda</button>
+</section>
+
+
+<section class="card">
+<h2>Comprei (estoque)</h2>
+<input id="compras_desc" placeholder="Descrição (ex: 10 calcinhas)" />
+<input id="compras_val" placeholder="Valor (R$)" inputmode="decimal" />
+<button onclick="submit('compras')">Registrar compra</button>
+</section>
+
+
+<section class="card">
+<h2>Paguei (despesa)</h2>
+<input id="despesas_desc" placeholder="Descrição (ex: Aluguel)" />
+<input id="despesas_val" placeholder="Valor (R$)" inputmode="decimal" />
+<button onclick="submit('despesas')">Registrar despesa</button>
+</section>
+</div>
+
+
+<div class="actions">
+<a class="btn" href="/download">Baixar planilha (Excel)</a>
+<p class="note">A planilha contém uma aba <strong>Resumo</strong> com totais e saldo atual.</p>
+</div>
+
+
+<div id="toast" class="toast"></div>
+</main>
+
+
+<script src="/static/script.js"></script>
+</body>
+</html>
