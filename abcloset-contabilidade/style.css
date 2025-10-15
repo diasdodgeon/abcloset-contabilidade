@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f5f7e8;
+  background: #f4f4e0;
   margin: 0;
   padding: 0;
   display: flex;
@@ -52,4 +52,5 @@ button:hover {
   margin-top: 10px;
   color: #4caf50;
 }
+
 
