@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4e0;
+  background: #f9fdfd;
   margin: 0;
   padding: 0;
   display: flex;
@@ -8,7 +8,12 @@ body {
 }
 
 .container {
-  background: white;
+  
+  background-image:url(fgd.jpg); 
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center bottom 34px;
+  background-size: 480px;
   margin-top: 40px;
   padding: 20px;
   border-radius: 16px;
@@ -24,9 +29,10 @@ h1 {
 }
 
 form {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 input, select, button {
@@ -52,5 +58,12 @@ button:hover {
   margin-top: 10px;
   color: #4caf50;
 }
-
+.background{
+  background-image:url(fgd.png); 
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center top 250px;
+  background-size: 480px;
+  background-color: #f2f2f2 ;
+}
 
