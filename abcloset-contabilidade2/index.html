@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ABCloset — Lançamentos (estoque & vendas)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1>ABCloset — Lançamentos</h1>
+
+    <section class="cfg card">
+      <h2>Configuração Firebase</h2>
+      <p class="small">Cole o seu <strong>firebaseConfig</strong> em <code>script.js</code> (local do projeto).</p>
+    </section>
+
+    <section class="card">
+      <label for="tipo">Tipo de entrada</label>
+      <select id="tipo">
+        <option value="">Selecione...</option>
+        <option value="comprei">Comprei (entrada de estoque)</option>
+        <option value="vendi">Vendi (venda ao cliente)</option>
+        <option value="paguei">Paguei (despesa)</option>
+      </select>
+
+      <div id="form-area"></div>
+
+      <div class="actions">
+        <button id="enviar" class="btn">Enviar</button>
+        <button id="limpar" class="btn ghost">Limpar</button>
+      </div>
+
+      <p id="status" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Produtos (estoque)</h2>
+      <div id="produtos-list" class="produtos-list">Carregando...</div>
+      <button id="refreshProdutos" class="btn ghost">Atualizar lista</button>
+    </section>
+
+    <footer class="small muted">© ABCloset — controle simples</footer>
+  </main>
+
+  <!-- Firebase (modular SDK) -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
