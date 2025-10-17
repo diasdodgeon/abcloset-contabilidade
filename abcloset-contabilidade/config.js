@@ -9,8 +9,9 @@ export const FIREBASE_CONFIG = {
   appId: "1:69860840165:web:cb4694c4d73da77b55fa0c",
   measurementId: "G-YFSDS23CMY"
 };
-export const GITHUB_CONFIG = {
+export const githubToken = {
   repoOwner: "diasdodgeon",
   repoName: "abcloset-imagens",
-  token: "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",
+  token: "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",
 };
+
