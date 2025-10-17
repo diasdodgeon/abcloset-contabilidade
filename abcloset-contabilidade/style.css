@@ -8,11 +8,8 @@ justify-content: center;
 }
 
 .container {
-background-image: url(fgd.jpg);
-background-repeat: no-repeat;
-background-attachment: fixed;
-background-position: center bottom 34px;
-background-size: 480px;
+background-collor: white;
+
 margin-top: 40px;
 padding: 20px;
 border-radius: 16px;
@@ -106,5 +103,6 @@ height: 42px;
 .contador{
 	max-width: 20px;
 }
+
 
 
