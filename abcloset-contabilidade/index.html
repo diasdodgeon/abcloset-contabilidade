@@ -8,8 +8,45 @@
   <link rel="stylesheet" href="style.css" />
   <script type="module" src="script.js" defer></script>
 </head>
+<script src="script.js"></script>
 <body class="background">
-  <script src="script.js"></script>
+<div id="preview-modal" class="modal-preview">
+    <img id="preview-image" alt="Pré-visualização da foto" />
+    <div class="botoes">
+      <button id="btn-usar">Usar esta</button>
+      <button id="btn-cancelar" class="cancelar">Cancelar</button>
+    </div>
+</div>
+
+<style>
+  .modal-preview {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-preview.active {
+    display: flex;
+  }
+  .modal-preview img {
+    max-width: 80%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .botoes button {
+    margin: 4px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #btn-usar { background: #4CAF50; color: white; }
+  #btn-cancelar { background: #f44336; color: white; }
+</style>
 
   <div class="container">
 
@@ -73,6 +110,6 @@
 ```
 
   </div>
+
 </body>
 </html>
-
