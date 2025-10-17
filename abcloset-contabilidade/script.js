@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   const selectTipo = document.getElementById("tipo");
   const modais = {
@@ -18,9 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewModal = document.createElement("div");
   previewModal.classList.add("preview-modal");
   previewModal.innerHTML = `
-    <div class="preview-content">
-      <img id="preview-img" src="" alt="Pré-visualização">
-      <button id="btn-usar-foto">Usar esta</button>
+    
+    <div id="preview-modal" class="modal-preview" class="preview-content">
+      <img id="preview-image" alt="Pré-visualização da foto" />
+      <div class="botoes">
+        <button id="btn-usar">Usar esta</button>
+        <button id="btn-cancelar" class="cancelar">Cancelar</button>
+      </div>
     </div>
   `;
   document.body.appendChild(previewModal);
@@ -63,5 +68,3 @@ document.addEventListener("DOMContentLoaded", () => {
   selectTipo.value = "vendi";
   atualizarModal();
 });
-
-
