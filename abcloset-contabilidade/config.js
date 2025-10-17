@@ -1,5 +1,3 @@
-
-
 export const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBE7Swcwkx_B7IAROPuC6sIdWpxyEC3r_Q",
   authDomain: "contabilidade-abcloset.firebaseapp.com",
@@ -12,7 +10,7 @@ export const FIREBASE_CONFIG = {
 export const GITHUB_CONFIG = {
   repoOwner: "diasdodgeon",
   repoName: "abcloset-imagens",
-  token: "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",
+  token: "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",
 };
 
 
