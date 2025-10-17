@@ -1,7 +1,8 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { FIREBASE_CONFIG, GITHUB_CONFIG } from "./config.js";
+import { GITHUB_CONFIG } from "./config.js";
+import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
@@ -109,4 +110,5 @@ document.addEventListener("DOMContentLoaded", () => {
   selectTipo.value = "vendi";
   atualizarModal();
 });
+
 
