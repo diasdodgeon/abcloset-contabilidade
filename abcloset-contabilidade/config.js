@@ -10,7 +10,8 @@ export const FIREBASE_CONFIG = {
 export const GITHUB_CONFIG = {
   repoOwner: "diasdodgeon",
   repoName: "abcloset-imagens",
-  token: "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",
+  token: "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",
 };
+
 
 
