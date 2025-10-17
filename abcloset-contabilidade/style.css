@@ -1,57 +1,110 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f4e0;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
+font-family: Arial, sans-serif;
+background: #f9fdfd;
+margin: 0;
+padding: 0;
+display: flex;
+justify-content: center;
 }
 
 .container {
-  background: white;
-  margin-top: 40px;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  width: 90%;
-  max-width: 400px;
+background-image: url(fgd.jpg);
+background-repeat: no-repeat;
+background-attachment: fixed;
+background-position: center bottom 34px;
+background-size: 480px;
+margin-top: 40px;
+padding: 20px;
+border-radius: 16px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+width: 90%;
+max-width: 400px;
+background-color: #fff;
 }
 
 h1 {
-  text-align: center;
-  color: #284E5B;
-  font-size: 1.5rem;
+text-align: center;
+color: #284E5B;
+font-size: 1.5rem;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+text-align: center;
+display: flex ;
+flex-direction: column;
+gap: 8px;
 }
 
 input, select, button {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 8px;
+font-size: 1rem;
 }
 
 button {
-  background-color: #284E5B;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+background-color: #284E5B;
+color: white;
+font-weight: bold;
+cursor: pointer;
 }
 
 button:hover {
-  background-color: #1D3F4B;
+background-color: #1D3F4B;
 }
 
-#status {
-  text-align: center;
-  margin-top: 10px;
-  color: #4caf50;
+#status, #status-comprei {
+text-align: center;
+margin-top: 10px;
+color: #4caf50;
 }
 
+/* ----------- MODAIS ----------- */
+.modal {
+display: none;
+margin-top: 20px;
+padding: 15px;
+background: white;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.modal.active {
+display: block;
+}
+
+.total {
+margin-top: 10px;
+font-size: 1.1em;
+}
+
+/* ----------- LAYOUT DAS LINHAS ----------- */
+
+.linha {
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap; /* garante que o botão quebre linha se faltar espaço */
+gap: 6px;
+width: 100%;
+box-sizing: border-box;
+}
+
+input[type="text"], input[type="number"] {
+flex: 1 4 12%; /* define proporção para dividir espaço igualmente */
+min-width: 20px;
+}
+
+#btn-camera {
+flex: 0 0 auto; /* impede o botão de expandir */
+align-self: stretch; /* deixa o botão da altura dos inputs */
+display: flex;
+justify-content: center;
+align-items: center;
+height: 42px;
+}
+.contador{
+	max-width: 20px;
+}
 
 
