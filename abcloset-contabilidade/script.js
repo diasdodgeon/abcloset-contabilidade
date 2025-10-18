@@ -1,5 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
@@ -141,5 +143,6 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
