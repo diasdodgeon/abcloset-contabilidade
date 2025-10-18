@@ -65,61 +65,63 @@
     <option value="comprei">📦 Comprei</option>
     <option value="paguei">💸 Paguei</option>
   </select>
-  
 </form>
 
-<!-- 🔹 Modais individuais -->
+<!-- 🔹 Modal Vendi -->
 <div id="modal-vendi" class="modal">
   <h2>💰 Registrar Venda</h2>
   <form id="form-vendi">
-    <label>Descrição:</label>
-    <input type="text" required placeholder="Ex: Camiseta branca" />
-    <label>Valor:</label>
-    <input type="number" required step="0.01" placeholder="R$ 0,00" />
+    <label for="venda-descricao">Descrição:</label>
+    <input type="text" id="venda-descricao" required placeholder="Ex: Camiseta branca" />
+    <label for="venda-valor">Valor:</label>
+    <input type="number" id="venda-valor" required step="0.01" placeholder="R$ 0,00" />
     <button type="submit">Registrar ✏️</button>
   </form>
 </div>
 
-<!-- Modal Comprei --> 
-<div id="modal-comprei" class="modal active"> 
-  <form id="form-comprei"> 
-    <label for="descricao">Quantidade    /  Descriçao  /   Foto</label>
+<!-- 🔹 Modal Comprei -->
+<div id="modal-comprei" class="modal">
+  <h2>📦 Registrar Compra</h2>
+  <form id="form-comprei">
+    <label for="produto-nome">Quantidade / Descrição / Foto</label>
     <div class="linha">
-      <input type="number" id="quantidade" class="contador" placeholder="00" required />
-      <input type="text" id="produto-nome" placeholder="          Ex:Lingerie preta tm(p)"required>
-     
-      
-      <button type="button" id="btn-camera">📸</button> 
-    </div> 
-    <label for="descricao">Preço de compra   /    Preço de venda  </label>
+      <input type="number" id="produto-quantidade" class="contador" placeholder="00" required />
+      <input type="text" id="produto-nome" placeholder="Ex: Lingerie preta tm(p)" required />
+      <button type="button" id="btn-camera">📸</button>
+    </div>
+
+    <label for="produto-custo">Preço de compra / Preço de venda</label>
     <div class="linha">
-     <input type="number" id="preco-compra" step="0.01" placeholder=" Ex:80.00" required /> 
-     <input type="number" id="preco-venda" step="0.01" placeholder=" Ex:105.00" required /> 
-    </div> 
-    
-    <button id="btn-registrar" type="submit">Registrar ✏️</button>
-  </form> 
+      <input type="number" id="produto-custo" step="0.01" placeholder="Ex: 80.00" required />
+      <input type="number" id="produto-venda" step="0.01" placeholder="Ex: 105.00" required />
+    </div>
+
+    <button type="button" id="btn-registrar">Registrar ✏️</button>
+  </form>
   <p id="status-comprei"></p>
 </div>
 
+<!-- 🔹 Modal Paguei -->
 <div id="modal-paguei" class="modal">
   <h2>💸 Registrar Pagamento</h2>
   <form id="form-paguei">
-    <label>Serviço ou despesa:</label>
-    <input type="text" required placeholder="Ex: Energia, transporte..." />
-    <label>Valor:</label>
-    <input type="number" required step="0.01" placeholder="R$ 0,00" />
+    <label for="pagamento-descricao">Serviço ou despesa:</label>
+    <input type="text" id="pagamento-descricao" required placeholder="Ex: Energia, transporte..." />
+    <label for="pagamento-valor">Valor:</label>
+    <input type="number" id="pagamento-valor" required step="0.01" placeholder="R$ 0,00" />
     <button type="submit">Registrar ✏️</button>
   </form>
 </div>
 
 <p id="status"></p>
+
 ```
 
   </div>
 
 </body>
 </html>
+
 
 
 
