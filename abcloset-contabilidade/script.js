@@ -86,12 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 🧭 Alternar modais
-  function atualizarModal() {
-    const tipoSelecionado = selectTipo.value;
-    Object.keys(modais).forEach((tipo) => {
-      modais[tipo].classList.toggle("active", tipo === tipoSelecionado);
-    });
-  }
+ function atualizarModal() {
+  const tipoSelecionado = selectTipo.value;
+  Object.entries(modais).forEach(([tipo, modal]) => {
+    if (modal) {
+      modal.classList.remove("active");
+      if (tipo === tipoSelecionado) modal.classList.add("active");
+    }
+  });
+}
+
 
   selectTipo.addEventListener("change", atualizarModal);
   selectTipo.value = "vendi";
@@ -131,3 +135,4 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
