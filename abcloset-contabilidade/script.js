@@ -56,7 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 🧾 BOTÃO REGISTRAR: envia tudo para o Firestore
-  const btnRegistrar = document.getElementById("btn-registrar");
+ const btnRegistrar = document.getElementById("btn-registrar");
+
+if (btnRegistrar) {
   btnRegistrar.addEventListener("click", async () => {
     try {
       const nome = document.getElementById("produto-nome")?.value || "";
@@ -84,6 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("❌ Falha ao salvar produto. Veja o console para detalhes.");
     }
   });
+} else {
+  console.warn("⚠️ Botão 'btn-registrar' não encontrado no DOM.");
+}
+
 
   // 🧭 Alternar modais
  function atualizarModal() {
@@ -135,4 +141,5 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
