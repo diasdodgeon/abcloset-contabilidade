@@ -139,8 +139,10 @@ async function initVendi(db) {
 
   
   function renderCart() {
-    const cartContainer = document.getElementById("cart-items");
-    const totalEl = document.getElementById("cart-total");
+    
+    const cartContainer = document.getElementById("vendi-cart");
+    const totalEl = document.getElementById("vendi-total");
+
     cartContainer.innerHTML = "";
   
     let total = 0;
@@ -402,3 +404,4 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
