@@ -6,6 +6,9 @@ padding: 0;
 display: flex;
 justify-content: center;
 }
+.titulo{
+  text-align: center;
+}
 
 .container {
 background-image: url(fgd.jpg);
@@ -277,6 +280,7 @@ height: 42px;
   z-index: 999;
   position: relative;
 }
+
 
 
 
