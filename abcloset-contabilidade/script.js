@@ -321,37 +321,37 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🧾 BOTÃO REGISTRAR: envia tudo para o Firestore
  const btnRegistrar = document.getElementById("btn-registrar");
 
-if (btnRegistrar) {
-  btnRegistrar.addEventListener("click", async () => {
-    try {
-      const nome = document.getElementById("produto-nome")?.value || "";
-      const precoCusto = parseFloat(document.getElementById("produto-custo")?.value) || 0;
-      const precoVenda = parseFloat(document.getElementById("produto-venda")?.value) || 0;
-      const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 0;
+  if (btnRegistrar) {
+    btnRegistrar.addEventListener("click", async () => {
+      try {
+        const nome = document.getElementById("produto-nome")?.value || "";
+        const precoCusto = parseFloat(document.getElementById("produto-custo")?.value) || 0;
+        const precoVenda = parseFloat(document.getElementById("produto-venda")?.value) || 0;
+        const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 0;
 
-      if (!nome) return alert("❗Informe o nome do produto antes de registrar.");
-      if (!imagemBase64) return alert("❗Você precisa selecionar uma imagem antes de registrar.");
+        if (!nome) return alert("❗Informe o nome do produto antes de registrar.");
+        if (!imagemBase64) return alert("❗Você precisa selecionar uma imagem antes de registrar.");
 
-      await addDoc(collection(db, "produtos"), {
-        nome,
-        preco_custo: precoCusto,
-        preco_venda: precoVenda,
-        quantidade,
-        imagem_base64: imagemBase64,
-        data_cadastro: new Date().toISOString(),
-      });
+        await addDoc(collection(db, "produtos"), {
+          nome,
+          preco_custo: precoCusto,
+          preco_venda: precoVenda,
+          quantidade,
+          imagem_base64: imagemBase64,
+          data_cadastro: new Date().toISOString(),
+        });
 
-      alert("✅ Produto registrado com sucesso!");
-      imagemBase64 = null;
-      inputCamera.value = "";
-    } catch (err) {
-      console.error("Erro ao salvar produto:", err);
-      alert("❌ Falha ao salvar produto. Veja o console para detalhes.");
-    }
-  });
-} else {
-  console.warn("⚠️ Botão 'btn-registrar' não encontrado no DOM.");
-}
+        alert("✅ Produto registrado com sucesso!");
+        imagemBase64 = null;
+        inputCamera.value = "";
+      } catch (err) {
+        console.error("Erro ao salvar produto:", err);
+        alert("❌ Falha ao salvar produto. Veja o console para detalhes.");
+      }
+    });
+  } else {
+    console.warn("⚠️ Botão 'btn-registrar' não encontrado no DOM.");
+  }
 
 
   // 🧭 Alternar modais
@@ -404,13 +404,3 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
-
-
-
-
-
-
-
-
-
-
