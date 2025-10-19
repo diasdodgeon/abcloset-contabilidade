@@ -67,17 +67,36 @@
   </select>
 </form>
 
-<!-- 🔹 Modal Vendi -->
+<!-- 🔹 Modal Vendi (substitua o modal-vendi atual por este) -->
 <div id="modal-vendi" class="modal">
   <h2>💰 Registrar Venda</h2>
-  <form id="form-vendi">
-    <label for="venda-descricao">Descrição:</label>
-    <input type="text" id="venda-descricao" required placeholder="Ex: Camiseta branca" />
-    <label for="venda-valor">Valor:</label>
-    <input type="number" id="venda-valor" required step="0.01" placeholder="R$ 0,00" />
-    <button type="submit">Registrar ✏️</button>
-  </form>
+
+  <!-- Busca -->
+  <label for="vendi-search">Pesquisar produto:</label>
+  <input type="search" id="vendi-search" placeholder="Busque pelo nome..." autocomplete="off">
+
+  <!-- Resultados da busca -->
+  <div id="vendi-results" class="lista-resultados"></div>
+
+  <!-- Carrinho -->
+  <h3>Carrinho</h3>
+  <div id="vendi-cart" class="carrinho"></div>
+
+  <!-- Total e observação -->
+  <div class="linha total-row">
+    <div> Total: <strong id="vendi-total">R$ 0,00</strong></div>
+    <div><input id="vendi-observacao" placeholder="Observação (opcional)"></div>
+  </div>
+
+  <!-- Finalizar -->
+  <div class="linha">
+    <button id="btn-finalizar-venda">Finalizar Venda ✅</button>
+    <button id="btn-limpar-carrinho" type="button">Limpar Carrinho</button>
+  </div>
+
+  <p id="vendi-status"></p>
 </div>
+
 
 <!-- 🔹 Modal Comprei -->
 <div id="modal-comprei" class="modal">
@@ -121,6 +140,7 @@
 
 </body>
 </html>
+
 
 
 
