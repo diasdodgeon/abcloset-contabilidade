@@ -116,53 +116,90 @@ async function initVendi(db) {
     renderCart();
   }
 
-  function renderCart() {
-    cartEl.innerHTML = "";
-    if (!cart.length) {
-      cartEl.innerHTML = "<div style='color:#666'>Carrinho vazio</div>";
-      totalEl.textContent = "R$ 0,00";
-      return;
+  // 🔹 Modal de visualização de imagem ampliada
+  const modalView = document.getElementById("modal-view-image");
+  const viewImage = document.getElementById("view-image");
+  const btnFecharView = document.getElementById("btn-fechar-view");
+  
+  function abrirImagemProduto(src) {
+    viewImage.src = src;
+    modalView.classList.add("active");
+  }
+  
+  btnFecharView.addEventListener("click", () => {
+    modalView.classList.remove("active");
+  });
+  
+  // Fecha o modal clicando fora da imagem
+  modalView.addEventListener("click", e => {
+    if (e.target === modalView) {
+      modalView.classList.remove("active");
     }
-    cart.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "cart-item";
-      const thumb = `<img class="cart-thumb" src="${item.imagem_base64 ? item.imagem_base64 : ''}" />`;
-      div.innerHTML = `
-        ${thumb}
-        <div class="cart-meta">
-          <div><b>${escapeHtml(item.nome)}</b></div>
-          <div>R$ ${item.preco_venda.toFixed(2)}</div>
+  });
+
+  
+  function renderCart() {
+    const cartContainer = document.getElementById("cart-items");
+    const totalEl = document.getElementById("cart-total");
+    cartContainer.innerHTML = "";
+  
+    let total = 0;
+  
+    cart.forEach((item, index) => {
+      const li = document.createElement("li");
+      li.className = "cart-item";
+  
+      li.innerHTML = `
+        <div class="cart-info">
+          <img src="${item.imagem_url}" alt="${item.nome}" class="miniatura-produto" style="width:50px; height:50px; border-radius:6px; cursor:pointer;">
+          <span>${item.nome}</span>
         </div>
-        <div class="cart-qty">
-          <button data-action="dec" data-id="${item.id}">-</button>
-          <input type="number" min="1" max="${item.quantidade}" value="${item.qty}" data-id="${item.id}">
-          <button data-action="inc" data-id="${item.id}">+</button>
+        <div class="cart-controls">
+          <button class="btn-menor" data-index="${index}">–</button>
+          <span>${item.qty}</span>
+          <button class="btn-maior" data-index="${index}">+</button>
         </div>
-        <div style="width:80px;text-align:right">
-          <div>R$ ${(item.preco_venda * item.qty).toFixed(2)}</div>
-          <button data-action="remove" data-id="${item.id}">✖</button>
+        <div class="cart-price">
+          R$ ${(item.preco_venda * item.qty).toFixed(2)}
         </div>
       `;
-      cartEl.appendChild(div);
+  
+      total += item.preco_venda * item.qty;
+      cartContainer.appendChild(li);
     });
-
-    cartEl.querySelectorAll("button[data-action]").forEach(b => {
-      b.addEventListener("click", () => {
-        const action = b.dataset.action;
-        const id = b.dataset.id;
-        const item = cart.find(c => c.id === id);
-        if (!item) return;
-        if (action === "inc") {
-          if (item.qty + 1 > item.quantidade) { alert("Estoque insuficiente"); return; }
-          item.qty++;
-        } else if (action === "dec") {
-          if (item.qty > 1) item.qty--;
-        } else if (action === "remove") {
-          cart = cart.filter(c => c.id !== id);
+  
+    totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
+  
+    // ➕ Botão de aumentar
+    document.querySelectorAll(".btn-maior").forEach(btn => {
+      btn.addEventListener("click", e => {
+        const index = e.target.dataset.index;
+        cart[index].qty++;
+        renderCart();
+      });
+    });
+  
+    // ➖ Botão de diminuir
+    document.querySelectorAll(".btn-menor").forEach(btn => {
+      btn.addEventListener("click", e => {
+        const index = e.target.dataset.index;
+        if (cart[index].qty > 1) {
+          cart[index].qty--;
+        } else {
+          cart.splice(index, 1); // remove item do carrinho
         }
         renderCart();
       });
     });
+  
+    // 👁️ Clique na imagem para abrir modal
+    document.querySelectorAll(".miniatura-produto").forEach(img => {
+      img.addEventListener("click", e => {
+        abrirImagemProduto(e.target.src);
+      });
+    });
+  }
+
 
     totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
   }
@@ -365,6 +402,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
