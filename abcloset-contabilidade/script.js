@@ -209,19 +209,25 @@ async function initVendi(db) {
     if (!cart.length) return alert("Carrinho vazio!");
     statusEl.textContent = "Processando venda...";
     try {
-      // run transaction for each product update safely
-      await runTransaction(db, async (tx) => {
-        // check all stock availability again inside tx
-        for (const item of cart) {
-          const prodRef = doc(db, "produtos", item.id);
-          const prodSnap = await tx.get(prodRef);
-          if (!prodSnap.exists()) throw new Error(`Produto ${item.nome} não existe mais.`);
-          const currentQty = Number(prodSnap.data().quantidade || 0);
-          if (currentQty < item.qty) throw new Error(`Estoque insuficiente para ${item.nome}. Disponível ${currentQty}.`);
-          // decrement
-          tx.update(prodRef, { quantidade: currentQty - item.qty });
-        }
-      });
+        // run transaction for each product update safely
+        await runTransaction(db, async (transaction) => {
+            const produtoSnap = await transaction.get(produtoRef);
+
+            if (!produtoSnap.exists()) {
+              throw "Produto não encontrado!";
+            }
+
+            const dados = produtoSnap.data();
+            const novaQuantidade = dados.quantidade - quantidadeVendida;
+
+            if (novaQuantidade < 0) {
+              throw "Estoque insuficiente!";
+            }
+
+            transaction.update(produtoRef, { quantidade: novaQuantidade });
+          });
+
+      };
 
       // After successful transaction, create lancamentos documents (one per item)
       for (const item of cart) {
@@ -394,6 +400,9 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
+
+
 
 
 
