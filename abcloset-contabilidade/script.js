@@ -6,6 +6,245 @@ import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
+// IMPORTS NEEDED (certifique-se que já importou anteriormente no seu script):
+// import { getFirestore, collection, getDocs, doc, runTransaction, addDoc, serverTimestamp } from "...firebase-firestore.js"
+// Você já tem getFirestore, collection, addDoc antes. Precisamos também de getDocs, doc, runTransaction, serverTimestamp.
+import { getDocs, doc, runTransaction, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+function formatCurrencyBR(value) {
+  return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
+
+async function initVendi(db) {
+  // DOM
+  const searchEl = document.getElementById("vendi-search");
+  const resultsEl = document.getElementById("vendi-results");
+  const cartEl = document.getElementById("vendi-cart");
+  const totalEl = document.getElementById("vendi-total");
+  const obsEl = document.getElementById("vendi-observacao");
+  const statusEl = document.getElementById("vendi-status");
+  const btnFinalizar = document.getElementById("btn-finalizar-venda");
+  const btnLimpar = document.getElementById("btn-limpar-carrinho");
+
+  let allProducts = []; // cache local fetched from Firestore
+  let cart = []; // items: {id, nome, preco_venda, preco_custo, quantidade, qty, imagem_base64}
+
+  // Fetch products once (when modal becomes active, we can re-fetch if needed)
+  async function fetchProducts() {
+    resultsEl.innerHTML = "Carregando produtos...";
+    try {
+      const snapshot = await getDocs(collection(db, "produtos"));
+      allProducts = snapshot.docs.map(d => ({ id: d.id, ref: d.ref, ...d.data() }));
+      // normalize fields names in case: preco_venda or precoVenda etc.
+      allProducts = allProducts.map(p => ({
+        id: p.id,
+        nome: p.nome || p.name || "Sem nome",
+        preco_venda: ("preco_venda" in p) ? Number(p.preco_venda) : (p.precoVenda ? Number(p.precoVenda) : 0),
+        preco_custo: ("preco_custo" in p) ? Number(p.preco_custo) : (p.precoCusto ? Number(p.precoCusto) : 0),
+        quantidade: ("quantidade" in p) ? Number(p.quantidade) : (p.qty ? Number(p.qty) : 0),
+        imagem_base64: p.imagem_base64 || p.imagem || null,
+        raw: p
+      }));
+      renderResults(allProducts.slice(0,50)); // show initial slice
+      statusEl.textContent = "";
+    } catch (err) {
+      console.error("Erro ao buscar produtos:", err);
+      resultsEl.innerHTML = "Erro ao carregar produtos.";
+      statusEl.textContent = "Erro ao carregar produtos. Veja console.";
+    }
+  }
+
+  // Render list of results
+  function renderResults(list) {
+    if (!list.length) {
+      resultsEl.innerHTML = "<div style='color:#666;padding:8px'>Nenhum produto encontrado</div>";
+      return;
+    }
+    resultsEl.innerHTML = "";
+    list.forEach(prod => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.dataset.id = prod.id;
+      div.innerHTML = `
+        <img class="result-thumb" src="${prod.imagem_base64 ? prod.imagem_base64 : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABfElEQVR4Xu3WsU3DMBQG4H9kE6gS6gV6gS6gS6gS6gTqgS6gU6g3kZpRz5cXjv3s7K3VwEAAAAAAAAAIDPqzv5s2f7x7Z3l7c0gY4g9rK4b8u3m1b6p1s5r6t4s8p7u6s7r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8v+v7q7r8u9r8v+v7q7r8u9r8v8v6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3oAAAAAElFTkSuQmCC'}" alt="thumb">
+        <div class="result-meta">
+          <b>${escapeHtml(prod.nome)}</b>
+          <small>R$ ${Number(prod.preco_venda).toFixed(2)} • Qtd: ${prod.quantidade}</small>
+        </div>
+      `;
+      // click to add to cart
+      div.addEventListener("click", () => addToCart(prod.id));
+      resultsEl.appendChild(div);
+    });
+  }
+
+  // escape helper
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+  }
+
+  // filter as user types
+  searchEl.addEventListener("input", (e) => {
+    const q = (e.target.value || "").trim().toLowerCase();
+    if (!q) return renderResults(allProducts.slice(0,50));
+    const filtered = allProducts.filter(p => (p.nome || "").toLowerCase().includes(q));
+    renderResults(filtered.slice(0,100));
+  });
+
+  // add product to cart (qty default 1)
+  function addToCart(productId) {
+    const p = allProducts.find(x => x.id === productId);
+    if (!p) return;
+    const existing = cart.find(c => c.id === p.id);
+    if (existing) {
+      if (existing.qty + 1 > p.quantidade) {
+        alert("Quantidade indisponível no estoque.");
+        return;
+      }
+      existing.qty += 1;
+    } else {
+      if (p.quantidade <= 0) { alert("Produto sem estoque."); return; }
+      cart.push({
+        id: p.id,
+        nome: p.nome,
+        preco_venda: Number(p.preco_venda),
+        preco_custo: Number(p.preco_custo),
+        quantidade: Number(p.quantidade),
+        qty: 1,
+        imagem_base64: p.imagem_base64
+      });
+    }
+    renderCart();
+  }
+
+  // render cart
+  function renderCart() {
+    cartEl.innerHTML = "";
+    if (!cart.length) {
+      cartEl.innerHTML = "<div style='color:#666'>Carrinho vazio</div>";
+      totalEl.textContent = "R$ 0,00";
+      return;
+    }
+    let total = 0;
+    cart.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      const thumb = `<img class="cart-thumb" src="${item.imagem_base64 ? item.imagem_base64 : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABfElEQVR4Xu3WsU3DMBQG4H9kE6gS6gV6gS6gS6gS6gTqgS6gU6g3kZpRz5cXjv3s7K3VwEAAAAAAAAAIDPqzv5s2f7x7Z3l7c0gY4g9rK4b8u3m1b6p1s5r6t4s8p7u6s7r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8v+v7q7r8u9r8v+v7q7r8u9r8v8v6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3oAAAAAElFTkSuQmCC'}" />`;
+      div.innerHTML = `
+        ${thumb}
+        <div class="cart-meta">
+          <div><b>${escapeHtml(item.nome)}</b></div>
+          <div>R$ ${item.preco_venda.toFixed(2)}</div>
+        </div>
+        <div class="cart-qty">
+          <button data-action="dec" data-id="${item.id}">-</button>
+          <input type="number" min="1" max="${item.quantidade}" value="${item.qty}" data-id="${item.id}">
+          <button data-action="inc" data-id="${item.id}">+</button>
+        </div>
+        <div style="width:80px;text-align:right">
+          <div>R$ ${(item.preco_venda * item.qty).toFixed(2)}</div>
+          <button data-action="remove" data-id="${item.id}">✖</button>
+        </div>
+      `;
+      // attach events for buttons/inputs after append
+      cartEl.appendChild(div);
+    });
+    // attach delegated listeners
+    cartEl.querySelectorAll("button[data-action]").forEach(b => {
+      b.addEventListener("click", () => {
+        const action = b.dataset.action;
+        const id = b.dataset.id;
+        const item = cart.find(c => c.id === id);
+        if (!item) return;
+        if (action === "inc") {
+          if (item.qty + 1 > item.quantidade) { alert("Estoque insuficiente"); return; }
+          item.qty++;
+        } else if (action === "dec") {
+          if (item.qty > 1) item.qty--;
+        } else if (action === "remove") {
+          cart = cart.filter(c => c.id !== id);
+        }
+        renderCart();
+      });
+    });
+    cartEl.querySelectorAll("input[type=number][data-id]").forEach(inp => {
+      inp.addEventListener("change", () => {
+        const id = inp.dataset.id;
+        const item = cart.find(c => c.id === id);
+        let val = parseInt(inp.value) || 1;
+        if (val < 1) val = 1;
+        if (val > item.quantidade) { alert("Quantidade maior que estoque"); val = item.quantidade; }
+        item.qty = val;
+        renderCart();
+      });
+    });
+
+    // compute total
+    total = cart.reduce((s, it) => s + it.preco_venda * it.qty, 0);
+    totalEl.textContent = formatCurrencyBR(total);
+  }
+
+  // clear cart
+  btnLimpar.addEventListener("click", () => {
+    if (!confirm("Limpar carrinho?")) return;
+    cart = [];
+    renderCart();
+  });
+
+  // finalize sale: create lancamentos and decrement estoque (transactional)
+  btnFinalizar.addEventListener("click", async () => {
+    if (!cart.length) return alert("Carrinho vazio!");
+    statusEl.textContent = "Processando venda...";
+    try {
+      // run transaction for each product update safely
+      await runTransaction(db, async (tx) => {
+        // check all stock availability again inside tx
+        for (const item of cart) {
+          const prodRef = doc(db, "produtos", item.id);
+          const prodSnap = await tx.get(prodRef);
+          if (!prodSnap.exists()) throw new Error(`Produto ${item.nome} não existe mais.`);
+          const currentQty = Number(prodSnap.data().quantidade || 0);
+          if (currentQty < item.qty) throw new Error(`Estoque insuficiente para ${item.nome}. Disponível ${currentQty}.`);
+          // decrement
+          tx.update(prodRef, { quantidade: currentQty - item.qty });
+        }
+      });
+
+      // After successful transaction, create lancamentos documents (one per item)
+      for (const item of cart) {
+        await addDoc(collection(db, "lancamentos"), {
+          tipo: "vendi",
+          produto_id: item.id,
+          descricao: item.nome,
+          quantidade: item.qty,
+          valor_unitario: item.preco_venda,
+          valor_total: item.preco_venda * item.qty,
+          observacao: obsEl.value || "",
+          timestamp: serverTimestamp()
+        });
+      }
+
+      statusEl.textContent = "✅ Venda registrada com sucesso!";
+      cart = [];
+      renderCart();
+    } catch (err) {
+      console.error("Erro ao finalizar venda:", err);
+      alert("Erro ao finalizar venda: " + (err.message || err));
+      statusEl.textContent = "❌ Erro na finalização: " + (err.message || "");
+    }
+  });
+
+  // initialize: fetch products when modal vended opened
+  // If modal toggling is handled elsewhere, just fetch once now
+  await fetchProducts();
+  renderCart();
+}
+
+// call initVendi(db) after db exists and DOM loaded
+// in your script.js (after db init) add:
+initVendi(db).catch(e => console.error("initVendi erro:", e));
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const selectTipo = document.getElementById("tipo");
@@ -143,6 +382,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
