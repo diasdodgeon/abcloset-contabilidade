@@ -46,7 +46,7 @@ async function initVendi(db) {
         nome: p.nome || p.name || "Sem nome",
         preco_venda: ("preco_venda" in p) ? Number(p.preco_venda) : (p.precoVenda ? Number(p.precoVenda) : 0),
         preco_custo: ("preco_custo" in p) ? Number(p.preco_custo) : (p.precoCusto ? Number(p.precoCusto) : 0),
-        quantidade: ("quantidade" in p) ? Number(p.quantidade) : (p.qty ? Number(p.qty) : 0),
+        quantidade: ("quantidade" in p) ? Number(p.quantidade) : (p.qty ? Number(p.qty) : 1),
         imagem_base64: p.imagem_base64 || p.imagem || null,
         raw: p
       }));
@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const nome = document.getElementById("produto-nome")?.value || "";
         const precoCusto = parseFloat(document.getElementById("produto-custo")?.value) || 0;
         const precoVenda = parseFloat(document.getElementById("produto-venda")?.value) || 0;
-        const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 0;
+        const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 1;
     
         if (!nome) return alert("❗Informe o nome do produto antes de registrar.");
     
@@ -501,6 +501,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
