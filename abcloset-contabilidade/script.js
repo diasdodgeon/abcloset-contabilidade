@@ -211,40 +211,20 @@ async function initVendi(db) {
     statusEl.textContent = "Processando venda...";
 
     try {
-      // --- Atualiza o estoque de cada produto dentro de uma transação ---
       await runTransaction(db, async (transaction) => {
-        // 🔹 Primeiro: ler todos os produtos
-        const produtosSnapshot = await Promise.all(
-          cart.map(item => transaction.get(doc(db, "produtos", item.id)))
-        );
-
-        // 🔹 Verificar e calcular novas quantidades
-        const atualizacoes = [];
-        for (let i = 0; i < cart.length; i++) {
-          const item = cart[i];
-          const snap = produtosSnapshot[i];
-
-          if (!snap.exists()) {
-            throw new Error(`Produto não encontrado: ${item.nome}`);
-          }
-
-          const dados = snap.data();
-          const novaQuantidade = dados.quantidade - item.qty;
-
-          if (novaQuantidade < 0) {
-            throw new Error(`Estoque insuficiente para ${item.nome}`);
-          }
-
-          atualizacoes.push({ ref: snap.ref, novaQuantidade });
+        for (const item of cart) {
+          const produtoRef = doc(db, "produtos", item.id);
+          const produtoSnap = await transaction.get(produtoRef);
+    
+          if (!produtoSnap.exists()) throw new Error("Produto não encontrado");
+          const novoEstoque = produtoSnap.data().estoque - item.qty;
+          if (novoEstoque < 0) throw new Error(`Estoque insuficiente para ${item.nome}`);
+    
+          transaction.update(produtoRef, { estoque: novoEstoque });
         }
-
-        // 🔹 Depois: aplicar todas as atualizações
-        atualizacoes.forEach(u => {
-          transaction.update(u.ref, { quantidade: u.novaQuantidade });
-        });
       });
-
-      // --- Cria os registros de venda (lançamentos) após atualizar o estoque ---
+    
+      // 🔸 Agora, fora da transação, registra os lançamentos normalmente:
       for (const item of cart) {
         await addDoc(collection(db, "lancamentos"), {
           tipo: "vendi",
@@ -257,15 +237,15 @@ async function initVendi(db) {
           timestamp: serverTimestamp()
         });
       }
-
-      statusEl.textContent = "✅ Venda registrada com sucesso!";
-      cart = [];
-      renderCart();
-    } catch (err) {
-      console.error("Erro ao finalizar venda:", err);
-      alert("Erro ao finalizar venda: " + (err.message || err));
-      statusEl.textContent = "❌ Erro na finalização: " + (err.message || "");
+    
+      console.log("Venda registrada com sucesso!");
+      alert("✅ Venda finalizada com sucesso!");
+    
+    } catch (error) {
+      console.error("Erro ao finalizar venda:", error);
+      alert("❌ Erro ao finalizar venda: " + error.message);
     }
+
   });
 
 
@@ -416,6 +396,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
