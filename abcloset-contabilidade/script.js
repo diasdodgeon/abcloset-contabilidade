@@ -222,31 +222,40 @@ async function initVendi(db) {
     renderCart();
   });
 
-  // ✅ NOVO CÓDIGO DE FINALIZAÇÃO DE VENDA
+  // ✅ CÓDIGO DE FINALIZAÇÃO DE VENDA
   btnFinalizar.addEventListener("click", async () => {
     if (!cart.length) return alert("Carrinho vazio!");
     statusEl.textContent = "Processando venda...";
-
+  
     try {
       for (const item of cart) {
         const produtoRef = doc(db, "produtos", item.id);
         const produtoSnap = await getDoc(produtoRef);
-
-        if (!produtoSnap.exists()) {
-          console.error(`Produto ${item.nome} não encontrado no banco de dados.`);
-          continue;
-        }
-
+  
+        if (!produtoSnap.exists()) continue;
+  
         const produtoData = produtoSnap.data();
         const novaQuantidade = produtoData.quantidade - item.qty;
-
+  
         if (novaQuantidade < 0) {
           alert(`❗ Estoque insuficiente para o produto "${item.nome}".`);
           continue;
         }
-
-        await updateDoc(produtoRef, { quantidade: novaQuantidade });
-
+  
+        if (novaQuantidade > 0) {
+          await updateDoc(produtoRef, { quantidade: novaQuantidade });
+        } else {
+          // 🔹 move produto para "arquivados"
+          await addDoc(collection(db, "arquivados"), {
+            ...produtoData,
+            quantidade: 0,
+            data_arquivado: new Date().toISOString()
+          });
+          await deleteDoc(produtoRef);
+          console.log(`📦 Produto "${item.nome}" movido para 'arquivados'.`);
+        }
+  
+        // 🔹 registra lançamento da venda
         await addDoc(collection(db, "lancamentos"), {
           tipo: "vendi",
           produto_id: item.id,
@@ -258,17 +267,19 @@ async function initVendi(db) {
           timestamp: serverTimestamp()
         });
       }
-
+  
       cart = [];
       renderCart();
+      await fetchProducts(); // atualiza a lista
       statusEl.textContent = "";
       alert("✅ Venda registrada com sucesso!");
-
+  
     } catch (error) {
       console.error("Erro ao finalizar venda:", error);
       alert("❌ Ocorreu um erro ao registrar a venda. Veja o console.");
     }
   });
+
   
   await fetchProducts();
   renderCart();
@@ -330,6 +341,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🧾 BOTÃO REGISTRAR: envia tudo para o Firestore
  const btnRegistrar = document.getElementById("btn-registrar");
+  // === BUSCA DINÂMICA EM "ARQUIVADOS" ===
+  const nomeInput = document.getElementById("produto-nome");
+  const sugestoesEl = document.createElement("div");
+  sugestoesEl.id = "sugestoes-arquivados";
+  sugestoesEl.className = "lista-resultados";
+  nomeInput.parentNode.insertBefore(sugestoesEl, nomeInput.nextSibling);
+  
+  let timerBusca = null;
+  
+  nomeInput.addEventListener("input", async () => {
+    clearTimeout(timerBusca);
+    const termo = nomeInput.value.trim().toLowerCase();
+    if (!termo) {
+      sugestoesEl.innerHTML = "";
+      return;
+    }
+  
+    timerBusca = setTimeout(async () => {
+      const snapshot = await getDocs(collection(db, "arquivados"));
+      const todosArquivados = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const filtrados = todosArquivados.filter(p =>
+        (p.nome || "").toLowerCase().includes(termo)
+      );
+  
+      if (!filtrados.length) {
+        sugestoesEl.innerHTML = "";
+        return;
+      }
+  
+      sugestoesEl.innerHTML = filtrados
+        .slice(0, 5)
+        .map(
+          p => `
+          <div class="result-item" data-id="${p.id}">
+            <img src="${p.imagem_base64 || ''}" class="result-thumb" />
+            <div class="result-meta">
+              <b>${p.nome}</b>
+              <small>Compra: R$ ${Number(p.preco_custo).toFixed(2)} | Venda: R$ ${Number(p.preco_venda).toFixed(2)}</small>
+            </div>
+          </div>`
+        )
+        .join("");
+  
+      sugestoesEl.querySelectorAll(".result-item").forEach(el => {
+        el.addEventListener("click", async () => {
+          const id = el.dataset.id;
+          const produtoSel = filtrados.find(p => p.id === id);
+          if (!produtoSel) return;
+  
+          nomeInput.value = produtoSel.nome;
+          document.getElementById("produto-custo").value = produtoSel.preco_custo;
+          document.getElementById("produto-venda").value = produtoSel.preco_venda;
+          imagemBase64 = produtoSel.imagem_base64 || null;
+          previewImage.src = imagemBase64 || "";
+          sugestoesEl.innerHTML = "";
+        });
+      });
+    }, 300);
+  });
+
 
   if (btnRegistrar) {
     btnRegistrar.addEventListener("click", async () => {
@@ -338,22 +409,37 @@ document.addEventListener("DOMContentLoaded", () => {
         const precoCusto = parseFloat(document.getElementById("produto-custo")?.value) || 0;
         const precoVenda = parseFloat(document.getElementById("produto-venda")?.value) || 0;
         const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 0;
-
+    
         if (!nome) return alert("❗Informe o nome do produto antes de registrar.");
-        if (!imagemBase64) return alert("❗Você precisa selecionar uma imagem antes de registrar.");
-
+    
+        const arquivadosSnap = await getDocs(collection(db, "arquivados"));
+        const arquivadoExistente = arquivadosSnap.docs.find(
+          d => d.data().nome.toLowerCase() === nome.toLowerCase()
+        );
+    
+        if (arquivadoExistente) {
+          // 🧩 Reativa produto arquivado
+          await deleteDoc(doc(db, "arquivados", arquivadoExistente.id));
+          console.log(`♻️ Produto "${nome}" reativado a partir de 'arquivados'.`);
+        }
+    
         await addDoc(collection(db, "produtos"), {
           nome,
           preco_custo: precoCusto,
           preco_venda: precoVenda,
           quantidade,
-          imagem_base64: imagemBase64,
-          data_cadastro: new Date().toISOString(),
+          imagem_base64: imagemBase64 || "",
+          data_cadastro: new Date().toISOString()
         });
-
+    
         alert("✅ Produto registrado com sucesso!");
         imagemBase64 = null;
         inputCamera.value = "";
+        previewImage.src = "";
+        document.getElementById("produto-nome").value = "";
+        document.getElementById("produto-custo").value = "";
+        document.getElementById("produto-venda").value = "";
+        document.getElementById("produto-quantidade").value = "";
       } catch (err) {
         console.error("Erro ao salvar produto:", err);
         alert("❌ Falha ao salvar produto. Veja o console para detalhes.");
@@ -414,5 +500,6 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
