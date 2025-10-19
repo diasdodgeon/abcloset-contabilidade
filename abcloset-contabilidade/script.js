@@ -257,7 +257,7 @@ async function initVendi(db) {
       alert("❌ Ocorreu um erro ao registrar a venda. Veja o console.");
     }
   });
-  {
+  
   await fetchProducts();
   renderCart();
 }
@@ -402,6 +402,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
