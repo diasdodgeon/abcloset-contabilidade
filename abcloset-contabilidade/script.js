@@ -18,23 +18,31 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
+// Função utilitária para formatar moeda
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
 
-async function initVendi(db) {
+document.addEventListener("DOMContentLoaded", () => {
+
   const searchEl = document.getElementById("vendi-search");
   const resultsEl = document.getElementById("vendi-results");
-  const cartEl = document.getElementById("vendi-cart");
-  const totalEl = document.getElementById("vendi-total");
+  const cartContainer = document.getElementById("cart-items");
+  const totalCartEl = document.getElementById("cart-total");
   const obsEl = document.getElementById("vendi-observacao");
   const statusEl = document.getElementById("vendi-status");
   const btnFinalizar = document.getElementById("btn-finalizar-venda");
   const btnLimpar = document.getElementById("btn-limpar-carrinho");
 
+  if (!resultsEl || !cartContainer || !totalCartEl) {
+    console.error("Elementos do carrinho ou resultados não encontrados no DOM.");
+    return;
+  }
+
   let allProducts = [];
   let cart = [];
 
+  // 🔹 Buscar produtos do Firestore
   async function fetchProducts() {
     resultsEl.innerHTML = "Carregando produtos...";
     try {
@@ -49,7 +57,7 @@ async function initVendi(db) {
         imagem_base64: p.imagem_base64 || p.imagem || null,
         raw: p
       }));
-      renderResults(allProducts.slice(0,50));
+      renderResults(allProducts.slice(0, 50));
       statusEl.textContent = "";
     } catch (err) {
       console.error("Erro ao buscar produtos:", err);
@@ -58,6 +66,7 @@ async function initVendi(db) {
     }
   }
 
+  // 🔹 Renderizar lista de produtos
   function renderResults(list) {
     if (!list.length) {
       resultsEl.innerHTML = "<div style='color:#666;padding:8px'>Nenhum produto encontrado</div>";
@@ -84,13 +93,15 @@ async function initVendi(db) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
   }
 
+  // 🔹 Filtro de pesquisa
   searchEl.addEventListener("input", (e) => {
     const q = (e.target.value || "").trim().toLowerCase();
-    if (!q) return renderResults(allProducts.slice(0,50));
+    if (!q) return renderResults(allProducts.slice(0, 50));
     const filtered = allProducts.filter(p => (p.nome || "").toLowerCase().includes(q));
-    renderResults(filtered.slice(0,100));
+    renderResults(filtered.slice(0, 100));
   });
 
+  // 🔹 Adicionar produto ao carrinho
   function addToCart(productId) {
     const p = allProducts.find(x => x.id === productId);
     if (!p) return;
@@ -116,42 +127,19 @@ async function initVendi(db) {
     renderCart();
   }
 
-  // 🔹 Modal de visualização de imagem ampliada
-  const modalView = document.getElementById("modal-view-image");
-  const viewImage = document.getElementById("view-image");
-  const btnFecharView = document.getElementById("btn-fechar-view");
-  
-  function abrirImagemProduto(src) {
-    viewImage.src = src;
-    modalView.classList.add("active");
-  }
-  
-  btnFecharView.addEventListener("click", () => {
-    modalView.classList.remove("active");
-  });
-  
-  // Fecha o modal clicando fora da imagem
-  modalView.addEventListener("click", e => {
-    if (e.target === modalView) {
-      modalView.classList.remove("active");
-    }
-  });
-
-  
+  // 🔹 Renderizar carrinho
   function renderCart() {
-    const cartContainer = document.getElementById("cart-items");
-    const totalEl = document.getElementById("cart-total");
+    if (!cartContainer || !totalCartEl) return;
+
     cartContainer.innerHTML = "";
-  
     let total = 0;
-  
+
     cart.forEach((item, index) => {
       const li = document.createElement("li");
       li.className = "cart-item";
-  
       li.innerHTML = `
         <div class="cart-info">
-          <img src="${item.imagem_url}" alt="${item.nome}" class="miniatura-produto" style="width:50px; height:50px; border-radius:6px; cursor:pointer;">
+          <img src="${item.imagem_base64}" alt="${item.nome}" class="miniatura-produto" style="width:50px; height:50px; border-radius:6px; cursor:pointer;">
           <span>${item.nome}</span>
         </div>
         <div class="cart-controls">
@@ -163,14 +151,13 @@ async function initVendi(db) {
           R$ ${(item.preco_venda * item.qty).toFixed(2)}
         </div>
       `;
-  
       total += item.preco_venda * item.qty;
       cartContainer.appendChild(li);
     });
-  
-    totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
-  
-    // ➕ Botão de aumentar
+
+    totalCartEl.textContent = formatCurrencyBR(total);
+
+    // Botões aumentar/diminuir quantidade
     document.querySelectorAll(".btn-maior").forEach(btn => {
       btn.addEventListener("click", e => {
         const index = e.target.dataset.index;
@@ -178,39 +165,40 @@ async function initVendi(db) {
         renderCart();
       });
     });
-  
-    // ➖ Botão de diminuir
+
     document.querySelectorAll(".btn-menor").forEach(btn => {
       btn.addEventListener("click", e => {
         const index = e.target.dataset.index;
         if (cart[index].qty > 1) {
           cart[index].qty--;
         } else {
-          cart.splice(index, 1); // remove item do carrinho
+          cart.splice(index, 1);
         }
         renderCart();
       });
     });
-  
-    // 👁️ Clique na imagem para abrir modal
+
+    // Clique na imagem para modal (se existir)
     document.querySelectorAll(".miniatura-produto").forEach(img => {
       img.addEventListener("click", e => {
-        abrirImagemProduto(e.target.src);
+        const modalView = document.getElementById("modal-view-image");
+        const viewImage = document.getElementById("view-image");
+        if (modalView && viewImage) {
+          viewImage.src = e.target.src;
+          modalView.classList.add("active");
+        }
       });
     });
   }
-  
 
-    totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
-  
-
+  // 🔹 Limpar carrinho
   btnLimpar.addEventListener("click", () => {
     if (!confirm("Limpar carrinho?")) return;
     cart = [];
     renderCart();
   });
 
-  // ✅ NOVO CÓDIGO DE FINALIZAÇÃO DE VENDA
+  // 🔹 Finalizar venda
   btnFinalizar.addEventListener("click", async () => {
     if (!cart.length) return alert("Carrinho vazio!");
     statusEl.textContent = "Processando venda...";
@@ -257,10 +245,13 @@ async function initVendi(db) {
       alert("❌ Ocorreu um erro ao registrar a venda. Veja o console.");
     }
   });
-  
-  await fetchProducts();
+
+  // Inicialização
+  fetchProducts();
   renderCart();
-}
+
+});
+
 
 initVendi(db).catch(e => console.error("initVendi erro:", e));
 
@@ -402,6 +393,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
