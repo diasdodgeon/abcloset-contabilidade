@@ -266,6 +266,19 @@ height: 42px;
   font-weight: bold;
   color: #284E5B;
 }
+#sugestoes-arquivados {
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  margin-top: 4px;
+  padding: 4px;
+  z-index: 999;
+  position: relative;
+}
+
+
 
 
 
