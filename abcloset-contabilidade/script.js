@@ -213,23 +213,35 @@ async function initVendi(db) {
     try {
       // --- Atualiza o estoque de cada produto dentro de uma transação ---
       await runTransaction(db, async (transaction) => {
-        for (const item of cart) {
-          const produtoRef = doc(db, "produtos", item.id);
-          const produtoSnap = await transaction.get(produtoRef);
+        // 🔹 Primeiro: ler todos os produtos
+        const produtosSnapshot = await Promise.all(
+          cart.map(item => transaction.get(doc(db, "produtos", item.id)))
+        );
 
-          if (!produtoSnap.exists()) {
+        // 🔹 Verificar e calcular novas quantidades
+        const atualizacoes = [];
+        for (let i = 0; i < cart.length; i++) {
+          const item = cart[i];
+          const snap = produtosSnapshot[i];
+
+          if (!snap.exists()) {
             throw new Error(`Produto não encontrado: ${item.nome}`);
           }
 
-          const dados = produtoSnap.data();
+          const dados = snap.data();
           const novaQuantidade = dados.quantidade - item.qty;
 
           if (novaQuantidade < 0) {
             throw new Error(`Estoque insuficiente para ${item.nome}`);
           }
 
-          transaction.update(produtoRef, { quantidade: novaQuantidade });
+          atualizacoes.push({ ref: snap.ref, novaQuantidade });
         }
+
+        // 🔹 Depois: aplicar todas as atualizações
+        atualizacoes.forEach(u => {
+          transaction.update(u.ref, { quantidade: u.novaQuantidade });
+        });
       });
 
       // --- Cria os registros de venda (lançamentos) após atualizar o estoque ---
@@ -404,3 +416,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
+
+
+
