@@ -22,10 +22,7 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 // IMPORTS NEEDED (certifique-se que já importou anteriormente no seu script):
-// import { getFirestore, collection, getDocs, doc, runTransaction, addDoc, serverTimestamp } from "...firebase-firestore.js"
-// Você já tem getFirestore, collection, addDoc antes. Precisamos também de getDocs, doc, runTransaction, serverTimestamp.
-import { getDocs, doc, runTransaction, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
