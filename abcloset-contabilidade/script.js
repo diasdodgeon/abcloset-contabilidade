@@ -120,16 +120,16 @@ async function initVendi(db) {
   const modalView = document.getElementById("modal-view-image");
   const viewImage = document.getElementById("view-image");
   const btnFecharView = document.getElementById("btn-fechar-view");
-
+  
   function abrirImagemProduto(src) {
     viewImage.src = src;
     modalView.classList.add("active");
   }
-
+  
   btnFecharView.addEventListener("click", () => {
     modalView.classList.remove("active");
   });
-
+  
   // Fecha o modal clicando fora da imagem
   modalView.addEventListener("click", e => {
     if (e.target === modalView) {
@@ -137,18 +137,18 @@ async function initVendi(db) {
     }
   });
 
-
+  
   function renderCart() {
     const cartContainer = document.getElementById("cart-items");
     const totalEl = document.getElementById("cart-total");
     cartContainer.innerHTML = "";
-
+  
     let total = 0;
-
+  
     cart.forEach((item, index) => {
       const li = document.createElement("li");
       li.className = "cart-item";
-
+  
       li.innerHTML = `
         <div class="cart-info">
           <img src="${item.imagem_url}" alt="${item.nome}" class="miniatura-produto" style="width:50px; height:50px; border-radius:6px; cursor:pointer;">
@@ -163,13 +163,13 @@ async function initVendi(db) {
           R$ ${(item.preco_venda * item.qty).toFixed(2)}
         </div>
       `;
-
+  
       total += item.preco_venda * item.qty;
       cartContainer.appendChild(li);
     });
-
+  
     totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
-
+  
     // ➕ Botão de aumentar
     document.querySelectorAll(".btn-maior").forEach(btn => {
       btn.addEventListener("click", e => {
@@ -178,7 +178,7 @@ async function initVendi(db) {
         renderCart();
       });
     });
-
+  
     // ➖ Botão de diminuir
     document.querySelectorAll(".btn-menor").forEach(btn => {
       btn.addEventListener("click", e => {
@@ -191,7 +191,7 @@ async function initVendi(db) {
         renderCart();
       });
     });
-
+  
     // 👁️ Clique na imagem para abrir modal
     document.querySelectorAll(".miniatura-produto").forEach(img => {
       img.addEventListener("click", e => {
@@ -199,10 +199,10 @@ async function initVendi(db) {
       });
     });
   }
-  { 
+  
 
     totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
-  };
+  
 
   btnLimpar.addEventListener("click", () => {
     if (!confirm("Limpar carrinho?")) return;
@@ -257,7 +257,7 @@ async function initVendi(db) {
       alert("❌ Ocorreu um erro ao registrar a venda. Veja o console.");
     }
   });
-
+  
   await fetchProducts();
   renderCart();
 }
@@ -402,19 +402,3 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
