@@ -199,10 +199,10 @@ async function initVendi(db) {
       });
     });
   }
-  {
+  
 
     totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
-  };
+  
 
   btnLimpar.addEventListener("click", () => {
     if (!confirm("Limpar carrinho?")) return;
@@ -402,6 +402,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
