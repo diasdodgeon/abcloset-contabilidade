@@ -260,7 +260,7 @@ async function initVendi(db) {
 
   await fetchProducts();
   renderCart();
-}
+
 
 initVendi(db).catch(e => console.error("initVendi erro:", e));
 
@@ -402,6 +402,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
