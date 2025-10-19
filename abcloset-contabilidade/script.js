@@ -139,68 +139,78 @@ async function initVendi(db) {
 
   
   function renderCart() {
-    
-    const cartContainer = document.getElementById("vendi-cart");
-    const totalEl = document.getElementById("vendi-total");
+  const cartContainer = document.getElementById("vendi-cart");
+  const totalEl = document.getElementById("vendi-total");
+  cartContainer.innerHTML = "";
 
-    cartContainer.innerHTML = "";
-  
-    let total = 0;
-  
-    cart.forEach((item, index) => {
-      const li = document.createElement("li");
-      li.className = "cart-item";
-  
-      li.innerHTML = `
-        <div class="cart-info">
-          <img src="${item.imagem_url}" alt="${item.nome}" class="miniatura-produto" style="width:50px; height:50px; border-radius:6px; cursor:pointer;">
-          <span>${item.nome}</span>
-        </div>
+  if (!cart.length) {
+    cartContainer.innerHTML = "<p style='text-align:center;color:#666;'>Carrinho vazio</p>";
+    totalEl.textContent = "R$ 0,00";
+    return;
+  }
+
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    const li = document.createElement("div");
+    li.className = "cart-item";
+    li.innerHTML = `
+      <img src="${item.imagem_base64 || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABfElEQVR4Xu3WsU3DMBQG4H9kE6gS6gV6gS6gS6gS6gTqgS6gU6g3kZpRz5cXjv3s7K3VwEAAAAAAAAAIDPqzv5s2f7x7Z3l7c0gY4g9rK4b8u3m1b6p1s5r6t4s8p7u6s7r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8v+v7q7r8u9r8v+v7q7r8u9r8v8v6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3oAAAAAElFTkSuQmCC'}"
+           alt="${item.nome}"
+           class="cart-thumb"
+           style="width:50px;height:50px;border-radius:6px;cursor:pointer;">
+      <div class="cart-meta">
+        <b class="nome-produto">${item.nome}</b>
         <div class="cart-controls">
           <button class="btn-menor" data-index="${index}">–</button>
           <span>${item.qty}</span>
           <button class="btn-maior" data-index="${index}">+</button>
         </div>
-        <div class="cart-price">
-          R$ ${(item.preco_venda * item.qty).toFixed(2)}
-        </div>
-      `;
-  
-      total += item.preco_venda * item.qty;
-      cartContainer.appendChild(li);
-    });
-  
-    totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
-  
-    // ➕ Botão de aumentar
-    document.querySelectorAll(".btn-maior").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const index = e.target.dataset.index;
+      </div>
+      <div class="cart-price">
+        R$ ${(item.preco_venda * item.qty).toFixed(2)}
+      </div>
+    `;
+
+    total += item.preco_venda * item.qty;
+    cartContainer.appendChild(li);
+  });
+
+  totalEl.textContent = `R$ ${total.toFixed(2)}`;
+
+  // botões + e -
+  document.querySelectorAll(".btn-maior").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const index = e.target.dataset.index;
+      if (cart[index].qty < cart[index].quantidade) {
         cart[index].qty++;
         renderCart();
-      });
+      } else {
+        alert("Quantidade máxima em estoque atingida.");
+      }
     });
-  
-    // ➖ Botão de diminuir
-    document.querySelectorAll(".btn-menor").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const index = e.target.dataset.index;
-        if (cart[index].qty > 1) {
-          cart[index].qty--;
-        } else {
-          cart.splice(index, 1); // remove item do carrinho
-        }
-        renderCart();
-      });
+  });
+
+  document.querySelectorAll(".btn-menor").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const index = e.target.dataset.index;
+      if (cart[index].qty > 1) {
+        cart[index].qty--;
+      } else {
+        cart.splice(index, 1);
+      }
+      renderCart();
     });
-  
-    // 👁️ Clique na imagem para abrir modal
-    document.querySelectorAll(".miniatura-produto").forEach(img => {
-      img.addEventListener("click", e => {
-        abrirImagemProduto(e.target.src);
-      });
+  });
+
+  // abre imagem no modal
+  document.querySelectorAll(".cart-thumb").forEach(img => {
+    img.addEventListener("click", e => {
+      abrirImagemProduto(e.target.src);
     });
-  }
+  });
+}
+
   
 
     totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
@@ -404,4 +414,5 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
