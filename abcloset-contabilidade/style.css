@@ -196,5 +196,26 @@ height: 42px;
   padding:10px 14px; border-radius:8px; border:none; cursor:pointer; background:#284E5B; color:#fff;
 }
 #btn-limpar-carrinho { background:#999; }
+#modal-view-image {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#modal-view-image.active {
+  display: flex;
+}
+#modal-view-image img {
+  max-width: 80%;
+  max-height: 80vh;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+
 
 
