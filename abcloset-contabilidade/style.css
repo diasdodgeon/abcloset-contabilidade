@@ -11,7 +11,7 @@ justify-content: center;
 }
 
 .container {
-background-image: url(fgd.jpg);
+background-color: #f5fcfb;
 background-repeat: no-repeat;
 background-attachment: fixed;
 background-position: center bottom 34px;
@@ -280,6 +280,7 @@ height: 42px;
   z-index: 999;
   position: relative;
 }
+
 
 
 
