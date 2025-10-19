@@ -8,28 +8,21 @@ import {
   getDocs,
   addDoc,
   doc,
-  runTransaction,
-  serverTimestamp,
+  updateDoc,
   getDoc,
-  query,
-  where,
-  orderBy
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 
 import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
-// IMPORTS NEEDED (certifique-se que já importou anteriormente no seu script):
-
 
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
 
 async function initVendi(db) {
-  // DOM
   const searchEl = document.getElementById("vendi-search");
   const resultsEl = document.getElementById("vendi-results");
   const cartEl = document.getElementById("vendi-cart");
@@ -39,16 +32,14 @@ async function initVendi(db) {
   const btnFinalizar = document.getElementById("btn-finalizar-venda");
   const btnLimpar = document.getElementById("btn-limpar-carrinho");
 
-  let allProducts = []; // cache local fetched from Firestore
-  let cart = []; // items: {id, nome, preco_venda, preco_custo, quantidade, qty, imagem_base64}
+  let allProducts = [];
+  let cart = [];
 
-  // Fetch products once (when modal becomes active, we can re-fetch if needed)
   async function fetchProducts() {
     resultsEl.innerHTML = "Carregando produtos...";
     try {
       const snapshot = await getDocs(collection(db, "produtos"));
       allProducts = snapshot.docs.map(d => ({ id: d.id, ref: d.ref, ...d.data() }));
-      // normalize fields names in case: preco_venda or precoVenda etc.
       allProducts = allProducts.map(p => ({
         id: p.id,
         nome: p.nome || p.name || "Sem nome",
@@ -58,7 +49,7 @@ async function initVendi(db) {
         imagem_base64: p.imagem_base64 || p.imagem || null,
         raw: p
       }));
-      renderResults(allProducts.slice(0,50)); // show initial slice
+      renderResults(allProducts.slice(0,50));
       statusEl.textContent = "";
     } catch (err) {
       console.error("Erro ao buscar produtos:", err);
@@ -67,7 +58,6 @@ async function initVendi(db) {
     }
   }
 
-  // Render list of results
   function renderResults(list) {
     if (!list.length) {
       resultsEl.innerHTML = "<div style='color:#666;padding:8px'>Nenhum produto encontrado</div>";
@@ -85,18 +75,15 @@ async function initVendi(db) {
           <small>R$ ${Number(prod.preco_venda).toFixed(2)} • Qtd: ${prod.quantidade}</small>
         </div>
       `;
-      // click to add to cart
       div.addEventListener("click", () => addToCart(prod.id));
       resultsEl.appendChild(div);
     });
   }
 
-  // escape helper
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
   }
 
-  // filter as user types
   searchEl.addEventListener("input", (e) => {
     const q = (e.target.value || "").trim().toLowerCase();
     if (!q) return renderResults(allProducts.slice(0,50));
@@ -104,7 +91,6 @@ async function initVendi(db) {
     renderResults(filtered.slice(0,100));
   });
 
-  // add product to cart (qty default 1)
   function addToCart(productId) {
     const p = allProducts.find(x => x.id === productId);
     if (!p) return;
@@ -130,7 +116,6 @@ async function initVendi(db) {
     renderCart();
   }
 
-  // render cart
   function renderCart() {
     cartEl.innerHTML = "";
     if (!cart.length) {
@@ -138,11 +123,10 @@ async function initVendi(db) {
       totalEl.textContent = "R$ 0,00";
       return;
     }
-    let total = 0;
     cart.forEach(item => {
       const div = document.createElement("div");
       div.className = "cart-item";
-      const thumb = `<img class="cart-thumb" src="${item.imagem_base64 ? item.imagem_base64 : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABfElEQVR4Xu3WsU3DMBQG4H9kE6gS6gV6gS6gS6gS6gTqgS6gU6g3kZpRz5cXjv3s7K3VwEAAAAAAAAAIDPqzv5s2f7x7Z3l7c0gY4g9rK4b8u3m1b6p1s5r6t4s8p7u6s7r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8s+v7q7r8u9r8v+v7q7r8u9r8v+v7q7r8u9r8v8v6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3o+8u6w3oAAAAAElFTkSuQmCC'}" />`;
+      const thumb = `<img class="cart-thumb" src="${item.imagem_base64 ? item.imagem_base64 : ''}" />`;
       div.innerHTML = `
         ${thumb}
         <div class="cart-meta">
@@ -159,10 +143,9 @@ async function initVendi(db) {
           <button data-action="remove" data-id="${item.id}">✖</button>
         </div>
       `;
-      // attach events for buttons/inputs after append
       cartEl.appendChild(div);
     });
-    // attach delegated listeners
+
     cartEl.querySelectorAll("button[data-action]").forEach(b => {
       b.addEventListener("click", () => {
         const action = b.dataset.action;
@@ -180,52 +163,41 @@ async function initVendi(db) {
         renderCart();
       });
     });
-    cartEl.querySelectorAll("input[type=number][data-id]").forEach(inp => {
-      inp.addEventListener("change", () => {
-        const id = inp.dataset.id;
-        const item = cart.find(c => c.id === id);
-        let val = parseInt(inp.value) || 1;
-        if (val < 1) val = 1;
-        if (val > item.quantidade) { alert("Quantidade maior que estoque"); val = item.quantidade; }
-        item.qty = val;
-        renderCart();
-      });
-    });
 
-    // compute total
-    total = cart.reduce((s, it) => s + it.preco_venda * it.qty, 0);
-    totalEl.textContent = formatCurrencyBR(total);
+    totalEl.textContent = formatCurrencyBR(cart.reduce((s, it) => s + it.preco_venda * it.qty, 0));
   }
 
-  // clear cart
   btnLimpar.addEventListener("click", () => {
     if (!confirm("Limpar carrinho?")) return;
     cart = [];
     renderCart();
   });
 
-  // finalize sale: create lancamentos and decrement estoque (transactional)
-  // finalize sale: create lancamentos and decrement estoque (transactional)
+  // ✅ NOVO CÓDIGO DE FINALIZAÇÃO DE VENDA
   btnFinalizar.addEventListener("click", async () => {
     if (!cart.length) return alert("Carrinho vazio!");
     statusEl.textContent = "Processando venda...";
 
     try {
-      await runTransaction(db, async (transaction) => {
-        for (const item of cart) {
-          const produtoRef = doc(db, "produtos", item.id);
-          const produtoSnap = await transaction.get(produtoRef);
-    
-          if (!produtoSnap.exists()) throw new Error("Produto não encontrado");
-          const novoEstoque = produtoSnap.data().estoque - item.qty;
-          if (novoEstoque < 0) throw new Error(`Estoque insuficiente para ${item.nome}`);
-    
-          transaction.update(produtoRef, { estoque: novoEstoque });
-        }
-      });
-    
-      // 🔸 Agora, fora da transação, registra os lançamentos normalmente:
       for (const item of cart) {
+        const produtoRef = doc(db, "produtos", item.id);
+        const produtoSnap = await getDoc(produtoRef);
+
+        if (!produtoSnap.exists()) {
+          console.error(`Produto ${item.nome} não encontrado no banco de dados.`);
+          continue;
+        }
+
+        const produtoData = produtoSnap.data();
+        const novaQuantidade = produtoData.quantidade - item.qty;
+
+        if (novaQuantidade < 0) {
+          alert(`❗ Estoque insuficiente para o produto "${item.nome}".`);
+          continue;
+        }
+
+        await updateDoc(produtoRef, { quantidade: novaQuantidade });
+
         await addDoc(collection(db, "lancamentos"), {
           tipo: "vendi",
           produto_id: item.id,
@@ -237,27 +209,24 @@ async function initVendi(db) {
           timestamp: serverTimestamp()
         });
       }
-    
-      console.log("Venda registrada com sucesso!");
-      alert("✅ Venda finalizada com sucesso!");
-    
+
+      cart = [];
+      renderCart();
+      statusEl.textContent = "";
+      alert("✅ Venda registrada com sucesso!");
+
     } catch (error) {
       console.error("Erro ao finalizar venda:", error);
-      alert("❌ Erro ao finalizar venda: " + error.message);
+      alert("❌ Ocorreu um erro ao registrar a venda. Veja o console.");
     }
-
   });
 
-
-  // initialize: fetch products when modal vended opened
-  // If modal toggling is handled elsewhere, just fetch once now
   await fetchProducts();
   renderCart();
 }
 
-// call initVendi(db) after db exists and DOM loaded
-// in your script.js (after db init) add:
 initVendi(db).catch(e => console.error("initVendi erro:", e));
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -396,6 +365,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
