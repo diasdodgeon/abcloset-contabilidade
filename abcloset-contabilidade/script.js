@@ -205,31 +205,34 @@ async function initVendi(db) {
   });
 
   // finalize sale: create lancamentos and decrement estoque (transactional)
+  // finalize sale: create lancamentos and decrement estoque (transactional)
   btnFinalizar.addEventListener("click", async () => {
     if (!cart.length) return alert("Carrinho vazio!");
     statusEl.textContent = "Processando venda...";
+
     try {
-        // run transaction for each product update safely
-        await runTransaction(db, async (transaction) => {
-            const produtoSnap = await transaction.get(produtoRef);
+      // --- Atualiza o estoque de cada produto dentro de uma transação ---
+      await runTransaction(db, async (transaction) => {
+        for (const item of cart) {
+          const produtoRef = doc(db, "produtos", item.id);
+          const produtoSnap = await transaction.get(produtoRef);
 
-            if (!produtoSnap.exists()) {
-              throw "Produto não encontrado!";
-            }
+          if (!produtoSnap.exists()) {
+            throw new Error(`Produto não encontrado: ${item.nome}`);
+          }
 
-            const dados = produtoSnap.data();
-            const novaQuantidade = dados.quantidade - quantidadeVendida;
+          const dados = produtoSnap.data();
+          const novaQuantidade = dados.quantidade - item.qty;
 
-            if (novaQuantidade < 0) {
-              throw "Estoque insuficiente!";
-            }
+          if (novaQuantidade < 0) {
+            throw new Error(`Estoque insuficiente para ${item.nome}`);
+          }
 
-            transaction.update(produtoRef, { quantidade: novaQuantidade });
-          });
+          transaction.update(produtoRef, { quantidade: novaQuantidade });
+        }
+      });
 
-      };
-
-      // After successful transaction, create lancamentos documents (one per item)
+      // --- Cria os registros de venda (lançamentos) após atualizar o estoque ---
       for (const item of cart) {
         await addDoc(collection(db, "lancamentos"), {
           tipo: "vendi",
@@ -252,6 +255,7 @@ async function initVendi(db) {
       statusEl.textContent = "❌ Erro na finalização: " + (err.message || "");
     }
   });
+
 
   // initialize: fetch products when modal vended opened
   // If modal toggling is handled elsewhere, just fetch once now
@@ -400,6 +404,8 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
+
 
 
 
