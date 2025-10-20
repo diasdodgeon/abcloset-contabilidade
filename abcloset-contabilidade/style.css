@@ -156,7 +156,15 @@ height: 42px;
   margin-bottom: 8px;
   background: #fff;
 }
-
+.lista-resultados2 {
+  max-height: 480px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: #fff;
+}
 .result-item {
   display: flex;
   gap: 8px;
@@ -309,6 +317,7 @@ height: 42px;
 .btn-remover:hover {
   background: #d32f2f;
 }
+
 
 
 
