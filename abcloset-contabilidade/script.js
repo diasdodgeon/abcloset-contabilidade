@@ -19,6 +19,25 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
+//codigo para deletar produtos parados a muito tempo na coleçao "arquivados"
+async function limparArquivadosAntigosLocal() {
+  const umAnoAtras = new Date();
+  umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
+
+  const snap = await getDocs(collection(db, "arquivados"));
+  for (const docu of snap.docs) {
+    const data = docu.data();
+    if (data.data_arquivado && new Date(data.data_arquivado) < umAnoAtras) {
+      await deleteDoc(doc(db, "arquivados", docu.id));
+      console.log(`🗑️ Produto antigo removido: ${data.nome}`);
+    }
+  }
+}
+
+// Executa a limpeza local a cada abertura
+limparArquivadosAntigosLocal().catch(console.error);
+
+
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
@@ -552,6 +571,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
