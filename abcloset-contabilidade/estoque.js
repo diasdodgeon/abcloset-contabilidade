@@ -102,6 +102,84 @@ function renderLista(lista) {
 
 carregarEstoque();
 
+const modalHistorico = document.getElementById("modal-historico");
+const listaArquivados = document.getElementById("lista-arquivados");
+const btnHistorico = document.getElementById("btn-historico");
+const btnFecharHistorico = document.getElementById("btn-fechar-historico");
+const btnLimparHistorico = document.getElementById("btn-limpar-historico");
+
+btnHistorico.addEventListener("click", async () => {
+  modalHistorico.classList.add("active");
+  await carregarHistorico();
+});
+
+btnFecharHistorico.addEventListener("click", () => {
+  modalHistorico.classList.remove("active");
+});
+
+async function carregarHistorico() {
+  listaArquivados.innerHTML = "<p style='text-align:center;color:#666;'>Carregando histórico...</p>";
+  const snap = await getDocs(collection(db, "arquivados"));
+  const itens = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (!itens.length) {
+    listaArquivados.innerHTML = "<p style='text-align:center;color:#999;'>Nenhum produto arquivado.</p>";
+    return;
+  }
+
+  listaArquivados.innerHTML = itens.map(p => `
+    <div class="result-item" data-id="${p.id}">
+      <img src="${p.imagem_base64 || ''}" class="result-thumb">
+      <div class="result-meta">
+        <b>${p.nome}</b>
+        <small>Compra: R$ ${p.preco_custo?.toFixed(2)} | Venda: R$ ${p.preco_venda?.toFixed(2)}</small><br>
+        <small>Arquivado em: ${new Date(p.data_arquivado).toLocaleDateString()}</small>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-editar" data-id="${p.id}">✏️</button>
+        <button class="btn-remover" data-id="${p.id}">🗑️</button>
+      </div>
+    </div>
+  `).join("");
+
+  // deletar individualmente
+  document.querySelectorAll(".btn-remover").forEach(btn => {
+    btn.addEventListener("click", async e => {
+      const id = e.target.dataset.id;
+      if (!confirm("Excluir este produto arquivado?")) return;
+      await deleteDoc(doc(db, "arquivados", id));
+      carregarHistorico();
+    });
+  });
+
+  // editar (recompra)
+  document.querySelectorAll(".btn-editar").forEach(btn => {
+    btn.addEventListener("click", async e => {
+      const id = e.target.dataset.id;
+      const ref = doc(db, "arquivados", id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+      const p = snap.data();
+
+      // salva dados no localStorage para preencher o modal "Comprei"
+      localStorage.setItem("recompra-produto", JSON.stringify({ ...p, id }));
+
+      // redireciona para a página principal e abre o modal de compra
+      window.location.href = "index.html#comprei";
+    });
+  });
+}
+
+// botão limpar histórico (todos)
+btnLimparHistorico.addEventListener("click", async () => {
+  if (!confirm("Tem certeza que deseja limpar todo o histórico de produtos arquivados?")) return;
+  const snap = await getDocs(collection(db, "arquivados"));
+  for (const docu of snap.docs) {
+    await deleteDoc(doc(db, "arquivados", docu.id));
+  }
+  alert("🧹 Histórico limpo com sucesso!");
+  listaArquivados.innerHTML = "";
+});
+
 
 
 
