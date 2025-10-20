@@ -334,6 +334,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnUsar = document.getElementById("btn-usar");
   const btnCancelar = document.getElementById("btn-cancelar");
 
+  let imagemBase64 = null; // 🔸 guardará a imagem comprimida
+
   // verifica se veio de uma recompra
   const produtoRecompra = localStorage.getItem("recompra-produto");
   if (produtoRecompra) {
@@ -348,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("tipo").value = "comprei";
   }
 
-  let imagemBase64 = null; // 🔸 guardará a imagem comprimida
+ 
 
   btnCamera.addEventListener("click", () => inputCamera.click());
 
@@ -588,6 +590,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
