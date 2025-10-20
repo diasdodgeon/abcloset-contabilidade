@@ -218,14 +218,14 @@ async function initVendi(db) {
   
 
   btnLimpar.addEventListener("click", () => {
-    if (!confirm("Limpar carrinho?")) return;
+    if (!confirm("Limpar recibo?")) return;
     cart = [];
     renderCart();
   });
 
   // ✅ CÓDIGO DE FINALIZAÇÃO DE VENDA
   btnFinalizar.addEventListener("click", async () => {
-    if (!cart.length) return alert("Carrinho vazio!");
+    if (!cart.length) return alert("Recibo vazio!");
     statusEl.textContent = "Processando venda...";
   
     try {
@@ -501,6 +501,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
