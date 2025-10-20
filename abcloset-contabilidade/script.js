@@ -562,12 +562,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tipo === tipoSelecionado) modal.classList.add("active");
     }
   });
+  selectTipo.addEventListener("change", atualizarModal);
+  selectTipo.value = "vendi";
+  
+
 }
 
 
-  selectTipo.addEventListener("change", atualizarModal);
-  selectTipo.value = "vendi";
-  atualizarModal();
+  
+atualizarModal();
 
 
 
@@ -605,6 +608,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
