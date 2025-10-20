@@ -19,6 +19,9 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
+// 🔹 Variáveis globais compartilhadas
+let imagemBase64 = null;
+
 //codigo para deletar produtos parados a muito tempo na coleçao "arquivados"
 async function limparArquivadosAntigosLocal() {
   const umAnoAtras = new Date();
@@ -618,6 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔄 Expor função global (usada em outras partes do script)
   window.atualizarModal = atualizarModal;
 });
+
 
 
 
