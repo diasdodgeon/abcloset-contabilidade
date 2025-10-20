@@ -42,7 +42,7 @@ function renderLista(lista) {
     const div = document.createElement("div");
     div.className = "result-item";
     div.innerHTML = `
-      <img src="${prod.imagem_base64 || ''}" class="result-thumb2" alt="${prod.nome}">
+      <img src="${prod.imagem_base64 || ''}" class="result-thumb" alt="${prod.nome}">
       <div class="result-meta">
         <b>${prod.nome}</b>
         <small>Compra: R$ ${Number(prod.preco_custo).toFixed(2)}</small>
@@ -58,7 +58,7 @@ function renderLista(lista) {
   });
 
   // abrir imagem
-  document.querySelectorAll(".result-thumb2").forEach(img => {
+  document.querySelectorAll(".result-thumb").forEach(img => {
     img.addEventListener("click", e => {
       viewImage.src = e.target.src;
       modalView.classList.add("active");
@@ -93,4 +93,5 @@ function renderLista(lista) {
 }
 
 carregarEstoque();
+
 
