@@ -11,6 +11,10 @@
 <body class="background">
   <div  class="container">
     <h1 align="center">📦 Estoque Atual</h1>
+    
+    <div style="text-align:right;margin-bottom:10px;">
+      <button id="btn-historico" align="right">⌚ Histórico</button>
+    </div>
 
     <!-- Barra de busca -->
     <input type="search" id="search-estoque" placeholder="Buscar produto..." />
@@ -31,8 +35,22 @@
       <button id="btn-fechar-view" class="cancelar">Fechar</button>
     </div>
   </div>
+  
+  <!-- Modal de produtos arquivados -->
+  <div id="modal-historico" class="modal-preview">
+    <div class="modal-content" style="max-height:80vh;overflow-y:auto;">
+      <h2>🗃️ Histórico de Produtos Arquivados</h2>
+      <div id="lista-arquivados" class="lista-resultados"></div>
+      <div style="text-align:center;margin-top:10px;">
+        <button id="btn-limpar-historico" class="btn-remover">🧹 Limpar histórico</button>
+        <button id="btn-fechar-historico">Fechar</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
+
 
 
 
