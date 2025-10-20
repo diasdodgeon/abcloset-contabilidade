@@ -375,7 +375,12 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("recompra-produto");
     // força o modal "comprei" a abrir
     document.getElementById("tipo").value = "comprei";
+    // ✅ garante que o modal “comprei” seja exibido automaticamente
+    if (typeof atualizarModal === "function") {
+      atualizarModal();
+    }
   }
+  
 
   
   // 🧾 BOTÃO REGISTRAR: envia tudo para o Firestore
@@ -590,6 +595,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
