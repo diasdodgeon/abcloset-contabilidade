@@ -559,6 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("tipo").value = "comprei";
     // ✅ garante que o modal “comprei” seja exibido automaticamente
     if (typeof atualizarModal === "function") {
+      selectTipo.value = "comprei";
       atualizarModal();
     }
   }
@@ -597,6 +598,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
