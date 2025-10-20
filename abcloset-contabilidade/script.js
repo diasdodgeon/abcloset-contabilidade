@@ -317,9 +317,6 @@ document.addEventListener("DOMContentLoaded", () => {
     paguei: document.getElementById("modal-paguei"),
   };
 
-  
-
-  
   // 🎥 --- CAPTURA DE IMAGEM ---
   const inputCamera = document.createElement("input");
   inputCamera.type = "file";
@@ -334,34 +331,62 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnUsar = document.getElementById("btn-usar");
   const btnCancelar = document.getElementById("btn-cancelar");
 
-  let imagemBase64 = null; // 🔸 guardará a imagem comprimida
+  let imagemBase64 = null; // 🔹 precisa vir antes de qualquer uso!
 
- 
+  // 🔄 Verifica se o usuário veio de uma recompra
+  const produtoRecompra = localStorage.getItem("recompra-produto");
+  if (produtoRecompra) {
+    const p = JSON.parse(produtoRecompra);
+    document.getElementById("produto-nome").value = p.nome;
+    document.getElementById("produto-custo").value = p.preco_custo;
+    document.getElementById("produto-venda").value = p.preco_venda;
+    previewImage.src = p.imagem_base64 || "";
+    imagemBase64 = p.imagem_base64 || null;
+    localStorage.removeItem("recompra-produto");
+    document.getElementById("tipo").value = "comprei";
+
+    // ✅ força o modal “comprei” a abrir automaticamente
+    if (typeof atualizarModal === "function") {
+      selectTipo.value = "comprei";
+      atualizarModal();
+    } else {
+      // caso a função ainda não exista, espera o carregamento e reexecuta
+      window.addEventListener("load", () => {
+        const tipoSel = document.getElementById("tipo");
+        tipoSel.value = "comprei";
+        const evt = new Event("change");
+        tipoSel.dispatchEvent(evt);
+      });
+    }
+  }
+
+  // 🎥 Lógica da câmera
   btnCamera.addEventListener("click", () => inputCamera.click());
 
   inputCamera.addEventListener("change", async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // 🔧 Comprimir imagem antes de exibir e salvar
     const compressedBase64 = await compressImage(file, 800, 0.7);
     previewImage.src = compressedBase64;
     previewModal.classList.add("active");
   });
 
-  // 📸 BOTÃO CANCELAR
   btnCancelar.addEventListener("click", () => {
     previewModal.classList.remove("active");
     inputCamera.value = "";
     imagemBase64 = null;
   });
 
-  // 📤 BOTÃO USAR ESTA: apenas confirma e guarda em memória
   btnUsar.addEventListener("click", () => {
-    imagemBase64 = previewImage.src; // guarda base64
+    imagemBase64 = previewImage.src;
     previewModal.classList.remove("active");
     alert("📸 Imagem pronta para envio!");
   });
+
+  // ... 🔹 (restante do seu código de busca, registro, e modais continua igual)
+});
+
 
 
   
@@ -580,24 +605,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
-   // verifica se veio de uma recompra
-  const produtoRecompra = localStorage.getItem("recompra-produto");
-  if (produtoRecompra) {
-    const p = JSON.parse(produtoRecompra);
-    document.getElementById("produto-nome").value = p.nome;
-    document.getElementById("produto-custo").value = p.preco_custo;
-    document.getElementById("produto-venda").value = p.preco_venda;
-    previewImage.src = p.imagem_base64 || "";
-    imagemBase64 = p.imagem_base64 || null;
-    localStorage.removeItem("recompra-produto");
-    // força o modal "comprei" a abrir
-    document.getElementById("tipo").value = "comprei";
-    // ✅ garante que o modal “comprei” seja exibido automaticamente
-    if (typeof atualizarModal === "function") {
-      selectTipo.value = "comprei";
-      atualizarModal();
-    }
-  }
+
 
 
 
