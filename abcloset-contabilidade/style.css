@@ -318,6 +318,17 @@ height: 42px;
   background: #d32f2f;
 }
 
+.reposicao-container {
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+}
+.reposicao-container input {
+  transform: scale(1.2);
+  margin-right: 6px;
+}
+
 
 
 
