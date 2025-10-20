@@ -145,7 +145,7 @@ async function initVendi(db) {
   cartContainer.innerHTML = "";
 
   if (!cart.length) {
-    cartContainer.innerHTML = "<p style='text-align:center;color:#666;'>Recibo vazio, adicione um ou produtos.</p>";
+    cartContainer.innerHTML = "<p style='text-align:center;color:#666;'>Recibo vazio, selecione os produtos acima.</p>";
     totalEl.textContent = "R$ 0,00";
     return;
   }
@@ -501,6 +501,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
