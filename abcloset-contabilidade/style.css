@@ -157,7 +157,7 @@ height: 42px;
   background: #fff;
 }
 .lista-resultados2 {
-  max-height: 480px;
+  max-height: 380px;
   overflow-y: auto;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -317,6 +317,7 @@ height: 42px;
 .btn-remover:hover {
   background: #d32f2f;
 }
+
 
 
 
