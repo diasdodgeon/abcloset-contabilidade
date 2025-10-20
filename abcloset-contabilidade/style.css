@@ -166,7 +166,7 @@ height: 42px;
   background: #f2f2f2;
 }
 .container-estoque{
-  height: 60%;
+  height: 90%;
 }
 
 .result-meta { flex: 1; }
@@ -302,6 +302,7 @@ height: 42px;
 .btn-remover:hover {
   background: #d32f2f;
 }
+
 
 
 
