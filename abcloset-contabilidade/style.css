@@ -270,7 +270,7 @@ height: 42px;
   color: #284E5B;
 }
 #sugestoes-arquivados {
-  max-height: 160px;
+  max-height: 360px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -299,6 +299,7 @@ height: 42px;
 .btn-remover:hover {
   background: #d32f2f;
 }
+
 
 
 
