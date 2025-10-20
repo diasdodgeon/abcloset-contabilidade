@@ -21,6 +21,7 @@ const db = getFirestore(app);
 
 // 🔹 Variáveis globais compartilhadas
 let imagemBase64 = null;
+let inputCamera = null;
 
 //codigo para deletar produtos parados a muito tempo na coleçao "arquivados"
 async function limparArquivadosAntigosLocal() {
@@ -329,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
   inputCamera.capture = "camera";
   inputCamera.style.display = "none";
   document.body.appendChild(inputCamera);
+  
 
   const btnCamera = document.getElementById("btn-camera");
   const previewModal = document.getElementById("preview-modal");
@@ -621,6 +623,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔄 Expor função global (usada em outras partes do script)
   window.atualizarModal = atualizarModal;
 });
+
 
 
 
