@@ -94,13 +94,14 @@ function renderLista(lista) {
       const data = snap.data();
       await addDoc(collection(db, "arquivados"), { ...data, data_arquivado: new Date().toISOString() });
       await deleteDoc(ref);
-      alert("🗂️ Produto movido para arquivados!");
+      alert("🗂️ Produto movido para seu historico!");
       carregarEstoque();
     });
   });
 }
 
 carregarEstoque();
+
 
 
 
