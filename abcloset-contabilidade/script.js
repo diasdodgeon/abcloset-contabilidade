@@ -342,27 +342,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🧾 BOTÃO REGISTRAR: envia tudo para o Firestore
  const btnRegistrar = document.getElementById("btn-registrar");
-  // === BUSCA DINÂMICA EM "ARQUIVADOS" ===
+  
+  // === BUSCA DINÂMICA PARA COMPRAS E REPOSIÇÃO ===
   const nomeInput = document.getElementById("produto-nome");
+  const chkReposicao = document.getElementById("chk-reposicao");
   const sugestoesEl = document.createElement("div");
   sugestoesEl.id = "sugestoes-arquivados";
   sugestoesEl.className = "lista-resultados";
   nomeInput.parentNode.insertBefore(sugestoesEl, nomeInput.nextSibling);
   
   let timerBusca = null;
+  let modoReposicao = false;
+  let produtoSelecionado = null;
+  
+  if (chkReposicao) {
+    chkReposicao.addEventListener("change", () => {
+      modoReposicao = chkReposicao.checked;
+      sugestoesEl.innerHTML = "";
+      produtoSelecionado = null;
+    });
+  }
   
   nomeInput.addEventListener("input", async () => {
     clearTimeout(timerBusca);
     const termo = nomeInput.value.trim().toLowerCase();
     if (!termo) {
       sugestoesEl.innerHTML = "";
+      produtoSelecionado = null;
       return;
     }
   
     timerBusca = setTimeout(async () => {
-      const snapshot = await getDocs(collection(db, "arquivados"));
-      const todosArquivados = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      const filtrados = todosArquivados.filter(p =>
+      const colecao = modoReposicao ? "produtos" : "arquivados";
+      const snapshot = await getDocs(collection(db, colecao));
+      const todos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const filtrados = todos.filter(p =>
         (p.nome || "").toLowerCase().includes(termo)
       );
   
@@ -379,7 +393,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="${p.imagem_base64 || ''}" class="result-thumb" />
             <div class="result-meta">
               <b>${p.nome}</b>
-              <small>Compra: R$ ${Number(p.preco_custo).toFixed(2)} | Venda: R$ ${Number(p.preco_venda).toFixed(2)}</small>
+              <small>
+                Compra: R$ ${Number(p.preco_custo).toFixed(2)} |
+                Venda: R$ ${Number(p.preco_venda).toFixed(2)}
+              </small>
             </div>
           </div>`
         )
@@ -390,6 +407,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const id = el.dataset.id;
           const produtoSel = filtrados.find(p => p.id === id);
           if (!produtoSel) return;
+  
+          produtoSelecionado = { ...produtoSel, colecao };
   
           nomeInput.value = produtoSel.nome;
           document.getElementById("produto-custo").value = produtoSel.preco_custo;
@@ -403,50 +422,82 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
+
   if (btnRegistrar) {
     btnRegistrar.addEventListener("click", async () => {
       try {
-        const nome = document.getElementById("produto-nome")?.value || "";
+        const nome = document.getElementById("produto-nome")?.value.trim() || "";
         const precoCusto = parseFloat(document.getElementById("produto-custo")?.value) || 0;
         const precoVenda = parseFloat(document.getElementById("produto-venda")?.value) || 0;
-        const quantidade = parseInt(document.getElementById("produto-quantidade")?.value) || 1;
-    
+        const quantidadeNova = parseInt(document.getElementById("produto-quantidade")?.value) || 1;
+  
         if (!nome) return alert("❗Informe o nome do produto antes de registrar.");
-    
-        const arquivadosSnap = await getDocs(collection(db, "arquivados"));
-        const arquivadoExistente = arquivadosSnap.docs.find(
-          d => d.data().nome.toLowerCase() === nome.toLowerCase()
-        );
-    
-        if (arquivadoExistente) {
-          // 🧩 Reativa produto arquivado
-          await deleteDoc(doc(db, "arquivados", arquivadoExistente.id));
-          console.log(`♻️ Produto "${nome}" reativado a partir de 'arquivados'.`);
+  
+        // --- MODO REPOSIÇÃO ---
+        if (chkReposicao && chkReposicao.checked && produtoSelecionado && produtoSelecionado.colecao === "produtos") {
+          const ref = doc(db, "produtos", produtoSelecionado.id);
+          const snap = await getDoc(ref);
+          if (!snap.exists()) return alert("Produto não encontrado no estoque.");
+  
+          const antigo = snap.data();
+          const qtdAntiga = parseInt(antigo.quantidade);
+          const precoAntigo = parseFloat(antigo.preco_custo);
+  
+          const totalAntigo = qtdAntiga * precoAntigo;
+          const totalNovo = quantidadeNova * precoCusto;
+          const qtdTotal = qtdAntiga + quantidadeNova;
+          const novoPrecoMedio = (totalAntigo + totalNovo) / qtdTotal;
+  
+          await updateDoc(ref, {
+            quantidade: qtdTotal,
+            preco_custo: parseFloat(novoPrecoMedio.toFixed(2)),
+            preco_venda: precoVenda
+          });
+  
+          alert("✅ Reposição registrada com sucesso (custo médio atualizado)!");
         }
-    
-        await addDoc(collection(db, "produtos"), {
-          nome,
-          preco_custo: precoCusto,
-          preco_venda: precoVenda,
-          quantidade,
-          imagem_base64: imagemBase64 || "",
-          data_cadastro: new Date().toISOString()
-        });
-    
-        alert("✅ Produto registrado com sucesso!");
+        // --- MODO COMPRA NORMAL ---
+        else {
+          const arquivadosSnap = await getDocs(collection(db, "arquivados"));
+          const arquivadoExistente = arquivadosSnap.docs.find(
+            d => d.data().nome.toLowerCase() === nome.toLowerCase()
+          );
+  
+          if (arquivadoExistente) {
+            await deleteDoc(doc(db, "arquivados", arquivadoExistente.id));
+            console.log(`♻️ Produto "${nome}" reativado a partir de 'arquivados'.`);
+          }
+  
+          await addDoc(collection(db, "produtos"), {
+            nome,
+            preco_custo: precoCusto,
+            preco_venda: precoVenda,
+            quantidade: quantidadeNova,
+            imagem_base64: imagemBase64 || "",
+            data_cadastro: new Date().toISOString()
+          });
+  
+          alert("✅ Produto registrado com sucesso!");
+        }
+  
+        // 🔄 limpar campos
         imagemBase64 = null;
         inputCamera.value = "";
         previewImage.src = "";
-        document.getElementById("produto-nome").value = "";
+        nomeInput.value = "";
         document.getElementById("produto-custo").value = "";
         document.getElementById("produto-venda").value = "";
         document.getElementById("produto-quantidade").value = "";
+        sugestoesEl.innerHTML = "";
+        produtoSelecionado = null;
+        chkReposicao.checked = false;
+  
       } catch (err) {
         console.error("Erro ao salvar produto:", err);
         alert("❌ Falha ao salvar produto. Veja o console para detalhes.");
       }
     });
-  } else {
+  }else {
     console.warn("⚠️ Botão 'btn-registrar' não encontrado no DOM.");
   }
 
@@ -501,6 +552,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
