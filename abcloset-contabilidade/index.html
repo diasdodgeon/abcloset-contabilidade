@@ -73,17 +73,7 @@
     <option value="paguei">💸 Paguei</option>
   </select>
 </form>
-<!-- Sistema (seguir para o stoque, inicio) -->
-<div style="text-align:center;margin-top:20px;">
-  <button id="btn-estoque" class="btn-estoque">➡️ Conferir Estoque 📦</button>
-</div>
 
-<script>
-  document.getElementById("btn-estoque").addEventListener("click", () => {
-    window.location.href = "estoque.html";
-  });
-</script>
-<!-- Sistema (seguir para o stoque, fim ) -->
     
 <!-- 🔹 Modal Vendi  -->
 <div id="modal-vendi" class="modal">
@@ -151,13 +141,24 @@
 </div>
 
 <p id="status"></p>
+<!-- Sistema (seguir para o stoque, inicio) -->
+<div style="text-align:center;margin-top:20px;">
+  <button id="btn-estoque" class="btn-estoque">➡️ Conferir Estoque 📦</button>
+</div>
 
+<script>
+  document.getElementById("btn-estoque").addEventListener("click", () => {
+    window.location.href = "estoque.html";
+  });
+</script>
+<!-- Sistema (seguir para o stoque, fim ) -->
 ```
 
   </div>
 
 </body>
 </html>
+
 
 
 
