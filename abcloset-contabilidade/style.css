@@ -26,7 +26,7 @@ background-color: #fff;
 }
 .container-estoque{
   background-color: #F2F2F0;
-  height: 1300px;
+  height: 90%;
   margin-top: 40px;
   padding: 20px;
   border-radius: 16px;
@@ -309,6 +309,7 @@ height: 42px;
 .btn-remover:hover {
   background: #d32f2f;
 }
+
 
 
 
