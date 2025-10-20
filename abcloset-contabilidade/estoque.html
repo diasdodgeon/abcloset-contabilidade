@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💼 Estoque - ABCloset</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="estoque.js" defer></script>
+</head>
+
+<body class="background">
+  <div class="container">
+    <h1 align="center">💼 Estoque Atual</h1>
+
+    <!-- Barra de busca -->
+    <input type="search" id="search-estoque" placeholder="Buscar produto..." />
+
+    <!-- Lista de produtos -->
+    <div id="lista-estoque" class="lista-resultados"></div>
+
+    <!-- Botão de voltar -->
+    <div style="text-align:center;margin-top:20px;">
+      <button onclick="window.location.href='index.html'">⬅️ Voltar</button>
+    </div>
+  </div>
+
+  <!-- Modal de visualização da imagem -->
+  <div id="modal-view-image" class="modal-preview">
+    <img id="view-image" alt="Visualização do produto" />
+    <div class="botoes">
+      <button id="btn-fechar-view" class="cancelar">Fechar</button>
+    </div>
+  </div>
+</body>
+</html>
