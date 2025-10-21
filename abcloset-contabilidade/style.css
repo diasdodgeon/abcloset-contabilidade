@@ -330,6 +330,10 @@ height: 42px;
   margin-right: 6px;
 }
 
+.background-modal-repo{
+  background-color: hsla(0, 0%, 100%, 0.5); 
+}
+
 
 
 
