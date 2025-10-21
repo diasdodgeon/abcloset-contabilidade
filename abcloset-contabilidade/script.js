@@ -539,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
   
         // 🔄 limpar campos
-        imagemBase64 = null;
+        //imagemBase64 = null;
         inputCamera.value = "";
         previewImage.src = "";
         nomeInput.value = "";
@@ -623,6 +623,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔄 Expor função global (usada em outras partes do script)
   window.atualizarModal = atualizarModal;
 });
+
 
 
 
