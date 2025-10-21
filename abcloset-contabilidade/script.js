@@ -368,9 +368,23 @@ if (produtoRecompra) {
   localStorage.removeItem("recompra-produto");
 // força o modal "comprei" a abrir
   document.getElementById("tipo").value = "comprei";
-  selectTipo.addEventListener("change", atualizarModal);
-  selectTipo.value = "comprei";
-  atualizarModal();
+  
+    // 🧭 Alternar modais
+   function atualizarModal() {
+    const tipoSelecionado = selectTipo.value;
+    Object.entries(modais).forEach(([tipo, modal]) => {
+      if (modal) {
+        modal.classList.remove("active");
+        if (tipo === tipoSelecionado) modal.classList.add("active");
+      }
+    });
+  }
+  
+  
+    selectTipo.addEventListener("change", atualizarModal);
+    selectTipo.value = "comprei";
+    atualizarModal();
+  });
   }
 
   
@@ -586,6 +600,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
