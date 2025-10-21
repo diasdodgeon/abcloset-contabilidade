@@ -357,17 +357,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // verifica se veio de uma recompra
-  const produtoRecompra = localStorage.getItem("recompra-produto");
-  if (produtoRecompra) {
-    const p = JSON.parse(produtoRecompra);
-    document.getElementById("produto-nome").value = p.nome;
-    document.getElementById("produto-custo").value = p.preco_custo;
-    document.getElementById("produto-venda").value = p.preco_venda;
-    previewImage.src = p.imagem_base64 || "";
-    imagemBase64 = p.imagem_base64 || null;
-    localStorage.removeItem("recompra-produto");
-    // força o modal "comprei" a abrir
-    document.getElementById("tipo").value = "comprei";
+const produtoRecompra = localStorage.getItem("recompra-produto");
+if (produtoRecompra) {
+  const p = JSON.parse(produtoRecompra);
+  document.getElementById("produto-nome").value = p.nome;
+  document.getElementById("produto-custo").value = p.preco_custo;
+  document.getElementById("produto-venda").value = p.preco_venda;
+  previewImage.src = p.imagem_base64 || "";
+  imagemBase64 = p.imagem_base64 || null;
+  localStorage.removeItem("recompra-produto");
+// força o modal "comprei" a abrir
+  document.getElementById("tipo").value = "comprei";
   }
 
   
@@ -583,6 +583,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
