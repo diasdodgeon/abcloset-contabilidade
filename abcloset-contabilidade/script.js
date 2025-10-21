@@ -23,7 +23,7 @@ const db = getFirestore(app);
 let imagemBase64 = null;
 let inputCamera = null;
 let previewImage = null;
-let nomeInput = null;
+
 
 
 //codigo para deletar produtos parados a muito tempo na coleçao "arquivados"
@@ -627,6 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔄 Expor função global (usada em outras partes do script)
   window.atualizarModal = atualizarModal;
 });
+
 
 
 
