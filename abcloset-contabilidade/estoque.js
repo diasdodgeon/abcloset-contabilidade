@@ -94,7 +94,7 @@ function renderLista(lista) {
       const data = snap.data();
       await addDoc(collection(db, "arquivados"), { ...data, data_arquivado: new Date().toISOString() });
       await deleteDoc(ref);
-      alert("📂 Produto arquivado no historico! 🗄️");
+      alert("📂 Produto arquivado no historico! 🗃️");
       carregarEstoque();
     });
   });
@@ -179,6 +179,7 @@ btnLimparHistorico.addEventListener("click", async () => {
   alert("🧹 Histórico limpo com sucesso!");
   listaArquivados.innerHTML = "";
 });
+
 
 
 
