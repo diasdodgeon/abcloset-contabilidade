@@ -120,6 +120,7 @@ height: 42px;
 }
 .modal-preview {
   position: fixed;
+  z-index: 100;
   inset: 0;
   background: rgba(0,0,0,0.85);
   display: none;
@@ -328,6 +329,7 @@ height: 42px;
   transform: scale(1.2);
   margin-right: 6px;
 }
+
 
 
 
