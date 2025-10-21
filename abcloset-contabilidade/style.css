@@ -34,6 +34,16 @@ background-color: #fff;
   width: 90%;
   max-width: 400px;
 }
+.container-arquivados{
+  background-color: #F2F2F0;
+  height: 60%;
+  margin-top: 40px;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 90%;
+  max-width: 400px;
+}
 h1 {
 text-align: center;
 color: #284E5B;
@@ -333,6 +343,7 @@ height: 42px;
 .cor-titulo{
   color:  white; 
 }
+
 
 
 
