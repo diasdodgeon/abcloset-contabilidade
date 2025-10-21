@@ -547,8 +547,14 @@ if (produtoRecompra) {
 
 
   selectTipo.addEventListener("change", atualizarModal);
-  selectTipo.value = "vendi";
-  atualizarModal();
+    if (produtoRecompra){
+        selectTipo.value = "comprei";
+        atualizarModal();
+    }
+    else{
+      selectTipo.value = "vendi";
+      atualizarModal();
+    }
 });
 
 // 🧠 Função utilitária para comprimir imagem
@@ -584,6 +590,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
