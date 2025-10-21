@@ -24,7 +24,7 @@ let imagemBase64 = null;
 let inputCamera = null;
 let previewImage.src = null;
 let nomeInput.value = null;
-let compressImage = null;
+
 
 //codigo para deletar produtos parados a muito tempo na coleçao "arquivados"
 async function limparArquivadosAntigosLocal() {
@@ -44,6 +44,39 @@ async function limparArquivadosAntigosLocal() {
 // Executa a limpeza local a cada abertura
 limparArquivadosAntigosLocal().catch(console.error);
 
+// 🧠 Função utilitária para comprimir imagem
+  async function compressImage(file, maxSize = 800, quality = 0.7) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          } else if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressed = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressed);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
@@ -588,44 +621,13 @@ document.addEventListener("DOMContentLoaded", () => {
   selectTipo.value = "vendi";
   atualizarModal();
   
-  // 🧠 Função utilitária para comprimir imagem
-  async function compressImage(file, maxSize = 800, quality = 0.7) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height && width > maxSize) {
-            height *= maxSize / width;
-            width = maxSize;
-          } else if (height > maxSize) {
-            width *= maxSize / height;
-            height = maxSize;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const compressed = canvas.toDataURL("image/jpeg", quality);
-          resolve(compressed);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+ 
  
 
   // 🔄 Expor função global (usada em outras partes do script)
   window.atualizarModal = atualizarModal;
 });
+
 
 
 
