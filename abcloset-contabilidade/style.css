@@ -393,6 +393,93 @@ height: 42px;
 .btn-ajuda:hover {
   transform: scale(1.1);
 }
+     /* Estilos do Modal (Overlay) */
+    .modal-mockup {
+        display: none; /* Esconde o modal por padrão */
+        position: fixed; /* Fixa na tela */
+        z-index: 1; /* Fica acima de tudo */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto; /* Permite rolagem se o conteúdo for grande */
+        background-color: rgba(0,0,0,0.7); /* Fundo escuro semi-transparente (overlay) */
+        backdrop-filter: blur(5px); /* Efeito de desfoque no fundo, se suportado */
+    }
+
+    /* Centraliza o conteúdo do modal */
+    .modal-content {
+        background-color: transparent; /* O fundo do conteúdo em si é transparente */
+        margin: 10% auto; /* 10% de margem no topo e centralizado horizontalmente */
+        padding: 0; /* Remove padding */
+        width: 90%; /* Largura máxima */
+        max-width: 350px; /* Largura máxima para o mockup */
+        position: relative;
+        border: none;
+    }
+
+    /* Estilos do Mockup de Celular */
+    .phone-mockup {
+        border: 10px solid #222; /* Borda grossa para simular a carcaça do celular */
+        border-radius: 40px; /* Bordas bem arredondadas */
+        box-shadow: 0 0 0 1px #444, /* Borda interna leve */
+                    0 0 30px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidade */
+        background-color: #333; /* Cor da carcaça */
+        padding: 5px; /* Espaço entre a carcaça e a tela */
+        position: relative;
+        overflow: hidden; /* Para garantir que a tela não ultrapasse a borda */
+    }
+
+    /* Topo do Celular (simulação de câmera/speaker) */
+    .phone-top-bar {
+        height: 10px;
+        width: 40%;
+        background-color: #222;
+        border-radius: 0 0 10px 10px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1; /* Garante que fique acima da tela */
+    }
+
+    /* A tela onde vai o conteúdo */
+    .phone-screen {
+        background-color: white;
+        width: 100%;
+        height: 680px; /* Altura da tela */
+        border-radius: 30px; /* Bordas arredondadas internas */
+        padding: 0px;
+        box-sizing: border-box;
+        overflow-y: auto; /* Adiciona rolagem se o conteúdo for maior que a tela */
+        position: relative;
+    }
+
+    /* Estilo do botão de fechar */
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 38px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 20px; /* Ajusta o alinhamento vertical do X */
+        position: absolute; /* Posição absoluta dentro da tela */
+        top: 10px;
+        right: 15px;
+        position: fixed;
+        z-index: 10;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    video {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
 
 
 
