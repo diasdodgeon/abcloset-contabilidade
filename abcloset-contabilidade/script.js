@@ -636,4 +636,40 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
   });
 }
 
+            // Pega os elementos do DOM
+    const modal = document.getElementById("phoneModal");
+    const openBtn = document.getElementById("ajuda-vendi");
+    const closeBtn = document.getElementById("closeModalBtn");
+
+    // Função para abrir o modal
+    openBtn.onclick = function() {
+        modal.style.display = "block";
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.add('show');
+    }
+
+    // Função para fechar o modal ao clicar no botão 'X'
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.remove('show');
+    }
+
+    // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            // Opcional: Remover classe
+            // modal.classList.remove('show');
+        }
+    }
+     document.getElementById("openModalBtn").addEventListener("click", function() {
+      document.getElementById("phoneModal").style.display = "flex";
+      document.getElementById("video").play();
+    });
+
+    document.getElementById("closeModalBtn").addEventListener("click", function() {
+      document.getElementById("phoneModal").style.display = "none";
+      document.getElementById("video").pause();
+    });
 
