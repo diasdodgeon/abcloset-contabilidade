@@ -460,6 +460,26 @@ height: 42px;
       width: 100%;
       height: 100%;
     }
+/* 🎥 Botão flutuante de ajuda */
+.btn-ajuda {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  font-size: 26px;
+  background: #0a3d91;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s ease;
+}
+.btn-ajuda:hover {
+  transform: scale(1.1);
+}
 
 
 
