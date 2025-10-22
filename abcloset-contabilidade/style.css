@@ -350,7 +350,7 @@ height: 42px;
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #2ecc71;
+  background: #284E5B;
   color: white;
   font-weight: 600;
   padding: 14px 18px;
@@ -371,6 +371,7 @@ height: 42px;
   opacity: 0;
   transform: translateY(20px);
 }
+
 
 
 
