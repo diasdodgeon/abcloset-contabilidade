@@ -81,23 +81,30 @@
   <h2 align="center"> 💰 Registro De Venda<span id="ajuda-vendi" style="cursor:pointer;">   ❓🙋</span></h2>
   
 
-   
+  <div id="phoneModal" class="modal">
+        
+        <div class="modal-content">
+            
+            <div class="phone-mockup">
+                <div class="phone-top-bar"></div>
+                
+                <div class="phone-screen">
+                    
+                    <span class="close-btn" id="closeModalBtn">&times;</span>
+                    
+                    <div >
+                        <video id="video" width="100%" height="100%" controls>
+                          <source src="bemVindo.mp4" type="video/mp4">
+                          Seu navegador não suporta o elemento de vídeo.
+                        </video>
+                      </div>
+                </div>
+            </div>
 
-  <!-- Modal de vídeo explicativo -->
-  <div id="video-modal" class="video-modal">
-    <div class="video-content">
-      <button id="fechar-video" class="fechar-video">✖</button>
-      <iframe id="youtube-frame" width="100%" height="315" 
-        src="https://www.youtube.com/embed/6YKWbwvFzGE?autoplay=0&rel=0"
-        title="Como registrar uma venda no app"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </div>
+        </div>
+    </div> 
 
-
+ 
 
   <!-- Busca -->
   <label for="vendi-search">Pesquisar produto:</label>
@@ -187,6 +194,7 @@
 
 </body>
 </html>
+
 
 
 
