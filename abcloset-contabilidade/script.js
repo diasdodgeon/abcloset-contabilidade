@@ -369,7 +369,7 @@ function mostrarToast(mensagem, duracao = 4000) {
   document.body.appendChild(toast);
 
   // Anima a entrada
-  setTimeout(() => toast.classList.add("show"), 100);
+  setTimeout(() => toast.classList.add("show"), 200);
 
   // Toca o som 🎵
   const audio = new Audio("./caixa.m4a");
@@ -403,14 +403,14 @@ if (produtoRecompra) {
   if (typeof atualizarModal === "function") {
     selectTipo.value = "comprei";
     atualizarModal();
-    mostrarToast("🙋 O formulário está pronto para recompra, prossiga ❗");
+    mostrarToast("🙋 O formulário está pronto para recompra ❗");
   } else {
     window.addEventListener("load", () => {
       const tipoSel = document.getElementById("tipo");
       tipoSel.value = "comprei";
       const evt = new Event("change");
       tipoSel.dispatchEvent(evt);
-      mostrarToast("🙋 O formulário está pronto para recompra, prossiga ❗");
+      mostrarToast("🙋 O formulário está pronto para recompra ❗");
     });
   }
   
@@ -635,6 +635,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
