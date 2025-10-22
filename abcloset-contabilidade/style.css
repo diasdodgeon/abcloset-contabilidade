@@ -372,69 +372,46 @@ height: 42px;
   opacity: 0;
   transform: translateY(20px);
 }
-/* 🎥 Botão flutuante de ajuda */
-.btn-ajuda {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  font-size: 26px;
-  background: #0a3d91;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 55px;
-  height: 55px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  cursor: pointer;
-  z-index: 1000;
-  transition: transform 0.2s ease;
-}
-.btn-ajuda:hover {
-  transform: scale(1.1);
-}
-
-/* 🎬 Modal vertical (formato Shorts 9:16) */
-.modal-ajuda {
+.video-modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 50%;
   height: 100%;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.75);
   justify-content: center;
   align-items: center;
-  z-index: 2000;
 }
 
-.modal-ajuda.active {
+.video-modal.active {
   display: flex;
 }
 
-.modal-content {
+.video-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   position: relative;
-  width: 360px;
-  height: 640px; /* proporção 9:16 */
-  background: #000;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(255,255,255,0.2);
 }
 
-.btn-fechar {
+.fechar-video {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(0,0,0,0.5);
+  background: #003366;
   color: #fff;
   border: none;
   font-size: 18px;
-  cursor: pointer;
   border-radius: 50%;
   width: 30px;
   height: 30px;
-  z-index: 10;
+  cursor: pointer;
 }
+
 
 
 
