@@ -78,22 +78,27 @@
 <!-- 🔹 Modal Vendi  -->
 <div id="modal-vendi" class="modal">
   
-  <h2 align="center"> 💰 Registro De Venda<span id="ajuda-vendi" style="cursor:pointer;">🙋❓</span></h2>
+  <h2 align="center"> 💰 Registro De Venda<span id="ajuda-vendi" style="cursor:pointer;"<button id="btn-ajuda" class="btn-ajuda">🙋</button></span></h2>
   
 
-    <!-- Modal de vídeo explicativo -->
-    <div id="video-modal" class="video-modal">
-      <div class="video-content">
-        <button id="fechar-video" class="fechar-video">✖</button>
-        <iframe id="youtube-frame" width="100%" height="315" 
-          src="https://www.youtube.com/embed/6YKWbwvFzGE"
-          title="Como registrar uma venda no app"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+      <!-- 🎥 BOTÃO DE AJUDA -->
+<!--  <button id="btn-ajuda" class="btn-ajuda">🙋</button> -->
+  
+  <!-- 🎬 MODAL VERTICAL PARA SHORTS -->
+  <div id="modal-ajuda" class="modal-ajuda">
+    <div class="modal-content">
+      <button id="fechar-ajuda" class="btn-fechar">❌</button>
+      <iframe
+        id="video-ajuda"
+        width="100%"
+        height="100%"
+        src="https://www.youtube.com/embed/SEU_VIDEO_ID?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
+  </div>
 
 
   <!-- Busca -->
@@ -184,6 +189,7 @@
 
 </body>
 </html>
+
 
 
 
