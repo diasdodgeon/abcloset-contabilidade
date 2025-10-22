@@ -356,6 +356,36 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("📸 Imagem pronta para envio!");
   });
 
+// === Função moderna de notificação com som ===
+function mostrarToast(mensagem, duracao = 4000) {
+  // Remove toasts antigos
+  const antigo = document.querySelector(".toast");
+  if (antigo) antigo.remove();
+
+  // Cria o elemento
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = mensagem;
+  document.body.appendChild(toast);
+
+  // Anima a entrada
+  setTimeout(() => toast.classList.add("show"), 100);
+
+  // Toca o som 🎵
+  const audio = new Audio("./caixa.m4a");
+  audio.volume = 0.5;
+  audio.play().catch(err =>
+    console.warn("Som bloqueado até interação do usuário:", err)
+  );
+
+  // Remove após alguns segundos
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 500);
+  }, duracao);
+}
+
+  
   // verifica se veio de uma recompra
 const produtoRecompra = localStorage.getItem("recompra-produto");
 if (produtoRecompra) {
@@ -369,26 +399,18 @@ if (produtoRecompra) {
 // força o modal "comprei" a abrir
   document.getElementById("tipo").value = "comprei";
   
-  // ✅ força o modal “comprei” a abrir automaticamente
+  // ✅ Força abertura automática e mostra alerta visual com som
   if (typeof atualizarModal === "function") {
     selectTipo.value = "comprei";
     atualizarModal();
-
-    // 🟢 ALERTA E SOM
-    alert("🙋 O formulário está pronto para recompra, prossiga ❗");
-    const audio = new Audio("./caixa.m4a");
-    audio.volume = 0.5; // volume moderado
-    audio.play().catch(e => console.warn("Som bloqueado até interação do usuário:", e));
+    mostrarToast("🙋 O formulário está pronto para recompra, prossiga ❗");
   } else {
     window.addEventListener("load", () => {
       const tipoSel = document.getElementById("tipo");
       tipoSel.value = "comprei";
       const evt = new Event("change");
       tipoSel.dispatchEvent(evt);
-      alert("🙋 O formulário está pronto para recompra, prossiga ❗");
-      const audio = new Audio("./caixa.m4a");
-      audio.volume = 0.5;
-      audio.play().catch(console.warn);
+      mostrarToast("🙋 O formulário está pronto para recompra, prossiga ❗");
     });
   }
   
@@ -613,6 +635,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
