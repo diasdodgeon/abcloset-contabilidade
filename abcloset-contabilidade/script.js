@@ -663,7 +663,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
             // modal.classList.remove('show');
         }
     }
-     document.getElementById("openModalBtn").addEventListener("click", function() {
+     document.getElementById("ajuda-vendi").addEventListener("click", function() {
       document.getElementById("phoneModal").style.display = "flex";
       document.getElementById("video").play();
     });
@@ -672,4 +672,5 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
 
