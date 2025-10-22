@@ -638,7 +638,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
 
             // Pega os elementos do DOM
     const modal = document.getElementById("phoneModal");
-    const openBtn = document.getElementById("ajuda-vendi");
+    const openBtn = document.getElementById("btn-ajuda");
     const closeBtn = document.getElementById("closeModalBtn");
 
     // Função para abrir o modal
@@ -663,7 +663,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
             // modal.classList.remove('show');
         }
     }
-     document.getElementById("ajuda-vendi").addEventListener("click", function() {
+     document.getElementById("btn-ajuda").addEventListener("click", function() {
       document.getElementById("phoneModal").style.display = "flex";
       document.getElementById("video").play();
     });
@@ -672,5 +672,6 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
 
 
