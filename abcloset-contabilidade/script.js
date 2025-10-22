@@ -369,6 +369,29 @@ if (produtoRecompra) {
 // força o modal "comprei" a abrir
   document.getElementById("tipo").value = "comprei";
   
+  // ✅ força o modal “comprei” a abrir automaticamente
+  if (typeof atualizarModal === "function") {
+    selectTipo.value = "comprei";
+    atualizarModal();
+
+    // 🟢 ALERTA E SOM
+    alert("🙋 O formulário está pronto para recompra, prossiga ❗");
+    const audio = new Audio("./caixa.mp4");
+    audio.volume = 0.5; // volume moderado
+    audio.play().catch(e => console.warn("Som bloqueado até interação do usuário:", e));
+  } else {
+    window.addEventListener("load", () => {
+      const tipoSel = document.getElementById("tipo");
+      tipoSel.value = "comprei";
+      const evt = new Event("change");
+      tipoSel.dispatchEvent(evt);
+      alert("🙋 O formulário está pronto para recompra, prossiga ❗");
+      const audio = new Audio("./caixa.mp4");
+      audio.volume = 0.5;
+      audio.play().catch(console.warn);
+    });
+  }
+  
   }
 
   
@@ -590,6 +613,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+
 
 
 
