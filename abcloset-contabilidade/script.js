@@ -313,29 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
     comprei: document.getElementById("modal-comprei"),
     paguei: document.getElementById("modal-paguei"),
   };
-  const btnAjuda = document.getElementById("btn-ajuda");
-  const modalAjuda = document.getElementById("modal-ajuda");
-  const btnFecharAjuda = document.getElementById("fechar-ajuda");
-  const videoAjuda = document.getElementById("video-ajuda");
-  
-  btnAjuda.addEventListener("click", () => {
-    modalAjuda.classList.add("active");
-    videoAjuda.src += "&autoplay=1"; // garante autoplay
-  });
-  
-  btnFecharAjuda.addEventListener("click", () => {
-    modalAjuda.classList.remove("active");
-    videoAjuda.src = videoAjuda.src.replace("&autoplay=1", ""); // pausa
-  });
-  
-  modalAjuda.addEventListener("click", (e) => {
-    if (e.target === modalAjuda) {
-      modalAjuda.classList.remove("active");
-      videoAjuda.src = videoAjuda.src.replace("&autoplay=1", "");
-    }
-  });
 
-  
   // 🎥 --- CAPTURA DE IMAGEM ---
   const inputCamera = document.createElement("input");
   inputCamera.type = "file";
@@ -657,36 +635,28 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const ajudaBtn = document.getElementById("ajuda-vendi");
+  const videoModal = document.getElementById("video-modal");
+  const fecharVideo = document.getElementById("fechar-video");
 
+  if (ajudaBtn && videoModal && fecharVideo) {
+    ajudaBtn.addEventListener("click", () => {
+      videoModal.classList.add("active");
+    });
 
+    fecharVideo.addEventListener("click", () => {
+      videoModal.classList.remove("active");
+      const frame = document.getElementById("youtube-frame");
+      frame.src = frame.src; // 🔄 pausa o vídeo automaticamente ao fechar
+    });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    videoModal.addEventListener("click", (e) => {
+      if (e.target === videoModal) {
+        videoModal.classList.remove("active");
+        const frame = document.getElementById("youtube-frame");
+        frame.src = frame.src;
+      }
+    });
+  }
+});
