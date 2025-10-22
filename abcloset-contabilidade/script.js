@@ -640,6 +640,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const ajudaBtn = document.getElementById("ajuda-vendi");
   const videoModal = document.getElementById("video-modal");
   const fecharVideo = document.getElementById("fechar-video");
+  const btnAjuda = document.getElementById("btn-ajuda");
+  const modalAjuda = document.getElementById("modal-ajuda");
+  const btnFecharAjuda = document.getElementById("fechar-ajuda");
+  const videoAjuda = document.getElementById("video-ajuda");
+  
+  btnAjuda.addEventListener("click", () => {
+    modalAjuda.classList.add("active");
+    videoAjuda.src += "&autoplay=1"; // garante autoplay
+  });
+  
+  btnFecharAjuda.addEventListener("click", () => {
+    modalAjuda.classList.remove("active");
+    videoAjuda.src = videoAjuda.src.replace("&autoplay=1", ""); // pausa
+  });
+  
+  modalAjuda.addEventListener("click", (e) => {
+    if (e.target === modalAjuda) {
+      modalAjuda.classList.remove("active");
+      videoAjuda.src = videoAjuda.src.replace("&autoplay=1", "");
+    }
+  });
+
 
   if (ajudaBtn && videoModal && fecharVideo) {
     ajudaBtn.addEventListener("click", () => {
@@ -661,6 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 
 
