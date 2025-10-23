@@ -35,6 +35,16 @@ async function limparArquivadosAntigosLocal() {
 }
 limparArquivadosAntigosLocal().catch(console.error);
 
+// 🔊 Soms de interação
+const SoundManager = {
+    play: (file) => {
+        const audio = new Audio(file);
+        audio.volume = 0.4;
+        audio.currentTime = 0;
+        audio.play();
+      }
+  };
+
 function formatCurrencyBR(value) {
   return "R$ " + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
@@ -635,11 +645,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
-// 🔊 Som padrão de interação
-    const soundInteraction = new Audio("./tone.mp3");
-    soundInteraction.volume = 0.4; // Volume suave
-    const soundInteraction2 = new Audio("./enot.mp3");
-    soundInteraction2.volume = 0.4; // Volume suave
+
 
         // Pega os elementos do DOM
     const modal = document.getElementById("phoneModal");
@@ -650,8 +656,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     openBtn.onclick = function() {
         modal.style.display = "block";
         // 🔊 Toca o som
-        soundInteraction.currentTime = 0;
-        soundInteraction.play();
+        SoundManager.play("./tone.mp3");
         // Futuramente: Adicionar classe para animações
         // modal.classList.add('show');
     }
@@ -660,8 +665,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     closeBtn.onclick = function() {
         modal.style.display = "none";
         // 🔊 Toca o som
-        soundInteraction2.currentTime = 0;
-        soundInteraction2.play();
+        SoundManager.play("./enot.mp3");
         // Futuramente: Adicionar classe para animações
         // modal.classList.remove('show');
     }
@@ -683,6 +687,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
 
 
 
