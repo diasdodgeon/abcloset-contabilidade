@@ -101,16 +101,17 @@ class MockupSystem {
     window.addEventListener("click", (e) => {
       if (e.target === this.modal) this.close();
     });
-  }
-  setTimeout(() => {
-  const openBtn = document.getElementById("btn-ajuda");
-  const closeBtn = document.getElementById("closeModalBtn");
-  if (openBtn && closeBtn) {
-    openBtn.onclick = () => AppMockup.open();
-    closeBtn.onclick = () => AppMockup.close();
-  }
-}, 200);
+     setTimeout(() => {
+    const openBtn = document.getElementById("btn-ajuda");
+    const closeBtn = document.getElementById("closeModalBtn");
+    if (openBtn && closeBtn) {
+      openBtn.onclick = () => AppMockup.open();
+      closeBtn.onclick = () => AppMockup.close();
+    }
+  }, 200);
 
+  }
+ 
   // 🌀 CSS Animations e estilo moderno
   injectCSS() {
     const style = document.createElement("style");
@@ -227,5 +228,6 @@ class MockupSystem {
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
 });
+
 
 
