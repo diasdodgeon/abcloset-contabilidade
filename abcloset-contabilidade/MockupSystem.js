@@ -3,24 +3,38 @@
 
 class MockupSystem {
   constructor(config = {}) {
-    // Caminhos de áudio e vídeo (padrões)
     this.toneIn = config.toneIn || "./tone.mp3";
     this.toneOut = config.toneOut || "./enot.mp3";
     this.defaultVideo = config.defaultVideo || "./bemVindo.mp4";
 
-    // Criação automática dos elementos
+    // Espera o DOM estar pronto antes de montar o HTML
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.init());
+    } else {
+      this.init();
+    }
+  }
+
+  init() {
     this.createHTML();
     this.addEvents();
   }
 
   // 🎨 Cria o HTML do mockup e do botão flutuante
   createHTML() {
+    // 🔹 Garante que o body exista
+    const body = document.body;
+    if (!body) {
+      console.error("❌ document.body não está disponível.");
+      return;
+    }
+
     // Botão flutuante
     this.btn = document.createElement("button");
     this.btn.id = "btn-ajuda";
     this.btn.className = "btn-ajuda";
     this.btn.textContent = "🙋";
-    document.body.appendChild(this.btn);
+    body.appendChild(this.btn);
 
     // Estrutura do modal + mockup
     this.modal = document.createElement("div");
@@ -40,7 +54,7 @@ class MockupSystem {
         </div>
       </div>
     `;
-    document.body.appendChild(this.modal);
+    body.appendChild(this.modal);
 
     // Referências
     this.video = this.modal.querySelector("#mockup-video");
@@ -55,7 +69,7 @@ class MockupSystem {
     audio.play();
   }
 
-  // 📱 Abre o mockup com animação e som
+  // 📱 Abre o mockup
   open(videoSrc) {
     this.modal.style.display = "flex";
     this.playSound(this.toneIn);
@@ -67,7 +81,7 @@ class MockupSystem {
     this.video.play();
   }
 
-  // ❌ Fecha o mockup com som e pausa o vídeo
+  // ❌ Fecha o mockup
   close() {
     this.modal.style.display = "none";
     this.playSound(this.toneOut);
@@ -75,7 +89,7 @@ class MockupSystem {
     this.video.pause();
   }
 
-  // ⚙️ Configura todos os eventos
+  // ⚙️ Eventos principais
   addEvents() {
     // Abrir
     this.btn.addEventListener("click", () => this.open());
@@ -85,12 +99,12 @@ class MockupSystem {
 
     // Fechar clicando fora
     window.addEventListener("click", (e) => {
-      if (e.target === this.modal) {
-        this.close();
-      }
+      if (e.target === this.modal) this.close();
     });
   }
 }
 
-// Cria uma instância global
-window.AppMockup = new MockupSystem();
+// ✅ Inicializa automaticamente quando o script é carregado
+document.addEventListener("DOMContentLoaded", () => {
+  window.AppMockup = new MockupSystem();
+});
