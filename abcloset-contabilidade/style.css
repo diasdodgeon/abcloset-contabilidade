@@ -480,6 +480,40 @@ height: 42px;
       width: 100%;
       height: 100%;
     }
+	/* --- animaçao de entrada e saida do mockup --- */
+	.phone-mockup-anime {
+	  opacity: 0;
+	  transform: scale(0.95);
+	  transition: opacity 0.5s ease, transform 0.5s ease;
+	}
+	
+	.phone-mockup.show {
+	  opacity: 1;
+	  transform: scale(1);
+	}
+	/* --- tema de celular, com apps --- */
+	.phone-menu {
+	  display: flex;
+	  justify-content: space-around;
+	  margin-top: 20px;
+	}
+	
+	.app-icon {
+	  font-size: 28px;
+	  background: #222;
+	  color: #fff;
+	  border-radius: 12px;
+	  padding: 10px;
+	  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+	  transition: transform 0.2s, background 0.2s;
+	  cursor: pointer;
+	}
+	
+	.app-icon:hover {
+	  background: #444;
+	  transform: scale(1.1);
+	}
+
 
 
 
