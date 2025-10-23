@@ -64,6 +64,7 @@ async function initVendi(db) {
 
   let allProducts = [];
   let cart = [];
+  let show;
 
   async function fetchProducts() {
     resultsEl.innerHTML = "Carregando produtos...";
@@ -658,13 +659,13 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
    
     openBtn.onclick = function() {
       modal.style.display = "flex";
-      const phone = modal.querySelector(".phone-mockup-anime");
+      const phone = modal.querySelector(".mockup-anime");
       requestAnimationFrame(() => phone.classList.add("show"));
       SoundManager.play("./tone.mp3", true);
     };
     
     closeBtn.onclick = function() {
-      const phone = modal.querySelector(".phone-mockup-anime");
+      const phone = modal.querySelector(".mockup-anime");
       phone.classList.remove("show");
       SoundManager.play("./enot.mp3", true);
       setTimeout(() => {
@@ -704,6 +705,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
 
 
 
