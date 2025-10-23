@@ -487,7 +487,7 @@ height: 42px;
 	  transition: opacity 0.5s ease, transform 0.5s ease;
 	}
 	
-	.phone-mockup.show {
+	.phone-mockup-anime.show {
 	  opacity: 1;
 	  transform: scale(1);
 	}
@@ -513,6 +513,7 @@ height: 42px;
 	  background: #444;
 	  transform: scale(1.1);
 	}
+
 
 
 
