@@ -100,10 +100,9 @@ class MockupSystem {
     this.closeBtn.addEventListener("click", () => this.close());
     window.addEventListener("click", (e) => {
       if (e.target === this.modal) this.close();
-    }); 
-
+    });
   }
- 
+
   // 🌀 CSS Animations e estilo moderno
   injectCSS() {
     const style = document.createElement("style");
@@ -220,6 +219,8 @@ class MockupSystem {
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
 });
+
+
 
 
 
