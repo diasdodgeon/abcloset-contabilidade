@@ -385,13 +385,11 @@ function mostrarToast(mensagem, duracao = 4000) {
   setTimeout(() => toast.classList.add("show"), 200);
 
   // Toca o som 🎵
-  //const audio = new Audio("./Cash.mp3");
- // audio.volume = 0.5;
-//  audio.play().catch(err =>
-   
-    SoundManager.play("./Cash.mp3", true).catch(err =>
-    console.warn("Som bloqueado até interação do usuário:", err)
- // );
+  const audio = new Audio("./Cash.mp3");
+  audio.volume = 0.5; 
+  audio.play().catch(err =>
+  console.warn("Som bloqueado até interação do usuário:", err)
+  );
 
   // Remove após alguns segundos
   setTimeout(() => {
@@ -692,6 +690,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
 
 
 
