@@ -443,7 +443,7 @@ height: 42px;
   padding: 0px;
   box-sizing: border-box;
   position: relative;
-  overflow: alto;
+  overflow: auto;
 }
 
 /* Botão de fechar */
@@ -489,6 +489,7 @@ height: 42px;
     background: #444;
     transform: scale(1.1);
   }
+
 
 
 
