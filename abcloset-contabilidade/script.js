@@ -656,31 +656,22 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     const openBtn = document.getElementById("btn-ajuda");
     const closeBtn = document.getElementById("closeModalBtn");
 
-   
-    if (modal && openBtn && closeBtn) {
-      openBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-        const phone = modal.querySelector(".mockup-anime");
-        if (phone) {
-          // força o reflow antes de aplicar a classe
-          requestAnimationFrame(() => phone.classList.add("show"));
-        }
+   // Função para abrir o modal
+    openBtn.onclick = function() {
+        modal.style.display = "block";
+        // 🔊 Toca o som
         SoundManager.play("./tone.mp3", true);
-        if (navigator.vibrate) navigator.vibrate(100); // vibração leve ao abrir
-      });
-    
-      closeBtn.addEventListener("click", () => {
-        const phone = modal.querySelector(".mockup-anime");
-        if (phone) phone.classList.remove("show");
-    
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.add('show');
+    }
+
+    // Função para fechar o modal ao clicar no botão 'X'
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+        // 🔊 Toca o som
         SoundManager.play("./enot.mp3", true);
-        if (navigator.vibrate) navigator.vibrate([50, 50, 30]); // vibração curta e dupla ao fechar
-    
-        // aguarda o fade-out terminar
-        setTimeout(() => {
-          modal.style.display = "none";
-        }, 400);
-      });
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.remove('show');
     }
     // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
     window.onclick = function(event) {
@@ -714,6 +705,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
 
 
 
