@@ -64,7 +64,7 @@ async function initVendi(db) {
 
   let allProducts = [];
   let cart = [];
-  let show;
+  let classList = null;
 
   async function fetchProducts() {
     resultsEl.innerHTML = "Carregando produtos...";
@@ -705,6 +705,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
 
 
 
