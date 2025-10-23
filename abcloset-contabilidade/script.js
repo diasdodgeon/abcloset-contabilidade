@@ -658,13 +658,13 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
    
     openBtn.onclick = function() {
       modal.style.display = "flex";
-      const phone = modal.querySelector(".phone-mockup");
+      const phone = modal.querySelector(".phone-mockup-anime");
       requestAnimationFrame(() => phone.classList.add("show"));
       SoundManager.play("./tone.mp3", true);
     };
     
     closeBtn.onclick = function() {
-      const phone = modal.querySelector(".phone-mockup");
+      const phone = modal.querySelector(".phone-mockup-anime");
       phone.classList.remove("show");
       SoundManager.play("./enot.mp3", true);
       setTimeout(() => {
@@ -704,6 +704,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
 
 
 
