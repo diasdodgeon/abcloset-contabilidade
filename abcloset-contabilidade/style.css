@@ -453,7 +453,7 @@ height: 42px;
   font-size: 38px;
   font-weight: bold;
   cursor: pointer;
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 15px;
   z-index: 10;
@@ -489,6 +489,7 @@ height: 42px;
     background: #444;
     transform: scale(1.1);
   }
+
 
 
 
