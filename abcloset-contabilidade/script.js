@@ -655,23 +655,22 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     const openBtn = document.getElementById("btn-ajuda");
     const closeBtn = document.getElementById("closeModalBtn");
 
-    // Função para abrir o modal
+   
     openBtn.onclick = function() {
-        modal.style.display = "block";
-        // 🔊 Toca o som
-        SoundManager.play("./tone.mp3");
-        // Futuramente: Adicionar classe para animações
-        // modal.classList.add('show');
-    }
-
-    // Função para fechar o modal ao clicar no botão 'X'
+      modal.style.display = "flex";
+      const phone = modal.querySelector(".phone-mockup");
+      requestAnimationFrame(() => phone.classList.add("show"));
+      SoundManager.play("./tone.mp3", true);
+    };
+    
     closeBtn.onclick = function() {
+      const phone = modal.querySelector(".phone-mockup");
+      phone.classList.remove("show");
+      SoundManager.play("./enot.mp3", true);
+      setTimeout(() => {
         modal.style.display = "none";
-        // 🔊 Toca o som
-        SoundManager.play("./enot.mp3");
-        // Futuramente: Adicionar classe para animações
-        // modal.classList.remove('show');
-    }
+      }, 400); // espera o fade-out terminar
+    };
 
     // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
     window.onclick = function(event) {
@@ -690,6 +689,21 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
+    document.getElementById("app-tutoriais").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("🎓 Acessando tutoriais...");
+    };
+    
+    document.getElementById("app-funcionalidades").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("⚙️ Acessando funcionalidades...");
+    };
+    
+    document.getElementById("app-suporte").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("💬 Abrindo suporte...");
+    };
 
 
 
