@@ -657,22 +657,31 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     const closeBtn = document.getElementById("closeModalBtn");
 
    
-    openBtn.onclick = function() {
-      modal.style.display = "flex";
-      const phone = modal.querySelector(".mockup-anime");
-      requestAnimationFrame(() => phone.classList.add("show"));
-      SoundManager.play("./tone.mp3", true);
-    };
+    if (modal && openBtn && closeBtn) {
+      openBtn.addEventListener("click", () => {
+        modal.style.display = "flex";
+        const phone = modal.querySelector(".mockup-anime");
+        if (phone) {
+          // força o reflow antes de aplicar a classe
+          requestAnimationFrame(() => phone.classList.add("show"));
+        }
+        SoundManager.play("./tone.mp3", true);
+        if (navigator.vibrate) navigator.vibrate(100); // vibração leve ao abrir
+      });
     
-    closeBtn.onclick = function() {
-      const phone = modal.querySelector(".mockup-anime");
-      phone.classList.remove("show");
-      SoundManager.play("./enot.mp3", true);
-      setTimeout(() => {
-        modal.style.display = "none";
-      }, 400); // espera o fade-out terminar
-    };
-
+      closeBtn.addEventListener("click", () => {
+        const phone = modal.querySelector(".mockup-anime");
+        if (phone) phone.classList.remove("show");
+    
+        SoundManager.play("./enot.mp3", true);
+        if (navigator.vibrate) navigator.vibrate([50, 50, 30]); // vibração curta e dupla ao fechar
+    
+        // aguarda o fade-out terminar
+        setTimeout(() => {
+          modal.style.display = "none";
+        }, 400);
+      });
+    }
     // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
     window.onclick = function(event) {
         if (event.target == modal) {
@@ -705,6 +714,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
 
 
 
