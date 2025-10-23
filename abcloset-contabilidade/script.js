@@ -635,6 +635,12 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     reader.readAsDataURL(file);
   });
 }
+// 🔊 Som padrão de interação
+    const soundInteraction = new Audio("./tone.mp3");
+    soundInteraction.volume = 0.4; // Volume suave
+    const soundInteraction2 = new Audio("./enot.mp3");
+    soundInteraction2.volume = 0.4; // Volume suave
+
         // Pega os elementos do DOM
     const modal = document.getElementById("phoneModal");
     const openBtn = document.getElementById("btn-ajuda");
@@ -643,6 +649,9 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     // Função para abrir o modal
     openBtn.onclick = function() {
         modal.style.display = "block";
+        // 🔊 Toca o som
+        soundInteraction.currentTime = 0;
+        soundInteraction.play();
         // Futuramente: Adicionar classe para animações
         // modal.classList.add('show');
     }
@@ -650,6 +659,9 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
     // Função para fechar o modal ao clicar no botão 'X'
     closeBtn.onclick = function() {
         modal.style.display = "none";
+        // 🔊 Toca o som
+        soundInteraction2.currentTime = 0;
+        soundInteraction2.play();
         // Futuramente: Adicionar classe para animações
         // modal.classList.remove('show');
     }
@@ -671,6 +683,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       document.getElementById("phoneModal").style.display = "none";
       document.getElementById("video").pause();
     });
+
 
 
 
