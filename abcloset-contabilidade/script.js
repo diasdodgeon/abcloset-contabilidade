@@ -15,6 +15,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { FIREBASE_CONFIG } from "./config.js";
+import { MockupSystem } from "./MockupSystem.js";
+import { ProgressSystem } from "./ProgressSystem.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getFirestore(app);
+
+// 🧠 Identificador temporário (antes do sistema de login)
+const userId = "usuarioteste001";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
@@ -705,3 +713,16 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
+
+// ✅ Inicialização do sistema de Mockup e Progresso
+document.addEventListener("DOMContentLoaded", async () => {
+  const AppMockup = new MockupSystem();
+  const Progress = new ProgressSystem(db, userId, AppMockup);
+
+  await Progress.initProgress();
+
+  // Exemplo: tutorial inicial (quando o app abre pela 1ª vez)
+  await Progress.verificarETocar("tutorial_inicial", "./bemVindo.mp4");
+
+  console.log("✅ Sistema de progresso e mockup prontos!");
+});
