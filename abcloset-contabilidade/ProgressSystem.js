@@ -55,7 +55,7 @@ export class ProgressSystem {
 } // ← 🔒 Certifique-se de que a classe termina aqui!
 
   // 🔹 Detecta onde o usuário está
-  detectarContexto(){
+  detectarContexto()
     const url = window.location.pathname;
     const abaAtiva = document.querySelector(".aba-ativa")?.id || "inicio";
 
@@ -65,7 +65,7 @@ export class ProgressSystem {
     if (abaAtiva.includes("comprei")) return "comprei";
     if (abaAtiva.includes("paguei")) return "paguei";
     return "inicio";
-  };
+  
 
   // 🔹 Exibe o tutorial correspondente
   async exibirTutorialSeNecessario() {
@@ -105,6 +105,7 @@ export class ProgressSystem {
     }
   }
 }
+
 
 
 
