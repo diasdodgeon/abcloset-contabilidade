@@ -41,12 +41,18 @@ export class ProgressSystem {
       console.log("📄 Documento de progresso já existente.");
     }
   }
-}
-  // 🔹 Atualiza marca de progresso no Firestore
+// ✅ Marca uma tarefa como concluída
   async marcarConcluido(chave) {
-    await updateDoc(this.ref, { [chave]: true });
-    this.progresso[chave] = true;
+    await updateDoc(this.progressRef, { [chave]: true });
+    console.log(`🏁 Progresso atualizado: ${chave} = true`);
   }
+
+  // ✅ Verifica se uma tarefa foi concluída
+  async verificarProgresso(chave) {
+    const snapshot = await getDoc(this.progressRef);
+    return snapshot.exists() ? snapshot.data()[chave] === true : false;
+  }
+} // ← 🔒 Certifique-se de que a classe termina aqui!
 
   // 🔹 Detecta onde o usuário está
   detectarContexto() {
@@ -99,6 +105,7 @@ export class ProgressSystem {
     }
   }
 }
+
 
 
 
