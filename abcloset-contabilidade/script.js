@@ -8,15 +8,19 @@ import {
   getDocs,
   addDoc,
   doc,
+  setDoc,
   updateDoc,
   getDoc,
   deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+
 import { FIREBASE_CONFIG } from "./config.js";
-import { MockupSystem } from "./MockupSystem.js";
 import { ProgressSystem } from "./ProgressSystem.js";
+import { MockupSystem } from "./MockupSystem.js";
+
+
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
@@ -724,4 +728,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log("✅ Sistema de progresso e mockup prontos!");
 });
+
 
