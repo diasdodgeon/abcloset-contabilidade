@@ -218,14 +218,4 @@ export class MockupSystem {
 // ✅ Inicializa automaticamente
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
-  //export { MockupSystem };
 });
-
-
-
-
-
-
-
-
-
