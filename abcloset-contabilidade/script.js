@@ -14,17 +14,26 @@ import {
   deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// --- Firebase Core ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
+// --- Firestore ---
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  updateDoc,
+  getDoc,
+  deleteDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { FIREBASE_CONFIG } from "./config.js";
 
-
-
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
-
-
-
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
 async function limparArquivadosAntigosLocal() {
@@ -712,22 +721,30 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
-import { ProgressSystem } from "./ProgressSystem.js";
-import { MockupSystem } from "./MockupSystem.js";
-// 🧠 Identificador temporário (antes do sistema de login)
-const userId = "usuarioteste001";
-// ✅ Inicialização do sistema de Mockup e Progresso
-document.addEventListener("DOMContentLoaded", async () => {
-  const AppMockup = new MockupSystem();
-  const Progress = new ProgressSystem(db, userId, AppMockup);
+// 🔄 Aguarda o Mockup ser criado e então liga os eventos corretamente
+function iniciarMockupQuandoPronto() {
+  const openBtn = document.getElementById("btn-ajuda");
+  const closeBtn = document.getElementById("closeModalBtn");
 
-  await Progress.initProgress();
+  if (openBtn && closeBtn) {
+    // Garante que AppMockup exista antes de usar
+    if (window.AppMockup && typeof AppMockup.open === "function") {
+      openBtn.onclick = () => AppMockup.open();
+      closeBtn.onclick = () => AppMockup.close();
+      console.log("✅ Eventos do mockup conectados com sucesso!");
+    } else {
+      console.warn("⚠️ AppMockup ainda não foi inicializado. Tentando novamente...");
+      setTimeout(iniciarMockupQuandoPronto, 200);
+    }
+  } else {
+    // Se os botões ainda não existem, tenta de novo após 200ms
+    setTimeout(iniciarMockupQuandoPronto, 200);
+  }
+}
 
-  // Exemplo: tutorial inicial (quando o app abre pela 1ª vez)
-  await Progress.verificarETocar("tutorial_inicial", "./bemVindo.mp4");
+// ⏳ Começa a verificar após o carregamento do DOM
+document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
 
-  console.log("✅ Sistema de progresso e mockup prontos!");
-});
 
 
 
