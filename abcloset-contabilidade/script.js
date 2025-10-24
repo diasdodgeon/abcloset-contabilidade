@@ -679,34 +679,19 @@ function iniciarMockupQuandoPronto() {
   }
 }
 
-// ⏳ Começa a verificar após o carregamento do DOM
-document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
-
-
-import { ProgressSystem } from "./ProgressSystem.js";
-
+// ✅ Inicialização do sistema de Mockup e Progresso
 document.addEventListener("DOMContentLoaded", async () => {
-  // 🔧 Simulação de usuário para testes locais
-  const userId = "testeUsuario001";  // pode ser substituído por UID real do Firebase Auth
-  const progress = new ProgressSystem(userId);
-  await progress.init();
-  await progress.exibirTutorialSeNecessario();
-});
+  const AppMockup = new MockupSystem();
+  const Progress = new ProgressSystem(db, userId, AppMockup);
 
-// script.js
-
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("App carregado!");
-
-
-  const Progress = new ProgressSystem(db, "usuario_demo", AppMockup);
-
-  // Inicializa modais e progressos só depois que tudo estiver carregado
   await Progress.initProgress();
-  initVendi(db);
+
+  // Exemplo: tutorial inicial (quando o app abre pela 1ª vez)
+  await Progress.verificarETocar("tutorial_inicial", "./bemVindo.mp4");
+
+  console.log("✅ Sistema de progresso e mockup prontos!");
 });
+
 
 
 
