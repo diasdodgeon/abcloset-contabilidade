@@ -21,7 +21,7 @@ const db = getFirestore(app);
 // 🧩 Identificador temporário de usuário (para testes locais)
 
 
-//import { ProgressSystem } from "./ProgressSystem.js";
+import { ProgressSystem } from "./ProgressSystem.js";
 
 
 const userId = "testeUsuario001"; // Mock para desenvolvimento
@@ -696,6 +696,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
