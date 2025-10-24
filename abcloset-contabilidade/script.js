@@ -687,7 +687,6 @@ function iniciarMockupQuandoPronto() {
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
 
 
-import { ProgressSystem } from "./ProgressSystem.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   // 🔧 Simulação de usuário para testes locais
@@ -696,6 +695,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
