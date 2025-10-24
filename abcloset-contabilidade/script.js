@@ -23,7 +23,7 @@ const db = getFirestore(app);
 
 import { ProgressSystem } from "./ProgressSystem.js";
 
-const db = getFirestore();
+
 const userId = "testeUsuario001"; // Mock para desenvolvimento
 
 const progress = new ProgressSystem(db, userId);
@@ -696,6 +696,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
