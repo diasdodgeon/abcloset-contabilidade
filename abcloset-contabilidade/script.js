@@ -4,6 +4,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 
 import { FIREBASE_CONFIG } from "./config.js";
 
+// --- Firebase Core ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
 
 // --- Firestore ---
 import {
@@ -682,6 +685,7 @@ function iniciarMockupQuandoPronto() {
 
 // ⏳ Começa a verificar após o carregamento do DOM
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
+
 
 
 
