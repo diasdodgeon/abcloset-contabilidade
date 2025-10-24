@@ -14,21 +14,7 @@ import {
   deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-// --- Firebase Core ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-// --- Firestore ---
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  updateDoc,
-  getDoc,
-  deleteDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { FIREBASE_CONFIG } from "./config.js";
 
@@ -744,6 +730,7 @@ function iniciarMockupQuandoPronto() {
 
 // ⏳ Começa a verificar após o carregamento do DOM
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
+
 
 
 
