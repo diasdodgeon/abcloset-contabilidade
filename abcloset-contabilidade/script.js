@@ -18,12 +18,8 @@ import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
-// 🧩 Identificador temporário de usuário (para testes locais)
-
 
 import { ProgressSystem } from "./ProgressSystem.js";
-
-
 const userId = "testeUsuario001"; // Mock para desenvolvimento
 
 const progress = new ProgressSystem(db, userId);
@@ -696,6 +692,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
