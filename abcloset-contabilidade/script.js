@@ -1,10 +1,13 @@
+
 // --- Firebase Core ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
 import { FIREBASE_CONFIG } from "./config.js";
 
 
 // --- Firestore ---
 import {
-  initializeApp,
+
   getFirestore,
   collection,
   getDocs,
