@@ -654,60 +654,7 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
 }
 
 
-        // Pega os elementos do DOM
-    const modal = document.getElementById("phoneModal");
-    const openBtn = document.getElementById("btn-ajuda");
-    const closeBtn = document.getElementById("closeModalBtn");
-
-   // Função para abrir o modal
-    openBtn.onclick = function() {
-        modal.style.display = "block";
-        // 🔊 Toca o som
-        SoundManager.play("./tone.mp3", true);
-        // Futuramente: Adicionar classe para animações
-        // modal.classList.add('show');
-    }
-
-    // Função para fechar o modal ao clicar no botão 'X'
-    closeBtn.onclick = function() {
-        modal.style.display = "none";
-        // 🔊 Toca o som
-        SoundManager.play("./enot.mp3", true);
-        // Futuramente: Adicionar classe para animações
-        // modal.classList.remove('show');
-    }
-    // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-            // Futuramente: Adicionar classe para animações
-            // modal.classList.remove('show');
-        }
-    }
-     document.getElementById("btn-ajuda").addEventListener("click", function() {
-      document.getElementById("phoneModal").style.display = "flex";
-      document.getElementById("video").play();
-    });
-
-    document.getElementById("closeModalBtn").addEventListener("click", function() {
-      document.getElementById("phoneModal").style.display = "none";
-      document.getElementById("video").pause();
-    });
-
-    document.getElementById("app-tutoriais").onclick = () => {
-      SoundManager.play("./tone.mp3", true);
-      alert("🎓 Acessando tutoriais...");
-    };
-    
-    document.getElementById("app-funcionalidades").onclick = () => {
-      SoundManager.play("./tone.mp3", true);
-      alert("⚙️ Acessando funcionalidades...");
-    };
-    
-    document.getElementById("app-suporte").onclick = () => {
-      SoundManager.play("./tone.mp3", true);
-      alert("💬 Abrindo suporte...");
-    };
+   
 // 🔄 Aguarda o Mockup ser criado e então liga os eventos corretamente
 function iniciarMockupQuandoPronto() {
   const openBtn = document.getElementById("btn-ajuda");
@@ -731,6 +678,7 @@ function iniciarMockupQuandoPronto() {
 
 // ⏳ Começa a verificar após o carregamento do DOM
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
+
 
 
 
