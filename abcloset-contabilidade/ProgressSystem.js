@@ -1,3 +1,4 @@
+import { FIREBASE_CONFIG } from "./config.js";
 // --- Firebase Core ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
@@ -15,7 +16,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import { FIREBASE_CONFIG } from "./config.js";
+
 // --- IMPORTA O MOCKUP ---
 import { MockupSystem } from "./MockupSystem.js";
 
@@ -99,6 +100,7 @@ export class ProgressSystem {
       }
     }
   }
+
 
 
 
