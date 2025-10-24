@@ -19,8 +19,15 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 // 🧩 Identificador temporário de usuário (para testes locais)
-const userId = "testeUsuario001";
+
+
+import { ProgressSystem } from "./ProgressSystem.js";
+
+const db = getFirestore();
+const userId = "testeUsuario001"; // Mock para desenvolvimento
+
 const progress = new ProgressSystem(db, userId);
+await progress.initProgress();
 
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
@@ -689,6 +696,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
