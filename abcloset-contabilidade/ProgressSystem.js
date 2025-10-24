@@ -20,9 +20,10 @@ import { MockupSystem } from "./MockupSystem.js";
 
 // --- SISTEMA DE PROGRESSO ---
 export class ProgressSystem {
-  constructor(userId) {
+  constructor(db, userId) {
+    this.db = db;
     this.userId = userId;
-    this.ref = doc(db, "usuarios", userId);
+    this.progressRef = doc(this.db, "progresso", this.userId);
     this.progresso = null;
   }
 
@@ -102,3 +103,4 @@ export class ProgressSystem {
     }
   }
 }
+
