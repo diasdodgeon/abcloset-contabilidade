@@ -17,16 +17,13 @@ import {
 
 
 import { FIREBASE_CONFIG } from "./config.js";
-import { ProgressSystem } from "./ProgressSystem.js";
-import { MockupSystem } from "./MockupSystem.js";
 
 
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
-// 🧠 Identificador temporário (antes do sistema de login)
-const userId = "usuarioteste001";
+
 
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
@@ -715,7 +712,10 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
       SoundManager.play("./tone.mp3", true);
       alert("💬 Abrindo suporte...");
     };
-
+import { ProgressSystem } from "./ProgressSystem.js";
+import { MockupSystem } from "./MockupSystem.js";
+// 🧠 Identificador temporário (antes do sistema de login)
+const userId = "usuarioteste001";
 // ✅ Inicialização do sistema de Mockup e Progresso
 document.addEventListener("DOMContentLoaded", async () => {
   const AppMockup = new MockupSystem();
@@ -728,5 +728,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log("✅ Sistema de progresso e mockup prontos!");
 });
+
 
 
