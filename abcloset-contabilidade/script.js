@@ -688,6 +688,7 @@ document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
 
 
 
+
 document.addEventListener("DOMContentLoaded", async () => {
   // 🔧 Simulação de usuário para testes locais
   const userId = "testeUsuario001";  // pode ser substituído por UID real do Firebase Auth
@@ -695,6 +696,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
