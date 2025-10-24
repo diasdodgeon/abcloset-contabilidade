@@ -19,7 +19,7 @@ import { FIREBASE_CONFIG } from "./config.js";
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
-import { ProgressSystem } from "./ProgressSystem.js";
+
 const userId = "testeUsuario001"; // Mock para desenvolvimento
 
 const progress = new ProgressSystem(db, userId);
@@ -683,7 +683,7 @@ function iniciarMockupQuandoPronto() {
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
 
 
-
+import { ProgressSystem } from "./ProgressSystem.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   // 🔧 Simulação de usuário para testes locais
@@ -692,6 +692,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
