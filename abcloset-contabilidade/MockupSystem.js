@@ -1,7 +1,7 @@
 // --- MockupSystem.js ---
 // Sistema modular do Mockup de Celular + Botão flutuante + Sons + Vídeo tutorial + Animações
 
-class MockupSystem {
+export class MockupSystem {
   constructor(config = {}) {
     this.toneIn = config.toneIn || "./tone.mp3";
     this.toneOut = config.toneOut || "./enot.mp3";
@@ -218,8 +218,10 @@ class MockupSystem {
 // ✅ Inicializa automaticamente
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
+  //export { MockupSystem };
 });
-export { MockupSystem };
+
+
 
 
 
