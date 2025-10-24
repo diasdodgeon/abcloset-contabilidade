@@ -219,6 +219,8 @@ class MockupSystem {
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
 });
+export { MockupSystem };
+
 
 
 
