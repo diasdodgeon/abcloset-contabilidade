@@ -41,70 +41,63 @@ export class ProgressSystem {
       console.log("📄 Documento de progresso já existente.");
     }
   }
-// ✅ Marca uma tarefa como concluída
-  async marcarConcluido(chave) {
-    await updateDoc(this.progressRef, { [chave]: true });
-    console.log(`🏁 Progresso atualizado: ${chave} = true`);
-  }
-
-  // ✅ Verifica se uma tarefa foi concluída
-  async verificarProgresso(chave) {
-    const snapshot = await getDoc(this.progressRef);
-    return snapshot.exists() ? snapshot.data()[chave] === true : false;
-  }
- 
-  // 🔹 Detecta onde o usuário está
-  detectarContexto() {
-    const url = window.location.pathname;
-    const abaAtiva = document.querySelector(".aba-ativa")?.id || "inicio";
-
-    if (url.includes("index.html")) return "inicio";
-    if (url.includes("estoque.html")) return "estoque";
-    if (abaAtiva.includes("vendi")) return "vendi";
-    if (abaAtiva.includes("comprei")) return "comprei";
-    if (abaAtiva.includes("paguei")) return "paguei";
-    return "inicio";
-  }
-
-  // 🔹 Exibe o tutorial correspondente
-  async exibirTutorialSeNecessario() {
-    const contexto = this.detectarContexto();
-
-    // garante que o progresso foi carregado
-    if (!this.progresso) await this.init();
-
-    switch (contexto) {
-      case "inicio":
-        if (!this.progresso.primeira_visita) {
-          MockupSystem.alertaInterativo("alô.mp3", "bemVindo.mp4");
-          await this.marcarConcluido("primeira_visita");
-        }
-        break;
-
-      case "comprei":
-        if (!this.progresso.primeira_compra) {
-          MockupSystem.alertaInterativo("alô.mp3", "tutorial_comprei.mp4");
-          await this.marcarConcluido("primeira_compra");
-        }
-        break;
-
-      case "vendi":
-        if (!this.progresso.primeira_venda) {
-          MockupSystem.alertaInterativo("alô.mp3", "tutorial_vendi.mp4");
-          await this.marcarConcluido("primeira_venda");
-        }
-        break;
-
-      case "estoque":
-        if (!this.progresso.estoque_iniciado) {
-          MockupSystem.alertaInterativo("alô.mp3", "tutorial_estoque.mp4");
-          await this.marcarConcluido("estoque_iniciado");
-        }
-        break;
+  // 🔹 Atualiza marca de progresso no Firestore
+    async marcarConcluido(chave) {
+      await updateDoc(this.ref, { [chave]: true });
+      this.progresso[chave] = true;
+    }
+  
+    // 🔹 Detecta onde o usuário está
+    detectarContexto() {
+      const url = window.location.pathname;
+      const abaAtiva = document.querySelector(".aba-ativa")?.id || "inicio";
+  
+      if (url.includes("index.html")) return "inicio";
+      if (url.includes("estoque.html")) return "estoque";
+      if (abaAtiva.includes("vendi")) return "vendi";
+      if (abaAtiva.includes("comprei")) return "comprei";
+      if (abaAtiva.includes("paguei")) return "paguei";
+      return "inicio";
+    }
+  
+    // 🔹 Exibe o tutorial correspondente
+    async exibirTutorialSeNecessario() {
+      const contexto = this.detectarContexto();
+  
+      // garante que o progresso foi carregado
+      if (!this.progresso) await this.init();
+  
+      switch (contexto) {
+        case "inicio":
+          if (!this.progresso.primeira_visita) {
+            MockupSystem.alertaInterativo("alô.mp3", "bemVindo.mp4");
+            await this.marcarConcluido("primeira_visita");
+          }
+          break;
+  
+        case "comprei":
+          if (!this.progresso.primeira_compra) {
+            MockupSystem.alertaInterativo("alô.mp3", "tutorial_comprei.mp4");
+            await this.marcarConcluido("primeira_compra");
+          }
+          break;
+  
+        case "vendi":
+          if (!this.progresso.primeira_venda) {
+            MockupSystem.alertaInterativo("alô.mp3", "tutorial_vendi.mp4");
+            await this.marcarConcluido("primeira_venda");
+          }
+          break;
+  
+        case "estoque":
+          if (!this.progresso.estoque_iniciado) {
+            MockupSystem.alertaInterativo("alô.mp3", "tutorial_estoque.mp4");
+            await this.marcarConcluido("estoque_iniciado");
+          }
+          break;
+      }
     }
   }
-}
-
 
 
 
