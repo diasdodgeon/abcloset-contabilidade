@@ -3,6 +3,7 @@
 
 export class MockupSystem {
   constructor(config = {}) {
+    console.log("📱 Mockup inicializado!");
     this.toneIn = config.toneIn || "./tone.mp3";
     this.toneOut = config.toneOut || "./enot.mp3";
     this.defaultVideo = config.defaultVideo || "./bemVindo.mp4";
@@ -219,3 +220,4 @@ export class MockupSystem {
 document.addEventListener("DOMContentLoaded", () => {
   window.AppMockup = new MockupSystem();
 });
+
