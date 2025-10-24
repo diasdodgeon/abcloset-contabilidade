@@ -15,18 +15,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { FIREBASE_CONFIG } from "./config.js";
-import { MockupSystem } from "./MockupSystem.js";
-import { ProgressSystem } from "./ProgressSystem.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
-
-
-const userId = "testeUsuario001"; // Mock para desenvolvimento
-
-const progress = new ProgressSystem(db, userId);
-await progress.initProgress();
-
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
 async function limparArquivadosAntigosLocal() {
@@ -660,68 +651,57 @@ async function compressImage(file, maxSize = 800, quality = 0.7) {
 }
 
 
-    // 🔄 Aguarda o Mockup ser criado e então liga os eventos corretamente
-function iniciarMockupQuandoPronto() {
-  const openBtn = document.getElementById("btn-ajuda");
-  const closeBtn = document.getElementById("closeModalBtn");
+        // Pega os elementos do DOM
+    const modal = document.getElementById("phoneModal");
+    const openBtn = document.getElementById("btn-ajuda");
+    const closeBtn = document.getElementById("closeModalBtn");
 
-  if (openBtn && closeBtn) {
-    // Garante que AppMockup exista antes de usar
-    if (window.AppMockup && typeof AppMockup.open === "function") {
-      openBtn.onclick = () => AppMockup.open();
-      closeBtn.onclick = () => AppMockup.close();
-      console.log("✅ Eventos do mockup conectados com sucesso!");
-    } else {
-      console.warn("⚠️ AppMockup ainda não foi inicializado. Tentando novamente...");
-      setTimeout(iniciarMockupQuandoPronto, 200);
+   // Função para abrir o modal
+    openBtn.onclick = function() {
+        modal.style.display = "block";
+        // 🔊 Toca o som
+        SoundManager.play("./tone.mp3", true);
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.add('show');
     }
-  } else {
-    // Se os botões ainda não existem, tenta de novo após 200ms
-    setTimeout(iniciarMockupQuandoPronto, 200);
-  }
-}
 
-// ✅ Inicialização do sistema de Mockup e Progresso
-document.addEventListener("DOMContentLoaded", async () => {
-  const AppMockup = new MockupSystem();
-  const Progress = new ProgressSystem(db, userId, AppMockup);
+    // Função para fechar o modal ao clicar no botão 'X'
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+        // 🔊 Toca o som
+        SoundManager.play("./enot.mp3", true);
+        // Futuramente: Adicionar classe para animações
+        // modal.classList.remove('show');
+    }
+    // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            // Futuramente: Adicionar classe para animações
+            // modal.classList.remove('show');
+        }
+    }
+     document.getElementById("btn-ajuda").addEventListener("click", function() {
+      document.getElementById("phoneModal").style.display = "flex";
+      document.getElementById("video").play();
+    });
 
-  await Progress.initProgress();
+    document.getElementById("closeModalBtn").addEventListener("click", function() {
+      document.getElementById("phoneModal").style.display = "none";
+      document.getElementById("video").pause();
+    });
 
-  // Exemplo: tutorial inicial (quando o app abre pela 1ª vez)
-  await Progress.verificarETocar("tutorial_inicial", "./bemVindo.mp4");
-
-  console.log("✅ Sistema de progresso e mockup prontos!");
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    document.getElementById("app-tutoriais").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("🎓 Acessando tutoriais...");
+    };
+    
+    document.getElementById("app-funcionalidades").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("⚙️ Acessando funcionalidades...");
+    };
+    
+    document.getElementById("app-suporte").onclick = () => {
+      SoundManager.play("./tone.mp3", true);
+      alert("💬 Abrindo suporte...");
+    };
