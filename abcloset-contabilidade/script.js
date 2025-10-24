@@ -18,6 +18,8 @@ import { FIREBASE_CONFIG } from "./config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
+const progress = new ProgressSystem(db, userId);
+
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
 async function limparArquivadosAntigosLocal() {
@@ -685,6 +687,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.init();
   await progress.exibirTutorialSeNecessario();
 });
+
 
 
 
