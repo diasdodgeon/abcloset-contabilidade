@@ -676,6 +676,15 @@ function iniciarMockupQuandoPronto() {
 document.addEventListener("DOMContentLoaded", iniciarMockupQuandoPronto);
 
 
+import { ProgressSystem } from "./ProgressSystem.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+  //const userId = "user_demo_001"; // pode ser substituído por UID real do Firebase Auth
+  const progress = new ProgressSystem(userId);
+  await progress.init();
+  await progress.exibirTutorialSeNecessario();
+});
+
 
 
 
