@@ -18,34 +18,30 @@ import { FIREBASE_CONFIG } from "./config.js";
 // --- IMPORTA O MOCKUP ---
 import { MockupSystem } from "./MockupSystem.js";
 
-// --- SISTEMA DE PROGRESSO ---
 export class ProgressSystem {
   constructor(db, userId) {
     this.db = db;
     this.userId = userId;
+    // 🔹 Aqui é o certo: cria uma referência para o documento do usuário
     this.progressRef = doc(this.db, "progresso", this.userId);
-    this.progresso = null;
   }
 
-  // 🔹 Inicializa o progresso no Firestore, se não existir
-  async init() {
-    const snap = await getDoc(this.ref);
-    if (!snap.exists()) {
-      this.progresso = {
-        primeira_visita: false,
+  async initProgress() {
+    const snapshot = await getDoc(this.progressRef);
+    if (!snapshot.exists()) {
+      await setDoc(this.progressRef, {
         primeira_venda: false,
-        primeira_compra: false,
         estoque_iniciado: false,
+        primeira_compra: false,
         historico_visto: false,
-        ultimo_video_assistido: null,
-        data_ultima_interacao: new Date().toISOString()
-      };
-      await setDoc(this.ref, this.progresso);
+        created_at: new Date().toISOString()
+      });
+      console.log("✅ Documento de progresso criado com sucesso!");
     } else {
-      this.progresso = snap.data();
+      console.log("📄 Documento de progresso já existente.");
     }
   }
-
+}
   // 🔹 Atualiza marca de progresso no Firestore
   async marcarConcluido(chave) {
     await updateDoc(this.ref, { [chave]: true });
@@ -103,6 +99,7 @@ export class ProgressSystem {
     }
   }
 }
+
 
 
 
