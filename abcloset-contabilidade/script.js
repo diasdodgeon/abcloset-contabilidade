@@ -693,6 +693,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   await progress.exibirTutorialSeNecessario();
 });
 
+// script.js
+
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("App carregado!");
+
+
+  const Progress = new ProgressSystem(db, "usuario_demo", AppMockup);
+
+  // Inicializa modais e progressos só depois que tudo estiver carregado
+  await Progress.initProgress();
+  initVendi(db);
+});
+
 
 
 
