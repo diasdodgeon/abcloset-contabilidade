@@ -21,9 +21,10 @@ import {
 import { MockupSystem } from "./MockupSystem.js";
 
 export class ProgressSystem {
-  constructor(db, userId) {
+  constructor(db, userId, mockupSystem) {
     this.db = db;
     this.userId = userId;
+    this.mockupSystem = mockupSystem;
     // 🔹 Aqui é o certo: cria uma referência para o documento do usuário
     this.progressRef = doc(this.db, "progresso", this.userId);
   }
@@ -100,6 +101,7 @@ export class ProgressSystem {
       }
     }
   }
+
 
 
 
