@@ -24,8 +24,6 @@ const db = getFirestore(app);
 // 🧠 Identificador temporário (antes do sistema de login)
 const userId = "usuarioteste001";
 
-const app = initializeApp(FIREBASE_CONFIG);
-const db = getFirestore(app);
 
 // 🧹 Limpa produtos arquivados com mais de 1 ano
 async function limparArquivadosAntigosLocal() {
@@ -726,3 +724,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log("✅ Sistema de progresso e mockup prontos!");
 });
+
