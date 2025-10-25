@@ -65,6 +65,7 @@
     width: 100%;
     display: block;
     border-radius: 12px;
+    transition: transform 0.25s ease;
   }
 
   .wallpaper-option:hover {
@@ -82,18 +83,18 @@
   .wallpaper-option::before {
     content: "📌";
     position: absolute;
-    top: 0px;
-    left: 57%;
+    top: -12px;
+    left: 50%;
     transform: translateX(-50%) translateY(0) scale(0);
-    font-size: 28px;
+    font-size: 22px;
     filter: drop-shadow(0 0 3px black);
-    z-index: 100;
+    z-index: 10;
     opacity: 0;
     transition: all 0.3s ease;
   }
 
   .wallpaper-option.selected::before {
-    transform: translateX(-50%) translateY(-5px) scale(2);
+    transform: translateX(-50%) translateY(-5px) scale(1);
     opacity: 1;
     animation: pinPop 0.3s ease forwards;
   }
@@ -102,6 +103,19 @@
     0% { transform: translateX(-50%) translateY(-10px) scale(0); opacity:0; }
     60% { transform: translateX(-50%) translateY(-15px) scale(1.2); opacity:1; }
     100% { transform: translateX(-50%) translateY(-5px) scale(1); opacity:1; }
+  }
+
+  /* --- Balanço horizontal da imagem selecionada --- */
+  .wallpaper-option.selected img {
+    animation: swing 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes swing {
+    0%   { transform: translateX(0) translateY(0) scale(1.05); }
+    25%  { transform: translateX(2px) translateY(0) scale(1.05); }
+    50%  { transform: translateX(-2px) translateY(0) scale(1.05); }
+    75%  { transform: translateX(1px) translateY(0) scale(1.05); }
+    100% { transform: translateX(-1px) translateY(0) scale(1.05); }
   }
 </style>
 </head>
@@ -123,7 +137,6 @@
   const phoneScreen = document.querySelector('.phone-screen'); // ajuste se seu mockup tiver outro nome
   const backBtn = document.getElementById('backBtn');
 
-  // Função para aplicar wallpaper
   function applyWallpaper(url, container) {
     if (phoneScreen) {
       phoneScreen.style.backgroundImage = `url('${url}')`;
@@ -133,18 +146,15 @@
     }
 
     // Remove seleção anterior
-    document.querySelectorAll('.wallpaper-option').forEach(opt => {
-      opt.classList.remove('selected');
-    });
+    document.querySelectorAll('.wallpaper-option').forEach(opt => opt.classList.remove('selected'));
 
-    // Marca o container atual como selecionado
+    // Marca o atual
     container.classList.add('selected');
   }
 
   // Carregar wallpaper salvo
   const saved = localStorage.getItem('selectedWallpaper');
 
-  // Carregar wallpapers do JSON
   fetch('wallpapers/index.json')
     .then(res => res.json())
     .then(images => {
@@ -160,7 +170,7 @@
         container.appendChild(thumb);
         gallery.appendChild(container);
 
-        // Aplica seleção se for o salvo
+        // Seleção inicial
         if (saved && saved === thumb.dataset.wall) {
           container.classList.add('selected');
           if (phoneScreen) {
@@ -170,10 +180,7 @@
           }
         }
 
-        // Clique no container
-        container.addEventListener('click', () => {
-          applyWallpaper(thumb.dataset.wall, container);
-        });
+        container.addEventListener('click', () => applyWallpaper(thumb.dataset.wall, container));
       });
     })
     .catch(err => console.error('Erro ao carregar wallpapers:', err));
@@ -188,8 +195,3 @@
 
 </body>
 </html>
-
-
-
-
-
