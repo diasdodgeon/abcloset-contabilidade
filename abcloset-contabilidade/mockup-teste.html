@@ -499,7 +499,7 @@
         padding: 10px;
         overflow-y: auto;
         flex-grow: 1;
-        overflow: auto;
+        
         
     }
 
@@ -511,12 +511,15 @@
         overflow: hidden;
         transition: transform 0.25s ease, box-shadow 0.25s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        /* 🆕 PROPRIEDADE CHAVE: Define a proporção vertical (largura/altura = 9/18 ou 1/2) */
+        /* Isso garante que a altura seja o dobro da largura, simulando um celular */
+        aspect-ratio: 9 / 18; /* Use 9 / 18 ou 1 / 2 */
     }
 
     .wallpaper-option img {
         width: 100%;
         height: 100%;
-        
+        object-fit: cover; /* Garante que a imagem preencha sem distorcer (cortando se necessário) */
         display: block;
         border-radius: 8px; /* Ajustado */
     }
@@ -1309,6 +1312,7 @@
 </body>
 
 </html>
+
 
 
 
