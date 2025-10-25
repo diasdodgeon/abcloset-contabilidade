@@ -568,7 +568,7 @@
                 <div class="phone-screen">
                     
                     <div class="status-bar" id="statusBar">
-                        <div class="time">10:47</div>
+                        <div class="time" id="currentTime">10:47</div>
                         <div class="icons">
                             ⏰📬⚙️📆
                             <span class="signal">🔋📶</span>
@@ -764,6 +764,37 @@
         const notificationDrawer = document.getElementById("notificationDrawer");
         // 🆕 Novo elemento para a lista de notificações
         const notificationList = document.getElementById("notificationList");
+
+        // 🆕 Novo elemento DOM para a hora:
+        const currentTimeElement = document.getElementById("currentTime");
+        
+        // =========================================================
+        // 🆕 4. FUNÇÃO DE ATUALIZAÇÃO DO RELÓGIO EM TEMPO REAL
+        // =========================================================
+    
+        function updateTime() {
+            const now = new Date();
+            
+            // Formata a hora (HH:MM) garantindo que tenha dois dígitos (ex: 09:05)
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const timeString = `${hours}:${minutes}`;
+            
+            // Atualiza o elemento no DOM
+            if (currentTimeElement) {
+                currentTimeElement.textContent = timeString;
+            }
+        }
+    
+        // Chama a função uma vez imediatamente para mostrar a hora correta ao carregar
+        updateTime();
+    
+        // Configura para atualizar a cada 60 segundos (60000 milissegundos)
+        // O relógio se manterá preciso sem sobrecarregar o navegador.
+        setInterval(updateTime, 60000); 
+    
+        // =========================================================
 
         // =========================================================
         // 🆕 1. DADOS DE NOTIFICAÇÕES (Simulando o backend)
@@ -1275,3 +1306,4 @@
 </body>
 
 </html>
+
