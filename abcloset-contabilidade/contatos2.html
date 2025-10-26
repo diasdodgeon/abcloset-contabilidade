@@ -224,6 +224,12 @@
       if(!num) return alert('Número inválido');
       window.open(`https://wa.me/${num}`, '_blank');
     });
+    // clique na thumb abre stories
+    thumb.addEventListener('click', (ev)=>{
+      ev.stopPropagation(); // evita abrir WhatsApp
+      openStories(c);
+    });
+
 
     listEl.appendChild(el);
   }
@@ -381,4 +387,5 @@
 
 </body>
 </html>
+
 
