@@ -248,7 +248,7 @@
 
   async function loadNetworking(){
     try {
-      const res = await fetch('./networking/contatos.json', {cache:'no-store'});
+      const res = await ('./networking/contatos.json', {cache:'no-store'});
       if(!res.ok) throw new Error('Arquivo não encontrado');
       const networkContacts = await res.json();
       let added = 0;
@@ -525,6 +525,7 @@
 
 </body>
 </html>
+
 
 
 
