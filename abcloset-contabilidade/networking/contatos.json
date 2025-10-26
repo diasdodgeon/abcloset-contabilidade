@@ -25,8 +25,18 @@
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
     ]
+  },
+  {
+    "name": "Oficina savana",
+    "number": "5585999999999",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
   }
 ]
+
 
 
 
