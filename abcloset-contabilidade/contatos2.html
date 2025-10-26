@@ -57,6 +57,74 @@
     pointer-events: none;
   }
 
+  .status-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .status-modal.hidden {
+    display: none;
+  }
+  .status-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .status-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    padding: 10px;
+    z-index: 10;
+  }
+  .status-bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .status-bar-inner {
+    width: 0%;
+    height: 100%;
+    background: white;
+    transition: width linear;
+  }
+  .status-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .status-content img, .status-content video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .status-caption {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  }
 
 </style>
 
@@ -65,6 +133,14 @@
     <button id="contacts-back" class="back-btn">←</button>
     <h2>Contatos</h2>
     <button id="contacts-add" class="add-btn">＋</button>
+  </div>
+  <!-- Modal de Status -->
+  <div id="statusModal" class="status-modal hidden">
+    <div class="status-container">
+      <div class="status-progress"></div>
+      <div class="status-content"></div>
+      <div class="status-caption"></div>
+    </div>
   </div>
   <!-- Stories Modal -->
     <div id="stories-modal" class="contacts-modal hidden">
@@ -267,7 +343,7 @@
       const video = document.createElement('video');
       video.src=s.src;
       video.autoplay=true;
-      video.controls=true;
+      video.controls=false;
       div.appendChild(video);
     } else {
       const img = document.createElement('img');
@@ -290,6 +366,130 @@
   storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
   storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
 
+  let contatosData = [];
+  let currentStatusIndex = 0;
+  let currentMediaIndex = 0;
+  let statusTimer;
+  let isVideoPlaying = false;
+  
+  // 🔹 Abre o modal de status ao clicar na foto do contato
+  async function openStatus(number) {
+    if (contatosData.length === 0) {
+      const res = await fetch('contatos.json');
+      contatosData = await res.json();
+    }
+  
+    const contato = contatosData.find(c => c.number === number);
+    if (!contato || !contato.status) return;
+  
+    currentStatusIndex = contatosData.indexOf(contato);
+    currentMediaIndex = 0;
+    showStatus(contato);
+  }
+  
+  function showStatus(contato) {
+    const modal = document.getElementById('statusModal');
+    const content = modal.querySelector('.status-content');
+    const caption = modal.querySelector('.status-caption');
+    const progress = modal.querySelector('.status-progress');
+  
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  
+    progress.innerHTML = '';
+    contato.status.forEach((_, i) => {
+      progress.innerHTML += `<div class="status-bar"><div class="status-bar-inner" id="bar${i}"></div></div>`;
+    });
+  
+    showMedia(contato, currentMediaIndex);
+  }
+  
+  function showMedia(contato, index) {
+    const modal = document.getElementById('statusModal');
+    const content = modal.querySelector('.status-content');
+    const caption = modal.querySelector('.status-caption');
+    const progressBars = modal.querySelectorAll('.status-bar-inner');
+  
+    const media = contato.status[index];
+    if (!media) return closeStatus();
+  
+    content.innerHTML = '';
+    caption.textContent = media.legenda || '';
+  
+    if (media.tipo === 'imagem') {
+      const img = document.createElement('img');
+      img.src = media.src;
+      content.appendChild(img);
+      animateBar(progressBars[index], 5000, () => nextMedia(contato));
+    } else if (media.tipo === 'video') {
+      const video = document.createElement('video');
+      video.src = media.src;
+      video.autoplay = true;
+      video.onended = () => nextMedia(contato);
+      content.appendChild(video);
+      const duration = 7000; // tempo médio p/ fallback
+      animateBar(progressBars[index], duration, () => {});
+    }
+  }
+  
+  function animateBar(bar, duration, callback) {
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    setTimeout(() => {
+      bar.style.transition = `width ${duration}ms linear`;
+      bar.style.width = '100%';
+    }, 50);
+  
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(callback, duration);
+  }
+  
+  function nextMedia(contato) {
+    currentMediaIndex++;
+    if (currentMediaIndex < contato.status.length) {
+      showMedia(contato, currentMediaIndex);
+    } else {
+      closeStatus();
+    }
+  }
+  
+  function prevMedia(contato) {
+    currentMediaIndex = Math.max(0, currentMediaIndex - 1);
+    showMedia(contato, currentMediaIndex);
+  }
+  
+  function closeStatus() {
+    const modal = document.getElementById('statusModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    clearTimeout(statusTimer);
+  }
+  
+  // 🔹 Eventos de clique e arraste
+  const modal = document.getElementById('statusModal');
+  let touchStartY = 0;
+  
+  modal.addEventListener('click', (e) => {
+    const contato = contatosData[currentStatusIndex];
+    const x = e.clientX / window.innerWidth;
+    if (x < 0.3) {
+      prevMedia(contato);
+    } else {
+      nextMedia(contato);
+    }
+  });
+  
+  modal.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  });
+  
+  modal.addEventListener('touchend', (e) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    if (touchEndY - touchStartY > 100) {
+      closeStatus();
+    }
+  });
+  
   // --- Lista de contatos ---
   function renderList(f=''){
     listEl.innerHTML='';
@@ -375,6 +575,7 @@
 
 </body>
 </html>
+
 
 
 
