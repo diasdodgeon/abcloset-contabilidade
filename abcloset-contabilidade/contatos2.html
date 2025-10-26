@@ -325,7 +325,7 @@
     clearInterval(storyTimer);
     const current = currentStories[currentStoryIndex];
     let duration = STORY_DURATION;
-    if(current.tipo === 'video') duration = 0; // vídeos não avançam automaticamente
+    if(current.tipo === 'video') duration = 60000; // vídeos não avançam automaticamente
   
     if(duration > 0){
       let elapsed = 0;
@@ -463,5 +463,6 @@
   loadNetworking();
 })();
 </script>
+
 
 
