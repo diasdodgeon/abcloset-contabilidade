@@ -22,6 +22,34 @@
   .contact-item:hover{transform:translateY(-2px);}
   .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:50%;z-index: 1;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;border:3px solid transparent;}
   .contact-thumb img{width:100%;height:100%;object-fit:cover;display:block;z-index: 1;}
+  .contact-thumb {
+    width:56px;
+    height:56px;
+    min-width:56px;
+    border-radius:50%; /* círculo */
+    z-index: 1;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    font-weight:700;
+    border: 2px solid transparent; /* borda padrão */
+    transition: border 0.3s ease;
+  }
+  
+  .contact-thumb.new-status {
+    border: 2px solid #25D366; /* verde WhatsApp */
+    animation: pulse 1.2s infinite alternate;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
   .contact-info{flex:1;display:flex;flex-direction:column;}
   .contact-name{font-size:1rem;font-weight:600;}
   .contact-number{font-size:0.82rem;opacity:0.9;}
@@ -234,6 +262,11 @@
     const thumb = document.createElement('div'); thumb.className='contact-thumb';
     if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)){
       thumb.textContent=c.photo; thumb.style.fontSize='1.8rem';
+     // marca como status novo se houver stories
+      if(c.status && c.status.length > 0 && !c.statusViewed) {
+        thumb.classList.add('new-status');
+      }
+
     } else {
       const img=document.createElement('img'); img.src=c.photo||'./user.png'; img.onerror=()=>{img.src='./user.png';};
       thumb.appendChild(img);
@@ -285,6 +318,10 @@
 
   function openStories(contact){
     if(!contact.status || contact.status.length===0) return;
+    // marcar como visto
+    contact.statusViewed = true;
+    save();
+    renderList(searchInput.value.trim());
     currentStories = contact.status;
     currentStoryIndex = 0;
     renderStoryUI();
@@ -519,3 +556,4 @@
 </script>
 </body>
 </html>
+
