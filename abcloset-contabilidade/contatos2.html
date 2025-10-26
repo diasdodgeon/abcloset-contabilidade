@@ -84,6 +84,19 @@
     opacity: 0;
     pointer-events: none;
   }
+  .story-progress-bar {
+    flex:1;
+    background: rgba(255,255,255,0.3);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  
+  .story-progress-fill {
+    width:0%;
+    height:100%;
+    background:#25D366;
+    transition: width 0.1s linear;
+  }
 
 
 </style>
@@ -98,6 +111,7 @@
     <div id="stories-modal" class="contacts-modal hidden">
       <div class="contacts-modal-card" style="max-width:480px; text-align:center; overflow:hidden; position:relative;">
         <button id="stories-close" class="btn" style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✖</button>
+        <div id="stories-progress" style="display:flex; gap:2px; position:absolute; top:12px; left:12px; right:12px; height:4px;"></div>
         <div id="stories-carousel" style="display:flex; overflow:hidden; border-radius:12px; margin-top:24px;"></div>
         <div id="stories-caption" style="margin-top:8px; font-size:0.9rem; color:#111;"></div>
         <div style="margin-top:12px;">
@@ -182,6 +196,8 @@
   let contacts = [];
   let editingId = null;
   let currentPhoto = '';
+  let storyTimer = null;
+  const STORY_DURATION = 5000; // 5s para imagens
 
   const defaultContacts = [];
 
@@ -292,7 +308,44 @@
     renderCurrentStory();
     storiesModal.classList.remove('hidden');
   }
-
+  function renderStoryProgress() {
+    const container = document.getElementById('stories-progress');
+    container.innerHTML = '';
+    currentStories.forEach((_, idx) => {
+      const bar = document.createElement('div');
+      bar.className = 'story-progress-bar';
+      const fill = document.createElement('div');
+      fill.className = 'story-progress-fill';
+      if(idx < currentStoryIndex) fill.style.width = '100%';
+      container.appendChild(bar);
+      bar.appendChild(fill);
+    });
+  }
+  function startStoryTimer() {
+    clearInterval(storyTimer);
+    const current = currentStories[currentStoryIndex];
+    let duration = STORY_DURATION;
+    if(current.tipo === 'video') duration = 0; // vídeos não avançam automaticamente
+  
+    if(duration > 0){
+      let elapsed = 0;
+      const step = 50;
+      const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
+      storyTimer = setInterval(() => {
+        elapsed += step;
+        fill.style.width = Math.min((elapsed / duration) * 100, 100) + '%';
+        if(elapsed >= duration){
+          clearInterval(storyTimer);
+          if(currentStoryIndex < currentStories.length-1){
+            currentStoryIndex++;
+            renderCurrentStory();
+          } else {
+            storiesModal.classList.add('hidden');
+          }
+        }
+      }, step);
+    }
+  }
   function renderCurrentStory(){
     storiesCarousel.innerHTML='';
     const s = currentStories[currentStoryIndex];
@@ -320,11 +373,15 @@
 
     storiesCarousel.appendChild(div);
     storiesCaption.textContent = s.legenda || '';
+    renderStoryProgress();
+    startStoryTimer();
+
   }
 
   storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
   storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
   storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
+  
 
   // --- Lista de contatos ---
   function renderList(f=''){
@@ -406,4 +463,5 @@
   loadNetworking();
 })();
 </script>
+
 
