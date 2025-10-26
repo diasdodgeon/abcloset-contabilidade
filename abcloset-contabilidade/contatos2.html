@@ -81,8 +81,8 @@
       </div>
 
       <div id="emoji-picker" class="emoji-picker" style="display:none;">
-        <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>💩</span><span>😅</span><span>☠️</span><span>🤢</span><span>🤮</span>
-        <span>😻</span><span>🧐</span><span>😠</span><span>😡</span><span>🙈</span><span>🐱</span><span>☠️</span><span>🤢</span><span>🤮</span>
+        <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>💩</span><span>😅</span><span>🐱</span><span>🤢</span><span>🤮</span>
+        <span>😻</span><span>🧐</span><span>😠</span><span>😡</span><span>🙈
         <span>🙉</span><span>🙊</span><span>🧒</span><span>👦</span><span>👧</span><span>🧑</span><span>👱</span><span>👨</span><span>🧔</span>
         </span><span>👨‍🦰</span><span>👨‍🦱</span><span>👨‍🦳</span><span>👨‍🦲</span>
         <span>👩</span><span>👩‍🦰</span><span>👩‍🦱</span><span>👩‍🦳</span><span>👧</span><span>🧓</span><span>👴</span><span>👵</span><span>⚽</span>
@@ -119,15 +119,41 @@
   let editingId = null;
   let currentPhoto = '';
 
-  const defaultContacts = [
-    {id:genId(),name:'Ariane Brandão',number:'5585999355181',photo:'./user.png',fav:false},
-    {id:genId(),name:'Alison Dias',number:'5588998096474',photo:'./user.png',fav:false}
-  ];
+  const defaultContacts = []; // agora será carregado do JSON externo
 
   function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
   function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
   function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
   function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+
+  // Função que carrega contatos de /networking/contatos.json
+  async function loadNetworking(){
+    try {
+      const res = await fetch('./networking/contatos.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('Arquivo não encontrado');
+      const networkContacts = await res.json();
+      let added = 0;
+
+      networkContacts.forEach(nc=>{
+        const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
+        if(!exists){
+          contacts.push({
+            id: genId(),
+            name: nc.name || '(sem nome)',
+            number: normalizeNumber(nc.number || ''),
+            photo: nc.photo || './user.png',
+            fav: false
+          });
+          added++;
+        }
+      });
+
+      if(added>0){ save(); renderList(searchInput.value.trim()); }
+      console.log(`🌐 Networking atualizado (${added} novos contatos).`);
+    } catch(err){
+      console.log('⚠️ Nenhum networking carregado:', err.message);
+    }
+  }
 
   function renderContact(c){
     const el = document.createElement('div');
@@ -185,18 +211,19 @@
     listEl.appendChild(el);
   }
 
-  function renderList(f=''){listEl.innerHTML='';contacts.filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase())).forEach(renderContact);}
+  function renderList(f=''){
+    listEl.innerHTML='';
+    contacts
+      .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+      .forEach(renderContact);
+  }
+
   function openAdd() {
-    // Adicionar novo contato
     editingId = null;
     inputName.value = '';
     inputNumber.value = '';
-    currentPhoto = '';
-
-    preview.textContent = './user.png';
-    preview.style.background = '#f0f0f0';
-    preview.innerHTML = '';
-
+    currentPhoto = './user.png';
+    preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     emojiPicker.style.display = 'none';
     modal.classList.remove('hidden');
   }
@@ -204,44 +231,59 @@
   function openEdit(id) {
     const c = contacts.find(x => x.id === id);
     if(!c) return;
-
     editingId = id;
     inputName.value = c.name || '';
     inputNumber.value = c.number || '';
-    currentPhoto = c.photo || '';
-
+    currentPhoto = c.photo || './user.png';
     if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
       preview.textContent = currentPhoto;
       preview.style.background = '#fff';
-      preview.innerHTML = currentPhoto;
-    } else if(currentPhoto) {
-      preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-      preview.style.background = '#f0f0f0';
     } else {
-      preview.textContent = './user.png';
-      preview.style.background = '#f0f0f0';
+      preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     }
-
     emojiPicker.style.display = 'none';
     modal.classList.remove('hidden');
+  }
+
+  function toggleFav(id){
+    const c = contacts.find(x => x.id === id);
+    if (!c) return;
+    c.fav = !c.fav;
+    save();
+    renderList(searchInput.value.trim());
+  }
+
+  function removeContact(id){
+    if (!confirm('Deseja realmente excluir este contato?')) return;
+    contacts = contacts.filter(x => x.id !== id);
+    save();
+    renderList(searchInput.value.trim());
   }
 
   function saveFromModal(){
     const name=inputName.value.trim();
     const number=normalizeNumber(inputNumber.value.trim());
     if(!number)return alert('Número inválido');
-    const photo=currentPhoto||'';
+    const photo=currentPhoto||'./user.png';
     if(editingId){
-      const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;}
+      const c=contacts.find(x=>x.id===editingId);
+      if(c){c.name=name;c.number=number;c.photo=photo;}
     }else contacts.unshift({id:genId(),name,number,photo,fav:false});
-    save(); renderList(searchInput.value.trim()); closeModal();
+    save();
+    renderList(searchInput.value.trim());
+    closeModal();
   }
 
   function closeModal(){modal.classList.add('hidden'); emojiPicker.style.display='none';}
+
   function handleFile(ev){
-    const file=ev.target.files[0]; if(!file)return;
+    const file=ev.target.files[0];
+    if(!file)return;
     const reader=new FileReader();
-    reader.onload=()=>{currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;};
+    reader.onload=()=>{
+      currentPhoto=reader.result;
+      preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -263,8 +305,13 @@
   searchInput.oninput=()=>renderList(searchInput.value);
   backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
 
-  load(); renderList();
+  // --- Inicialização ---
+  load();
+  renderList();
+  loadNetworking(); // <-- carrega contatos de /networking/contatos.json
 })();
 </script>
+
+
 </body>
 </html>
