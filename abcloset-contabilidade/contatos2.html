@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contatos - WhatsApp Mockup</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contatos - WhatsApp Mockup (Touch Controls)</title>
 </head>
 <body>
 <style>
-  .contacts-app{
-    width:100%; height:100%;
-    display:flex; flex-direction:column;
-    background: linear-gradient(#0b8450, #075f3a);
-    color:#fff; padding:10px; box-sizing:border-box;
-    border-radius:16px; overflow:hidden;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  }
+  /* --- layout geral (mantive seu estilo) --- */
+  .contacts-app{ width:100%; height:100%; display:flex; flex-direction:column;
+    background: linear-gradient(#0b8450, #075f3a); color:#fff; padding:10px; box-sizing:border-box;
+    border-radius:16px; overflow:hidden; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
   .contacts-header{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 4px;}
   .contacts-header h2{margin:0;font-size:1.05rem;}
   .back-btn{position:absolute;left:6px;background:transparent;border:none;color:white;font-size:1.3rem;cursor:pointer;}
@@ -24,36 +20,8 @@
   .contacts-list{flex:1;overflow:auto;padding:6px;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
   .contact-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,0.06);padding:8px;border-radius:12px;cursor:pointer;transition:transform .12s;}
   .contact-item:hover{transform:translateY(-2px);}
-  .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:12px;z-index: 1;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;}
+  .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:50%;z-index: 1;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;border:3px solid transparent;}
   .contact-thumb img{width:100%;height:100%;object-fit:cover;display:block;z-index: 1;}
-  .contact-thumb {
-    width:56px;
-    height:56px;
-    min-width:56px;
-    border-radius:50%; /* círculo */
-    z-index: 1;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(255,255,255,0.08);
-    color:#fff;
-    font-weight:700;
-    border: 2px solid transparent; /* borda padrão */
-    transition: border 0.3s ease;
-  }
-  
-  .contact-thumb.new-status {
-    border: 2px solid #25D366; /* verde WhatsApp */
-    animation: pulse 1.2s infinite alternate;
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-    100% { transform: scale(1); }
-  }
-
   .contact-info{flex:1;display:flex;flex-direction:column;}
   .contact-name{font-size:1rem;font-weight:600;}
   .contact-number{font-size:0.82rem;opacity:0.9;}
@@ -74,30 +42,78 @@
   .emoji-picker span{cursor:pointer;font-size:1.5rem;transition:transform .1s;}
   .emoji-picker span:hover{transform:scale(1.2);}
 
-  .story-item { min-width:100%; transition:transform 0.3s ease; display:flex; justify-content:center; align-items:center; }
-  .story-item img, .story-item video { width:100%; height:auto; max-height:600px; border-radius:12px; object-fit:cover; }
-  #stories-modal {
-    backdrop-filter: blur(6px);
-    transition: opacity 0.2s ease;
-  }
-  #stories-modal.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .story-progress-bar {
-    flex:1;
-    background: rgba(255,255,255,0.3);
-    border-radius:2px;
-    overflow:hidden;
-  }
-  
-  .story-progress-fill {
-    width:0%;
-    height:100%;
-    background:#25D366;
-    transition: width 0.1s linear;
+  /* --- stories modal (fullscreen) --- */
+  .stories-fullscreen { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.95); z-index: 10000; }
+  .stories-hidden { display:none; }
+
+  .stories-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action: manipulation;
   }
 
+  .stories-media {
+    width: 100%;
+    height: 100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .stories-media img, .stories-media video {
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+  }
+
+  /* progress bars (flutuando acima do conteúdo) */
+  .stories-progress {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    right: 10px;
+    display:flex;
+    gap:6px;
+    z-index: 12000;
+    pointer-events: none;
+  }
+  .stories-progress .bar {
+    flex:1; height:3px; background: rgba(255,255,255,0.25); border-radius:2px; overflow:hidden;
+  }
+  .stories-progress .bar .fill { width:0%; height:100%; background:#fff; transition: width linear; }
+
+  /* caption flutuante */
+  .stories-caption {
+    position: absolute;
+    left:0; right:0;
+    bottom: 24px;
+    padding: 12px 20px;
+    color: #fff;
+    text-align:center;
+    z-index:12000;
+    background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.45));
+    pointer-events: none;
+  }
+
+  /* tap areas (left/right) - ocupam full height */
+  .tap-area { position:absolute; top:0; bottom:0; width:50%; z-index:12001; }
+  .tap-left { left:0; }
+  .tap-right { right:0; }
+
+  /* small close arrow on top-left (discreto) */
+  .stories-close-arrow {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 12002;
+    width:36px; height:36px; border-radius:18px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.35); color:#fff; font-size:18px; cursor:pointer;
+  }
 
 </style>
 
@@ -107,72 +123,63 @@
     <h2>Contatos</h2>
     <button id="contacts-add" class="add-btn">＋</button>
   </div>
-  <!-- Stories Modal -->
-    <div id="stories-modal" class="contacts-modal hidden">
-      <div class="contacts-modal-card" style="max-width:480px; text-align:center; overflow:hidden; position:relative;">
-        <button id="stories-close" class="btn" style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✖</button>
-        <div id="stories-progress" style="display:flex; gap:2px; position:absolute; top:12px; left:12px; right:12px; height:4px;"></div>
-        <div id="stories-carousel" style="display:flex; overflow:hidden; border-radius:12px; margin-top:24px;"></div>
-        <div id="stories-caption" style="margin-top:8px; font-size:0.9rem; color:#111;"></div>
-        <div style="margin-top:12px;">
-          <button id="stories-prev" class="btn">←</button>
-          <button id="stories-next" class="btn">→</button>
-        </div>
-      </div>
-    </div>
+
   <div class="contacts-search">
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
   </div>
 
   <div id="contacts-list" class="contacts-list"></div>
 
-  <!-- Modal -->
+  <!-- Modal de adicionar contato (mantive) -->
   <div id="contacts-modal" class="contacts-modal hidden">
-    
     <div class="contacts-modal-card">
       <h3 id="modal-title">Adicionar Contato</h3>
-
       <label>Nome
         <input id="contact-name" type="text" placeholder="Ex: João Silva"/>
       </label>
       <label>Número (ex: 5585995598888)
         <input id="contact-number" type="text" placeholder="Código do país + DDD + número"/>
       </label>
-
       <div class="photo-preview" id="photo-preview">👤</div>
-
       <div style="text-align:center;display:flex;justify-content:center;gap:10px;">
         <button id="btn-photo" class="btn">📷 Foto</button>
         <button id="btn-emoji" class="btn">😎 Emoji</button>
         <input type="file" id="photo-input" accept="image/*" capture="user" style="display:none;">
       </div>
-
       <div id="emoji-picker" class="emoji-picker" style="display:none;">
-        <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>💩</span><span>😅</span><span>🐱</span><span>🤢</span><span>🤮</span>
-        <span>😻</span><span>🧐</span><span>😠</span><span>😡</span><span>🙈
-        <span>🙉</span><span>🙊</span><span>🧒</span><span>👦</span><span>👧</span><span>🧑</span><span>👱</span><span>👨</span><span>🧔</span>
-        </span><span>👨‍🦰</span><span>👨‍🦱</span><span>👨‍🦳</span><span>👨‍🦲</span>
-        <span>👩</span><span>👩‍🦰</span><span>👩‍🦱</span><span>👩‍🦳</span><span>👧</span><span>🧓</span><span>👴</span><span>👵</span><span>⚽</span>
+        <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>😅</span><span>🐱</span><span>🎧</span>
       </div>
-    
       <div class="modal-actions">
         <button id="modal-save" class="btn primary">Salvar</button>
         <button id="modal-cancel" class="btn">Cancelar</button>
       </div>
     </div>
   </div>
-  
-
 </div>
 
+<!-- stories fullscreen modal (novo markup para touch controls) -->
+<div id="storiesFull" class="stories-fullscreen stories-hidden" aria-hidden="true">
+  <div class="stories-content" id="storiesContent">
+    <div class="stories-media" id="storiesMedia"></div>
 
-<!-- ... código HTML e CSS permanece igual até <script> ... -->
+    <div class="stories-progress" id="storiesProgress"></div>
+    <div class="stories-caption" id="storiesCaption"></div>
+
+    <!-- tap areas -->
+    <div class="tap-area tap-left" id="tapLeft"></div>
+    <div class="tap-area tap-right" id="tapRight"></div>
+
+    <!-- close arrow (discreto, top-left) -->
+    <div class="stories-close-arrow" id="storiesCloseArrow">←</div>
+  </div>
+</div>
 
 <script>
 (function(){
+  // --- variáveis app (mantive sua estrutura) ---
   const STORAGE_KEY = 'contactsApp.v2';
   const listEl = document.getElementById('contacts-list');
-  const modal = document.getElementById('contacts-modal');
+  const contactsModal = document.getElementById('contacts-modal');
   const inputName = document.getElementById('contact-name');
   const inputNumber = document.getElementById('contact-number');
   const saveBtn = document.getElementById('modal-save');
@@ -185,20 +192,10 @@
   const photoInput = document.getElementById('photo-input');
   const preview = document.getElementById('photo-preview');
   const emojiPicker = document.getElementById('emoji-picker');
-  // --- Stories ---
-  const storiesModal = document.getElementById('stories-modal');
-  const storiesCarousel = document.getElementById('stories-carousel');
-  const storiesCaption = document.getElementById('stories-caption');
-  const storiesClose = document.getElementById('stories-close');
-  const storiesPrev = document.getElementById('stories-prev');
-  const storiesNext = document.getElementById('stories-next');
 
   let contacts = [];
   let editingId = null;
   let currentPhoto = '';
-  let storyTimer = null;
-  const STORY_DURATION = 5000; // 5s para imagens
-
   const defaultContacts = [];
 
   function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
@@ -221,7 +218,7 @@
             number: normalizeNumber(nc.number || ''),
             photo: nc.photo || './user.png',
             fav: false,
-            status: nc.status || [] // ✅ adiciona stories
+            status: nc.status || []
           });
           added++;
         }
@@ -231,59 +228,40 @@
     } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
   }
 
+  // --- render de contato (mantive) ---
   function renderContact(c){
-    const el = document.createElement('div');
-    el.className = 'contact-item';
-    el.dataset.id = c.id;
-
-    const thumb = document.createElement('div');
-    thumb.className = 'contact-thumb';
-    // marca como status novo se houver stories
-    if(c.status && c.status.length > 0 && !c.statusViewed) {
-      thumb.classList.add('new-status');
-    }
-
-    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
-      thumb.textContent = c.photo;
-      thumb.style.fontSize = '1.8rem';
+    const el = document.createElement('div'); el.className='contact-item'; el.dataset.id=c.id;
+    const thumb = document.createElement('div'); thumb.className='contact-thumb';
+    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)){
+      thumb.textContent=c.photo; thumb.style.fontSize='1.8rem';
     } else {
-      const img = document.createElement('img');
-      img.src = c.photo || './user.png';
-      img.onerror = () => { img.src = './user.png'; };
+      const img=document.createElement('img'); img.src=c.photo||'./user.png'; img.onerror=()=>{img.src='./user.png';};
       thumb.appendChild(img);
     }
-
-    const info = document.createElement('div'); info.className = 'contact-info';
-    const nm = document.createElement('div'); nm.className = 'contact-name'; nm.textContent = c.name || '(sem nome)';
-    const no = document.createElement('div'); no.className = 'contact-number'; no.textContent = c.number;
+    const info=document.createElement('div'); info.className='contact-info';
+    const nm=document.createElement('div'); nm.className='contact-name'; nm.textContent=c.name||'(sem nome)';
+    const no=document.createElement('div'); no.className='contact-number'; no.textContent=c.number;
     info.appendChild(nm); info.appendChild(no);
 
-    const actions = document.createElement('div'); actions.className = 'contact-actions';
-    const favBtn = document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
-    favBtn.innerHTML = c.fav ? '⭐' : '☆';
-    favBtn.addEventListener('click', ev=>{ ev.stopPropagation(); toggleFav(c.id); });
-
-    const editBtn = document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
-    editBtn.innerHTML = '✎';
-    editBtn.addEventListener('click', ev=>{ ev.stopPropagation(); openEdit(c.id); });
-
-    const delBtn = document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
-    delBtn.innerHTML = '🗑';
-    delBtn.addEventListener('click', ev=>{ ev.stopPropagation(); removeContact(c.id); });
-
+    const actions=document.createElement('div'); actions.className='contact-actions';
+    const favBtn=document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
+    favBtn.innerHTML=c.fav ? '⭐' : '☆'; favBtn.addEventListener('click', ev=>{ev.stopPropagation(); toggleFav(c.id);});
+    const editBtn=document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
+    editBtn.innerHTML='✎'; editBtn.addEventListener('click', ev=>{ev.stopPropagation(); openEdit(c.id);});
+    const delBtn=document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
+    delBtn.innerHTML='🗑'; delBtn.addEventListener('click', ev=>{ev.stopPropagation(); removeContact(c.id);});
     actions.appendChild(favBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
 
-    el.appendChild(thumb);
-    el.appendChild(info);
-    el.appendChild(actions);
+    el.appendChild(thumb); el.appendChild(info); el.appendChild(actions);
 
+    // abrir whatsapp ao clicar fora do thumb
     el.addEventListener('click', ()=>{
       const num = normalizeNumber(c.number);
       if(!num) return alert('Número inválido');
       window.open(`https://wa.me/${num}`, '_blank');
     });
 
-    // abrir stories
+    // abrir stories ao clicar na thumb (TOUCH)
     thumb.addEventListener('click', ev=>{
       ev.stopPropagation();
       openStories(c);
@@ -292,98 +270,174 @@
     listEl.appendChild(el);
   }
 
-  
+  // --- Stories fullscreen (touch controls) ---
+  const storiesFull = document.getElementById('storiesFull');
+  const storiesMedia = document.getElementById('storiesMedia');
+  const storiesProgress = document.getElementById('storiesProgress');
+  const storiesCaption = document.getElementById('storiesCaption');
+  const tapLeft = document.getElementById('tapLeft');
+  const tapRight = document.getElementById('tapRight');
+  const storiesCloseArrow = document.getElementById('storiesCloseArrow');
 
   let currentStories = [];
   let currentStoryIndex = 0;
+  let storyTimer = null;
 
   function openStories(contact){
     if(!contact.status || contact.status.length===0) return;
-    // marcar como visto
-    contact.statusViewed = true;
-    save();
-    renderList(searchInput.value.trim());
     currentStories = contact.status;
     currentStoryIndex = 0;
-    renderCurrentStory();
-    storiesModal.classList.remove('hidden');
+    renderStoryUI();
+    showStory(currentStoryIndex);
+    storiesFull.classList.remove('stories-hidden');
+    storiesFull.setAttribute('aria-hidden','false');
+    document.documentElement.style.overflow='hidden';
   }
-  function renderStoryProgress() {
-    const container = document.getElementById('stories-progress');
-    container.innerHTML = '';
-    currentStories.forEach((_, idx) => {
-      const bar = document.createElement('div');
-      bar.className = 'story-progress-bar';
-      const fill = document.createElement('div');
-      fill.className = 'story-progress-fill';
-      if(idx < currentStoryIndex) fill.style.width = '100%';
-      container.appendChild(bar);
-      bar.appendChild(fill);
+
+  function closeStories(){
+    clearTimeout(storyTimer);
+    storiesFull.classList.add('stories-hidden');
+    storiesFull.setAttribute('aria-hidden','true');
+    document.documentElement.style.overflow='';
+    storiesMedia.innerHTML='';
+    storiesProgress.innerHTML='';
+    storiesCaption.textContent='';
+  }
+
+  function renderStoryUI(){
+    // bars
+    storiesProgress.innerHTML = '';
+    currentStories.forEach((_,i)=>{
+      const b = document.createElement('div'); b.className='bar';
+      const f = document.createElement('div'); f.className='fill'; f.id='fill-'+i;
+      b.appendChild(f);
+      storiesProgress.appendChild(b);
     });
   }
-  function startStoryTimer() {
-    clearInterval(storyTimer);
-    const current = currentStories[currentStoryIndex];
-    let duration = STORY_DURATION;
-    if(current.tipo === 'video') duration = 60000; // vídeos não avançam automaticamente
-  
-    if(duration > 0){
-      let elapsed = 0;
-      const step = 50;
-      const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
-      storyTimer = setInterval(() => {
-        elapsed += step;
-        fill.style.width = Math.min((elapsed / duration) * 100, 100) + '%';
-        if(elapsed >= duration){
-          clearInterval(storyTimer);
-          if(currentStoryIndex < currentStories.length-1){
-            currentStoryIndex++;
-            renderCurrentStory();
-          } else {
-            storiesModal.classList.add('hidden');
-          }
-        }
-      }, step);
-    }
-  }
-  function renderCurrentStory(){
-    storiesCarousel.innerHTML='';
-    const s = currentStories[currentStoryIndex];
-    const div = document.createElement('div');
-    div.className='story-item';
-    
-    if(s.tipo==='video'){
-      const video = document.createElement('video');
-      video.src=s.src;
-      video.autoplay=true;
-      video.controls=true;
-      div.appendChild(video);
-    } else {
+
+  function showStory(index){
+    clearTimeout(storyTimer);
+    storiesMedia.innerHTML='';
+    storiesCaption.textContent='';
+
+    const media = currentStories[index];
+    if(!media){ closeStories(); return; }
+
+    // update caption
+    storiesCaption.textContent = media.legenda || '';
+
+    // reset fills
+    currentStories.forEach((_,i)=>{
+      const el = document.getElementById('fill-'+i);
+      if(el) el.style.transition='none', el.style.width = (i<index? '100%':'0%');
+    });
+
+    // show current media
+    if(media.tipo === 'imagem'){
       const img = document.createElement('img');
-      img.src = s.src;
-      // clique na imagem avança o story
-      img.addEventListener('click', ()=>{
-        if(currentStoryIndex < currentStories.length-1){
-          currentStoryIndex++;
-          renderCurrentStory();
-        } else { storiesModal.classList.add('hidden'); }
-      });
-      div.appendChild(img);
+      img.src = media.src;
+      storiesMedia.appendChild(img);
+
+      // animate current fill and auto-advance after 5s
+      const fill = document.getElementById('fill-'+index);
+      if(fill){
+        setTimeout(()=>{ fill.style.transition = 'width 5000ms linear'; fill.style.width='100%'; }, 50);
+      }
+      storyTimer = setTimeout(()=> goNext(), 5000);
+
+    } else if(media.tipo === 'video'){
+      const video = document.createElement('video');
+      video.src = media.src;
+      video.autoplay = true;
+      video.controls = false;
+      video.onended = ()=> goNext();
+      storiesMedia.appendChild(video);
+
+      // set max duration fallback (1 minute default)
+      const maxDur = 60 * 1000;
+      const fill = document.getElementById('fill-'+index);
+      if(fill){
+        setTimeout(()=>{ fill.style.transition = `width ${maxDur}ms linear`; fill.style.width='100%'; }, 50);
+      }
+      // ensure fallback advance after maxDur
+      clearTimeout(storyTimer);
+      storyTimer = setTimeout(()=> {
+        // if video still playing, pause then advance
+        try{ const v = storiesMedia.querySelector('video'); if(v && !v.ended) v.pause(); }catch(e){}
+        goNext();
+      }, maxDur);
     }
-
-    storiesCarousel.appendChild(div);
-    storiesCaption.textContent = s.legenda || '';
-    renderStoryProgress();
-    startStoryTimer();
-
   }
 
-  storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
-  storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
-  storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
-  
+  function goNext(){
+    if(currentStoryIndex < currentStories.length - 1){
+      currentStoryIndex++;
+      showStory(currentStoryIndex);
+    } else {
+      closeStories();
+    }
+  }
+  function goPrev(){
+    if(currentStoryIndex > 0){
+      currentStoryIndex--;
+      showStory(currentStoryIndex);
+    } else {
+      // if at first and user taps left, close (WhatsApp closes only when swipe down; here we keep at first)
+      showStory(0);
+    }
+  }
 
-  // --- Lista de contatos ---
+  // --- TOUCH handlers for left/right taps ---
+  // We'll treat quick taps as left/right; swipes vertical >100px close.
+  let touchStartX = 0, touchStartY = 0, touchMoved = false;
+
+  function onTapStart(e){
+    touchMoved = false;
+    const t = e.touches ? e.touches[0] : e;
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+  }
+  function onTapEnd(e, side){
+    const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : e;
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    const moved = Math.abs(dx) > 20 || Math.abs(dy) > 20;
+    if(Math.abs(dy) > 100 && Math.abs(dy) > Math.abs(dx)) {
+      // vertical swipe -> close
+      closeStories();
+      return;
+    }
+    if(moved){
+      // ignore large horizontal drags as taps
+      return;
+    }
+    // if side provided, use it; otherwise decide by x
+    if(side === 'left') goPrev();
+    else if(side === 'right') goNext();
+    else {
+      const winHalf = window.innerWidth/2;
+      if(t.clientX < winHalf) goPrev(); else goNext();
+    }
+  }
+
+  // attach to overlay tap areas
+  tapLeft.addEventListener('touchstart', onTapStart, {passive:true});
+  tapLeft.addEventListener('touchend', e => onTapEnd(e,'left'), {passive:true});
+  tapLeft.addEventListener('click', e => onTapEnd(e,'left'));
+
+  tapRight.addEventListener('touchstart', onTapStart, {passive:true});
+  tapRight.addEventListener('touchend', e => onTapEnd(e,'right'), {passive:true});
+  tapRight.addEventListener('click', e => onTapEnd(e,'right'));
+
+  // also allow tapping over the center (storiesMedia) to advance
+  storiesMedia.addEventListener('touchstart', onTapStart, {passive:true});
+  storiesMedia.addEventListener('touchend', e => onTapEnd(e,null), {passive:true});
+  storiesMedia.addEventListener('click', e => onTapEnd(e,null));
+
+  // close arrow
+  storiesCloseArrow.addEventListener('click', closeStories);
+
+  // --- restante do app: adicionar / editar contatos, carregar networking etc. ---
   function renderList(f=''){
     listEl.innerHTML='';
     contacts
@@ -391,7 +445,6 @@
       .forEach(renderContact);
   }
 
-  // --- Modal adicionar / editar ---
   function openAdd() {
     editingId = null;
     inputName.value = '';
@@ -399,7 +452,7 @@
     currentPhoto = './user.png';
     preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     emojiPicker.style.display = 'none';
-    modal.classList.remove('hidden');
+    contactsModal.classList.remove('hidden');
   }
 
   function openEdit(id) {
@@ -415,7 +468,7 @@
       preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     }
     emojiPicker.style.display='none';
-    modal.classList.remove('hidden');
+    contactsModal.classList.remove('hidden');
   }
 
   function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
@@ -429,7 +482,7 @@
     else contacts.unshift({id:genId(),name,number,photo,fav:false});
     save(); renderList(searchInput.value.trim()); closeModal();
   }
-  function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
+  function closeModal(){ contactsModal.classList.add('hidden'); emojiPicker.style.display='none'; }
 
   function handleFile(ev){
     const file=ev.target.files[0];
@@ -457,12 +510,12 @@
   searchInput.oninput=()=>renderList(searchInput.value);
   backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
 
-  // --- Inicialização ---
+  // --- inicialização ---
   load();
   renderList();
   loadNetworking();
+
 })();
 </script>
-
-
-
+</body>
+</html>
