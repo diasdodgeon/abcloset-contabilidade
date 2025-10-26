@@ -134,6 +134,13 @@
   const photoInput = document.getElementById('photo-input');
   const preview = document.getElementById('photo-preview');
   const emojiPicker = document.getElementById('emoji-picker');
+  // --- Stories ---
+  const storiesModal = document.getElementById('stories-modal');
+  const storiesCarousel = document.getElementById('stories-carousel');
+  const storiesCaption = document.getElementById('stories-caption');
+  const storiesClose = document.getElementById('stories-close');
+  const storiesPrev = document.getElementById('stories-prev');
+  const storiesNext = document.getElementById('stories-next');
 
   let contacts = [];
   let editingId = null;
@@ -227,13 +234,7 @@
     listEl.appendChild(el);
   }
 
-  // --- Stories ---
-  const storiesModal = document.getElementById('stories-modal');
-  const storiesCarousel = document.getElementById('stories-carousel');
-  const storiesCaption = document.getElementById('stories-caption');
-  const storiesClose = document.getElementById('stories-close');
-  const storiesPrev = document.getElementById('stories-prev');
-  const storiesNext = document.getElementById('stories-next');
+  
 
   let currentStories = [];
   let currentStoryIndex = 0;
@@ -356,7 +357,7 @@
   // --- Inicialização ---
   load();
   renderList();
-  openStories(c)
+  renderCurrentStory();
   loadNetworking();
 })();
 </script>
@@ -365,4 +366,5 @@
 
 </body>
 </html>
+
 
