@@ -206,7 +206,12 @@
 (function(){
   const STORAGE_KEY = 'contactsApp.v2';
   const listEl = document.getElementById('contacts-list');
-  const modal = document.getElementById('contacts-modal');
+
+  // Modais
+  const contactsModal = document.getElementById('contacts-modal');
+  const statusModal = document.getElementById('statusModal');
+
+  // Inputs do modal de contatos
   const inputName = document.getElementById('contact-name');
   const inputNumber = document.getElementById('contact-number');
   const saveBtn = document.getElementById('modal-save');
@@ -214,12 +219,15 @@
   const addBtn = document.getElementById('contacts-add');
   const backBtn = document.getElementById('contacts-back');
   const searchInput = document.getElementById('contacts-search-input');
+
+  // Foto e emoji
   const btnPhoto = document.getElementById('btn-photo');
   const btnEmoji = document.getElementById('btn-emoji');
   const photoInput = document.getElementById('photo-input');
   const preview = document.getElementById('photo-preview');
   const emojiPicker = document.getElementById('emoji-picker');
-  // --- Stories ---
+
+  // Stories
   const storiesModal = document.getElementById('stories-modal');
   const storiesCarousel = document.getElementById('stories-carousel');
   const storiesCaption = document.getElementById('stories-caption');
@@ -253,7 +261,7 @@
             number: normalizeNumber(nc.number || ''),
             photo: nc.photo || './user.png',
             fav: false,
-            status: nc.status || [] // ✅ adiciona stories
+            status: nc.status || []
           });
           added++;
         }
@@ -263,6 +271,7 @@
     } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
   }
 
+  // --- Renderizar contatos ---
   function renderContact(c){
     const el = document.createElement('div');
     el.className = 'contact-item';
@@ -305,229 +314,168 @@
     el.appendChild(info);
     el.appendChild(actions);
 
+    // Abrir WhatsApp
     el.addEventListener('click', ()=>{
       const num = normalizeNumber(c.number);
       if(!num) return alert('Número inválido');
       window.open(`https://wa.me/${num}`, '_blank');
     });
 
-    // abrir stories
+    // Abrir status
     thumb.addEventListener('click', ev=>{
       ev.stopPropagation();
-      openStories(c);
+      openStatus(c.number);
     });
 
     listEl.appendChild(el);
   }
 
-  
-
-  let currentStories = [];
-  let currentStoryIndex = 0;
-
-  function openStories(contact){
-    if(!contact.status || contact.status.length===0) return;
-    currentStories = contact.status;
-    currentStoryIndex = 0;
-    renderCurrentStory();
-    storiesModal.classList.remove('hidden');
-  }
-
-  function renderCurrentStory(){
-    storiesCarousel.innerHTML='';
-    const s = currentStories[currentStoryIndex];
-    const div = document.createElement('div');
-    div.className='story-item';
-    
-    if(s.tipo==='video'){
-      const video = document.createElement('video');
-      video.src=s.src;
-      video.autoplay=true;
-      video.controls=false;
-      div.appendChild(video);
-    } else {
-      const img = document.createElement('img');
-      img.src = s.src;
-      // clique na imagem avança o story
-      img.addEventListener('click', ()=>{
-        if(currentStoryIndex < currentStories.length-1){
-          currentStoryIndex++;
-          renderCurrentStory();
-        } else { storiesModal.classList.add('hidden'); }
-      });
-      div.appendChild(img);
-    }
-
-    storiesCarousel.appendChild(div);
-    storiesCaption.textContent = s.legenda || '';
-  }
-
-  storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
-  storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
-  storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
-
+  // --- Modal de status ---
   let contatosData = [];
   let currentStatusIndex = 0;
   let currentMediaIndex = 0;
   let statusTimer;
-  let isVideoPlaying = false;
-  
-  // 🔹 Abre o modal de status ao clicar na foto do contato
-  async function openStatus(number) {
-    if (contatosData.length === 0) {
+
+  async function openStatus(number){
+    if(contatosData.length===0){
       const res = await fetch('contatos.json');
       contatosData = await res.json();
     }
-  
-    const contato = contatosData.find(c => c.number === number);
-    if (!contato || !contato.status) return;
-  
+
+    const contato = contatosData.find(c=>c.number===number);
+    if(!contato || !contato.status || contato.status.length===0) return;
+
     currentStatusIndex = contatosData.indexOf(contato);
     currentMediaIndex = 0;
     showStatus(contato);
   }
-  
-  function showStatus(contato) {
-    //const modal = document.getElementById('statusModal');
-    const content = modal.querySelector('.status-content');
-    const caption = modal.querySelector('.status-caption');
-    const progress = modal.querySelector('.status-progress');
-  
-    modal.classList.remove('hidden');
+
+  function showStatus(contato){
+    const content = statusModal.querySelector('.status-content');
+    const caption = statusModal.querySelector('.status-caption');
+    const progress = statusModal.querySelector('.status-progress');
+
+    statusModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
-  
+
     progress.innerHTML = '';
-    contato.status.forEach((_, i) => {
+    contato.status.forEach((_, i)=>{
       progress.innerHTML += `<div class="status-bar"><div class="status-bar-inner" id="bar${i}"></div></div>`;
     });
-  
+
     showMedia(contato, currentMediaIndex);
   }
-  
-  function showMedia(contato, index) {
-    const modal = document.getElementById('statusModal');
-    const content = modal.querySelector('.status-content');
-    const caption = modal.querySelector('.status-caption');
-    const progressBars = modal.querySelectorAll('.status-bar-inner');
-  
+
+  function showMedia(contato, index){
+    const content = statusModal.querySelector('.status-content');
+    const caption = statusModal.querySelector('.status-caption');
+    const progressBars = statusModal.querySelectorAll('.status-bar-inner');
+
     const media = contato.status[index];
-    if (!media) return closeStatus();
-  
-    content.innerHTML = '';
+    if(!media) return closeStatus();
+
+    content.innerHTML='';
     caption.textContent = media.legenda || '';
-  
-    if (media.tipo === 'imagem') {
+
+    clearTimeout(statusTimer);
+
+    if(media.tipo==='imagem'){
       const img = document.createElement('img');
       img.src = media.src;
       content.appendChild(img);
-      animateBar(progressBars[index], 5000, () => nextMedia(contato));
-    } else if (media.tipo === 'video') {
+      animateBar(progressBars[index], 5000, ()=>nextMedia(contato));
+    } else if(media.tipo==='video'){
       const video = document.createElement('video');
       video.src = media.src;
       video.autoplay = true;
-      video.onended = () => nextMedia(contato);
+      video.onended = ()=>nextMedia(contato);
       content.appendChild(video);
-      const duration = 7000; // tempo médio p/ fallback
-      animateBar(progressBars[index], duration, () => {});
+      animateBar(progressBars[index], 7000, ()=>{}); // fallback
     }
   }
-  
-  function animateBar(bar, duration, callback) {
-    bar.style.transition = 'none';
-    bar.style.width = '0%';
-    setTimeout(() => {
-      bar.style.transition = `width ${duration}ms linear`;
-      bar.style.width = '100%';
-    }, 50);
-  
+
+  function animateBar(bar, duration, callback){
+    bar.style.transition='none';
+    bar.style.width='0%';
+    setTimeout(()=>{
+      bar.style.transition=`width ${duration}ms linear`;
+      bar.style.width='100%';
+    },50);
+
     clearTimeout(statusTimer);
     statusTimer = setTimeout(callback, duration);
   }
-  
-  function nextMedia(contato) {
+
+  function nextMedia(contato){
     currentMediaIndex++;
-    if (currentMediaIndex < contato.status.length) {
-      showMedia(contato, currentMediaIndex);
-    } else {
-      closeStatus();
-    }
+    if(currentMediaIndex<contato.status.length) showMedia(contato,currentMediaIndex);
+    else closeStatus();
   }
-  
-  function prevMedia(contato) {
-    currentMediaIndex = Math.max(0, currentMediaIndex - 1);
-    showMedia(contato, currentMediaIndex);
+
+  function prevMedia(contato){
+    currentMediaIndex=Math.max(0,currentMediaIndex-1);
+    showMedia(contato,currentMediaIndex);
   }
-  
-  function closeStatus() {
-    const modal = document.getElementById('statusModal');
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
+
+  function closeStatus(){
+    statusModal.classList.add('hidden');
+    document.body.style.overflow='auto';
     clearTimeout(statusTimer);
   }
-  
-  // 🔹 Eventos de clique e arraste
-  const modal = document.getElementById('statusModal');
-  let touchStartY = 0;
-  
-  modal.addEventListener('click', (e) => {
+
+  // Eventos do modal de status
+  statusModal.addEventListener('click', e=>{
     const contato = contatosData[currentStatusIndex];
     const x = e.clientX / window.innerWidth;
-    if (x < 0.3) {
-      prevMedia(contato);
-    } else {
-      nextMedia(contato);
-    }
+    if(x<0.3) prevMedia(contato);
+    else nextMedia(contato);
   });
-  
-  modal.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
+
+  let touchStartY=0;
+  statusModal.addEventListener('touchstart', e=>{ touchStartY=e.touches[0].clientY; });
+  statusModal.addEventListener('touchend', e=>{
+    const touchEndY=e.changedTouches[0].clientY;
+    if(touchEndY-touchStartY>100) closeStatus();
   });
-  
-  modal.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    if (touchEndY - touchStartY > 100) {
-      closeStatus();
-    }
-  });
-  
+
   // --- Lista de contatos ---
   function renderList(f=''){
     listEl.innerHTML='';
-    contacts
-      .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+    contacts.filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
       .forEach(renderContact);
   }
 
   // --- Modal adicionar / editar ---
-  function openAdd() {
-    editingId = null;
-    inputName.value = '';
-    inputNumber.value = '';
-    currentPhoto = './user.png';
-    preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    emojiPicker.style.display = 'none';
-    modal.classList.remove('hidden');
+  function openAdd(){
+    editingId=null;
+    inputName.value='';
+    inputNumber.value='';
+    currentPhoto='./user.png';
+    preview.innerHTML=`<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    emojiPicker.style.display='none';
+    contactsModal.classList.remove('hidden');
   }
 
-  function openEdit(id) {
-    const c = contacts.find(x => x.id === id);
+  function openEdit(id){
+    const c=contacts.find(x=>x.id===id);
     if(!c) return;
-    editingId = id;
-    inputName.value = c.name || '';
-    inputNumber.value = c.number || '';
-    currentPhoto = c.photo || './user.png';
-    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
-      preview.textContent = currentPhoto; preview.style.background='#fff';
+    editingId=id;
+    inputName.value=c.name||'';
+    inputNumber.value=c.number||'';
+    currentPhoto=c.photo||'./user.png';
+    if(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)){
+      preview.textContent=currentPhoto; preview.style.background='#fff';
     } else {
-      preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      preview.innerHTML=`<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     }
     emojiPicker.style.display='none';
-    modal.classList.remove('hidden');
+    contactsModal.classList.remove('hidden');
   }
 
   function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
   function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
-  function saveFromModal(){ 
+
+  function saveFromModal(){
     const name=inputName.value.trim();
     const number=normalizeNumber(inputNumber.value.trim());
     if(!number) return alert('Número inválido');
@@ -536,7 +484,8 @@
     else contacts.unshift({id:genId(),name,number,photo,fav:false});
     save(); renderList(searchInput.value.trim()); closeModal();
   }
-  function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
+
+  function closeModal(){ contactsModal.classList.add('hidden'); emojiPicker.style.display='none'; }
 
   function handleFile(ev){
     const file=ev.target.files[0];
@@ -564,7 +513,7 @@
   searchInput.oninput=()=>renderList(searchInput.value);
   backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
 
-  // --- Inicialização ---
+  // Inicialização
   load();
   renderList();
   loadNetworking();
@@ -573,8 +522,10 @@
 
 
 
+
 </body>
 </html>
+
 
 
 
