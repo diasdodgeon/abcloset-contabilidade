@@ -4,52 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contatos - WhatsApp Mockup</title>
-  <style>
-    .contacts-app{
-      width:100%; height:100%;
-      display:flex; flex-direction:column;
-      background: linear-gradient(#0b8450, #075f3a);
-      color:#fff; padding:10px; box-sizing:border-box;
-      border-radius:16px; overflow:hidden;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    }
-    .contacts-header{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 4px;}
-    .contacts-header h2{margin:0;font-size:1.05rem;}
-    .back-btn{position:absolute;left:6px;background:transparent;border:none;color:white;font-size:1.3rem;cursor:pointer;}
-    .add-btn{position:absolute;right:6px;background:rgba(255,255,255,0.12);border:none;color:white;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:1.05rem;}
-    .contacts-search{padding:8px 4px;}
-    #contacts-search-input{width:100%;padding:8px 10px;border-radius:10px;border:none;outline:none;box-sizing:border-box;font-size:0.95rem;}
-    .contacts-list{flex:1;overflow:auto;padding:6px;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
-    .contact-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,0.06);padding:8px;border-radius:12px;cursor:pointer;transition:transform .12s;}
-    .contact-item:hover{transform:translateY(-2px);}
-    .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;}
-    .contact-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-    .contact-info{flex:1;display:flex;flex-direction:column;}
-    .contact-name{font-size:1rem;font-weight:600;}
-    .contact-number{font-size:0.82rem;opacity:0.9;}
-    .contact-actions{display:flex;gap:8px;align-items:center;margin-left:8px;}
-    .icon-btn{background:transparent;border:none;color:rgba(255,255,255,0.95);cursor:pointer;font-size:1.05rem;padding:6px;border-radius:8px;}
-    .icon-btn.danger{color:rgba(255,200,200,0.95);}
-    .contacts-modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:1000;}
-    .contacts-modal.hidden{display:none;}
-    .contacts-modal-card{width:86%;max-width:420px;background:white;color:#111;border-radius:12px;padding:14px;box-sizing:border-box;}
-    .contacts-modal-card h3{margin-top:0;}
-    .contacts-modal-card label{display:block;font-size:0.85rem;margin:8px 0;}
-    .contacts-modal-card input{width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;}
-    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
-    .btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;}
-    .btn.primary{background:#0b8450;color:white;}
-    .photo-preview{display:flex;justify-content:center;align-items:center;margin:8px auto;width:80px;height:80px;border-radius:50%;background:#f0f0f0;overflow:hidden;font-size:4rem;}
-    .emoji-picker{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;justify-content:center;}
-    .emoji-picker span{cursor:pointer;font-size:1.5rem;transition:transform .1s;}
-    .emoji-picker span:hover{transform:scale(1.2);}
-
-    /* Stories */
-    .story-item { min-width:100%; transition:transform 0.3s ease; display:flex; justify-content:center; align-items:center; }
-    .story-item img, .story-item video { width:100%; height:auto; max-height:300px; border-radius:12px; object-fit:cover; }
-  </style>
 </head>
 <body>
+<style>
+  .contacts-app{
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    background: linear-gradient(#0b8450, #075f3a);
+    color:#fff; padding:10px; box-sizing:border-box;
+    border-radius:16px; overflow:hidden;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+  .contacts-header{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 4px;}
+  .contacts-header h2{margin:0;font-size:1.05rem;}
+  .back-btn{position:absolute;left:6px;background:transparent;border:none;color:white;font-size:1.3rem;cursor:pointer;}
+  .add-btn{position:absolute;right:6px;background:rgba(255,255,255,0.12);border:none;color:white;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:1.05rem;}
+  .contacts-search{padding:8px 4px;}
+  #contacts-search-input{width:100%;padding:8px 10px;border-radius:10px;border:none;outline:none;box-sizing:border-box;font-size:0.95rem;}
+  .contacts-list{flex:1;overflow:auto;padding:6px;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+  .contact-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,0.06);padding:8px;border-radius:12px;cursor:pointer;transition:transform .12s;}
+  .contact-item:hover{transform:translateY(-2px);}
+  .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:12px;z-index: 100;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;}
+  .contact-thumb img{width:100%;height:100%;object-fit:cover;display:block;z-index: 100;}
+  .contact-info{flex:1;display:flex;flex-direction:column;}
+  .contact-name{font-size:1rem;font-weight:600;}
+  .contact-number{font-size:0.82rem;opacity:0.9;}
+  .contact-actions{display:flex;gap:8px;align-items:center;margin-left:8px;}
+  .icon-btn{background:transparent;border:none;color:rgba(255,255,255,0.95);cursor:pointer;font-size:1.05rem;padding:6px;border-radius:8px;}
+  .icon-btn.danger{color:rgba(255,200,200,0.95);}
+  .contacts-modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);}
+  .contacts-modal.hidden{display:none;}
+  .contacts-modal-card{width:86%;max-width:420px;background:white;color:#111;border-radius:12px;padding:14px;box-sizing:border-box;}
+  .contacts-modal-card h3{margin-top:0;}
+  .contacts-modal-card label{display:block;font-size:0.85rem;margin:8px 0;}
+  .contacts-modal-card input{width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
+  .btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;}
+  .btn.primary{background:#0b8450;color:white;}
+  .photo-preview{display:flex;justify-content:center;align-items:center;margin:8px auto;width:80px;height:80px;border-radius:50%;background:#f0f0f0;overflow:hidden;font-size:4rem;}
+  .emoji-picker{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;justify-content:center;}
+  .emoji-picker span{cursor:pointer;font-size:1.5rem;transition:transform .1s;}
+  .emoji-picker span:hover{transform:scale(1.2);}
+
+  .story-item { min-width:100%; transition:transform 0.3s ease; display:flex; justify-content:center; align-items:center; }
+  .story-item img, .story-item video { width:100%; height:auto; max-height:300px; border-radius:12px; object-fit:cover; }
+
+</style>
+
 <div id="contacts-app" class="contacts-app">
   <div class="contacts-header">
     <button id="contacts-back" class="back-btn">←</button>
@@ -62,47 +63,59 @@
   </div>
 
   <div id="contacts-list" class="contacts-list"></div>
-</div>
 
-<!-- Modal Adicionar Contato -->
-<div id="contacts-modal" class="contacts-modal hidden">
-  <div class="contacts-modal-card">
-    <h3 id="modal-title">Adicionar Contato</h3>
-    <label>Nome
-      <input id="contact-name" type="text" placeholder="Ex: João Silva"/>
-    </label>
-    <label>Número (ex: 5585995598888)
-      <input id="contact-number" type="text" placeholder="Código do país + DDD + número"/>
-    </label>
-    <div class="photo-preview" id="photo-preview">👤</div>
-    <div style="text-align:center;display:flex;justify-content:center;gap:10px;">
-      <button id="btn-photo" class="btn">📷 Foto</button>
-      <button id="btn-emoji" class="btn">😎 Emoji</button>
-      <input type="file" id="photo-input" accept="image/*" capture="user" style="display:none;">
-    </div>
-    <div id="emoji-picker" class="emoji-picker" style="display:none;">
-      <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>💩</span><span>😅</span><span>🐱</span><span>🤢</span><span>🤮</span>
-      <span>😻</span><span>🧐</span><span>😠</span><span>😡</span><span>🙈</span>
-    </div>
-    <div class="modal-actions">
-      <button id="modal-save" class="btn primary">Salvar</button>
-      <button id="modal-cancel" class="btn">Cancelar</button>
+  <!-- Modal -->
+  <div id="contacts-modal" class="contacts-modal hidden">
+    
+    <div class="contacts-modal-card">
+      <h3 id="modal-title">Adicionar Contato</h3>
+
+      <label>Nome
+        <input id="contact-name" type="text" placeholder="Ex: João Silva"/>
+      </label>
+      <label>Número (ex: 5585995598888)
+        <input id="contact-number" type="text" placeholder="Código do país + DDD + número"/>
+      </label>
+
+      <div class="photo-preview" id="photo-preview">👤</div>
+
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;">
+        <button id="btn-photo" class="btn">📷 Foto</button>
+        <button id="btn-emoji" class="btn">😎 Emoji</button>
+        <input type="file" id="photo-input" accept="image/*" capture="user" style="display:none;">
+      </div>
+
+      <div id="emoji-picker" class="emoji-picker" style="display:none;">
+        <span>😎</span><span>😀</span><span>😁</span><span>❤️</span><span>💩</span><span>😅</span><span>🐱</span><span>🤢</span><span>🤮</span>
+        <span>😻</span><span>🧐</span><span>😠</span><span>😡</span><span>🙈
+        <span>🙉</span><span>🙊</span><span>🧒</span><span>👦</span><span>👧</span><span>🧑</span><span>👱</span><span>👨</span><span>🧔</span>
+        </span><span>👨‍🦰</span><span>👨‍🦱</span><span>👨‍🦳</span><span>👨‍🦲</span>
+        <span>👩</span><span>👩‍🦰</span><span>👩‍🦱</span><span>👩‍🦳</span><span>👧</span><span>🧓</span><span>👴</span><span>👵</span><span>⚽</span>
+      </div>
+    
+      <div class="modal-actions">
+        <button id="modal-save" class="btn primary">Salvar</button>
+        <button id="modal-cancel" class="btn">Cancelar</button>
+      </div>
     </div>
   </div>
+  <!-- Stories Modal -->
+    <div id="stories-modal" class="contacts-modal hidden">
+      <div class="contacts-modal-card" style="max-width:480px; text-align:center; overflow:hidden; position:relative;">
+        <button id="stories-close" class="btn" style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✖</button>
+        <div id="stories-carousel" style="display:flex; overflow:hidden; border-radius:12px; margin-top:24px;"></div>
+        <div id="stories-caption" style="margin-top:8px; font-size:0.9rem; color:#111;"></div>
+        <div style="margin-top:12px;">
+          <button id="stories-prev" class="btn">←</button>
+          <button id="stories-next" class="btn">→</button>
+        </div>
+      </div>
+    </div>
+
 </div>
 
-<!-- Modal Stories -->
-<div id="stories-modal" class="contacts-modal hidden">
-  <div class="contacts-modal-card" style="max-width:480px; text-align:center; overflow:hidden; position:relative;">
-    <button id="stories-close" class="btn" style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✖</button>
-    <div id="stories-carousel" style="display:flex; overflow:hidden; border-radius:12px; margin-top:24px;"></div>
-    <div id="stories-caption" style="margin-top:8px; font-size:0.9rem; color:#111;"></div>
-    <div style="margin-top:12px;">
-      <button id="stories-prev" class="btn">←</button>
-      <button id="stories-next" class="btn">→</button>
-    </div>
-  </div>
-</div>
+
+<!-- ... código HTML e CSS permanece igual até <script> ... -->
 
 <script>
 (function(){
@@ -122,23 +135,40 @@
   const preview = document.getElementById('photo-preview');
   const emojiPicker = document.getElementById('emoji-picker');
 
-  const storiesModal = document.getElementById('stories-modal');
-  const storiesCarousel = document.getElementById('stories-carousel');
-  const storiesCaption = document.getElementById('stories-caption');
-  const storiesClose = document.getElementById('stories-close');
-  const storiesPrev = document.getElementById('stories-prev');
-  const storiesNext = document.getElementById('stories-next');
-
   let contacts = [];
   let editingId = null;
   let currentPhoto = '';
-  let currentStories = [];
-  let currentStoryIndex = 0;
+
+  const defaultContacts = [];
 
   function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
-  function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
-  function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||[];}
+  function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
   function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
+  function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+
+  async function loadNetworking(){
+    try {
+      const res = await fetch('./networking/contatos.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('Arquivo não encontrado');
+      const networkContacts = await res.json();
+      let added = 0;
+      networkContacts.forEach(nc=>{
+        const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
+        if(!exists){
+          contacts.push({
+            id: genId(),
+            name: nc.name || '(sem nome)',
+            number: normalizeNumber(nc.number || ''),
+            photo: nc.photo || './user.png',
+            fav: false
+          });
+          added++;
+        }
+      });
+      if(added>0){ save(); renderList(searchInput.value.trim()); }
+      console.log(`🌐 Networking atualizado (${added} novos contatos).`);
+    } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
+  }
 
   function renderContact(c){
     const el = document.createElement('div');
@@ -166,8 +196,17 @@
     const actions = document.createElement('div'); actions.className = 'contact-actions';
     const favBtn = document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
     favBtn.innerHTML = c.fav ? '⭐' : '☆';
-    favBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); toggleFav(c.id); });
-    actions.appendChild(favBtn);
+    favBtn.addEventListener('click', ev=>{ ev.stopPropagation(); toggleFav(c.id); });
+
+    const editBtn = document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
+    editBtn.innerHTML = '✎';
+    editBtn.addEventListener('click', ev=>{ ev.stopPropagation(); openEdit(c.id); });
+
+    const delBtn = document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
+    delBtn.innerHTML = '🗑';
+    delBtn.addEventListener('click', ev=>{ ev.stopPropagation(); removeContact(c.id); });
+
+    actions.appendChild(favBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
 
     el.appendChild(thumb);
     el.appendChild(info);
@@ -179,7 +218,8 @@
       window.open(`https://wa.me/${num}`, '_blank');
     });
 
-    thumb.addEventListener('click', (ev)=>{
+    // abrir stories
+    thumb.addEventListener('click', ev=>{
       ev.stopPropagation();
       openStories(c);
     });
@@ -187,26 +227,124 @@
     listEl.appendChild(el);
   }
 
-  function renderList(f=''){ listEl.innerHTML=''; contacts.filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase())).forEach(renderContact); }
+  // --- Stories ---
+  const storiesModal = document.getElementById('stories-modal');
+  const storiesCarousel = document.getElementById('stories-carousel');
+  const storiesCaption = document.getElementById('stories-caption');
+  const storiesClose = document.getElementById('stories-close');
+  const storiesPrev = document.getElementById('stories-prev');
+  const storiesNext = document.getElementById('stories-next');
 
-  function openAdd(){
-    editingId=null; inputName.value=''; inputNumber.value=''; currentPhoto='./user.png';
-    preview.innerHTML=`<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    emojiPicker.style.display='none'; modal.classList.remove('hidden');
+  let currentStories = [];
+  let currentStoryIndex = 0;
+
+  function openStories(contact){
+    if(!contact.status || contact.status.length===0) return;
+    currentStories = contact.status;
+    currentStoryIndex = 0;
+    renderCurrentStory();
+    storiesModal.classList.remove('hidden');
+  }
+
+  function renderCurrentStory(){
+    storiesCarousel.innerHTML='';
+    const s = currentStories[currentStoryIndex];
+    const div = document.createElement('div');
+    div.className='story-item';
+    
+    if(s.tipo==='video'){
+      const video = document.createElement('video');
+      video.src=s.src;
+      video.autoplay=true;
+      video.controls=true;
+      div.appendChild(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = s.src;
+      // clique na imagem avança o story
+      img.addEventListener('click', ()=>{
+        if(currentStoryIndex < currentStories.length-1){
+          currentStoryIndex++;
+          renderCurrentStory();
+        } else { storiesModal.classList.add('hidden'); }
+      });
+      div.appendChild(img);
+    }
+
+    storiesCarousel.appendChild(div);
+    storiesCaption.textContent = s.legenda || '';
+  }
+
+  storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
+  storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
+  storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
+
+  // --- Lista de contatos ---
+  function renderList(f=''){
+    listEl.innerHTML='';
+    contacts
+      .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+      .forEach(renderContact);
+  }
+
+  // --- Modal adicionar / editar ---
+  function openAdd() {
+    editingId = null;
+    inputName.value = '';
+    inputNumber.value = '';
+    currentPhoto = './user.png';
+    preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    emojiPicker.style.display = 'none';
+    modal.classList.remove('hidden');
+  }
+
+  function openEdit(id) {
+    const c = contacts.find(x => x.id === id);
+    if(!c) return;
+    editingId = id;
+    inputName.value = c.name || '';
+    inputNumber.value = c.number || '';
+    currentPhoto = c.photo || './user.png';
+    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
+      preview.textContent = currentPhoto; preview.style.background='#fff';
+    } else {
+      preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+    emojiPicker.style.display='none';
+    modal.classList.remove('hidden');
   }
 
   function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
-
+  function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
+  function saveFromModal(){ 
+    const name=inputName.value.trim();
+    const number=normalizeNumber(inputNumber.value.trim());
+    if(!number) return alert('Número inválido');
+    const photo=currentPhoto||'./user.png';
+    if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
+    else contacts.unshift({id:genId(),name,number,photo,fav:false});
+    save(); renderList(searchInput.value.trim()); closeModal();
+  }
   function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
-  function saveFromModal(){ const name=inputName.value.trim(); const number=normalizeNumber(inputNumber.value.trim()); if(!number)return alert('Número inválido'); const photo=currentPhoto||'./user.png'; if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }else contacts.unshift({id:genId(),name,number,photo,fav:false}); save(); renderList(searchInput.value.trim()); closeModal(); }
 
-  function handleFile(ev){ const file=ev.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; }; reader.readAsDataURL(file); }
+  function handleFile(ev){
+    const file=ev.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
+    reader.readAsDataURL(file);
+  }
 
   btnPhoto.onclick=()=>photoInput.click();
   photoInput.onchange=handleFile;
   btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
   emojiPicker.querySelectorAll('span').forEach(sp=>{
-    sp.addEventListener('click',()=>{ currentPhoto=sp.textContent; preview.textContent=currentPhoto; preview.style.background='#fff'; emojiPicker.style.display='none'; });
+    sp.addEventListener('click',()=>{
+      currentPhoto=sp.textContent;
+      preview.textContent=currentPhoto;
+      preview.style.background='#fff';
+      emojiPicker.style.display='none';
+    });
   });
 
   addBtn.onclick=openAdd;
@@ -215,37 +353,14 @@
   searchInput.oninput=()=>renderList(searchInput.value);
   backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
 
-  // --- Stories ---
-  function openStories(contact){
-    if(!contact.status||contact.status.length===0) return;
-    currentStories=contact.status; currentStoryIndex=0;
-    renderCurrentStory();
-    storiesModal.classList.remove('hidden');
-  }
-
-  function renderCurrentStory(){
-    storiesCarousel.innerHTML='';
-    const s=currentStories[currentStoryIndex];
-    const div=document.createElement('div'); div.className='story-item';
-    if(s.tipo==='video'){ const video=document.createElement('video'); video.src=s.src; video.autoplay=true; video.controls=true; div.appendChild(video); }
-    else { const img=document.createElement('img'); img.src=s.src; div.appendChild(img); }
-    storiesCarousel.appendChild(div); storiesCaption.textContent=s.legenda||'';
-  }
-
-  storiesClose.onclick=()=>storiesModal.classList.add('hidden');
-  storiesPrev.onclick=()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
-  storiesNext.onclick=()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
-
   // --- Inicialização ---
   load();
   renderList();
+  loadNetworking();
 })();
 </script>
+
+
+
 </body>
 </html>
-
-
-
-
-
-
