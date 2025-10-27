@@ -325,10 +325,20 @@
         if (!res.ok) throw new Error('Arquivo não encontrado');
         const networkContacts = await res.json();
         let added = 0, updated = 0;
+        const now = new Date(); // 🔹 Data atual
     
         networkContacts.forEach(nc => {
           const normalizedNum = normalizeNumber(nc.number || '');
           const existing = contacts.find(c => normalizeNumber(c.number) === normalizedNum);
+    
+          // 🔹 Remove stories expirados ANTES de salvar
+          if (Array.isArray(nc.status)) {
+            nc.status = nc.status.filter(st => {
+              if (!st.endTime) return true;
+              const end = new Date(st.endTime);
+              return end > now; // mantém apenas stories ainda válidos
+            });
+          }
     
           if (!existing) {
             // Novo contato — adiciona tudo normalmente
@@ -347,9 +357,15 @@
             existing.name = nc.name || existing.name;
             existing.photo = nc.photo || existing.photo;
     
-            // Atualiza stories se houver novos
+            // 🔹 Remove stories vencidos também nos contatos existentes
+            existing.status = (existing.status || []).filter(st => {
+              if (!st.endTime) return true;
+              const end = new Date(st.endTime);
+              return end > now;
+            });
+    
+            // 🔹 Mescla novos stories válidos
             if (Array.isArray(nc.status)) {
-              // Mescla stories novos sem duplicar
               const existingSrcs = (existing.status || []).map(s => s.src);
               const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
               if (newStories.length > 0) {
@@ -365,11 +381,12 @@
           renderList(searchInput.value.trim());
         }
     
-        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories).`);
+        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories válidos).`);
       } catch (err) {
         console.log('⚠️ Nenhum networking carregado:', err.message);
       }
     }
+
 
 
     function showWhatsAppAlert(message, soundSrc) {
@@ -754,6 +771,7 @@
 
 </body>
 </html>
+
 
 
 
