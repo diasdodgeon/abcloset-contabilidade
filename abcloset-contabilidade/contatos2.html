@@ -859,9 +859,9 @@
     load();
     renderList();
   
-    loadNetworking();          // carrega contatos e stories da rede
-    filterExpiredStories(); // 🔹 remove stories vencidos automaticamente
-    await cleanOldStories(); //remove stories vencidos automaticamente do cache
+    loadNetworking();         // carrega contatos e stories da rede
+    filterExpiredStories(); // remove stories vencidos automaticamente da lista
+    cleanOldStories();     //remove stories vencidos automaticamente do cache
 
 })();
 </script>
@@ -870,6 +870,7 @@
 
 </body>
 </html>
+
 
 
 
