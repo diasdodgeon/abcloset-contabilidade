@@ -102,30 +102,7 @@
     opacity: 0.5;
   }
   /* 🔔 Modal estilo WhatsApp */
-  
-  
-  
-  
-  /* Animações 
-  .whatsapp-alert.show {
-    top: 20px;
-    opacity: 1;
-    pointer-events: auto;
-  }
-  
-  .whatsapp-alert.hidden {
-    opacity: 0;
-    top: -100px;
-  }
-  /* 🔔 Efeito de vibração */
-  /* @keyframes shakeAnim {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    20%, 60% { transform: translateX(-50%) translateY(-2px); }
-    40%, 80% { transform: translateX(-50%) translateY(2px); }
-  } */
-  
-  
- 
+
   .whatsapp-alert {
     position: fixed;
     top: -100px;
@@ -397,11 +374,11 @@
         alertBox.classList.remove('shake');
       }, 500);
     
-      // ✅ fecha automaticamente após 3.5s
+      // ✅ fecha automaticamente após 4s
       setTimeout(() => {
         alertBox.classList.remove('show');
         alertBox.classList.add('hidden');
-      }, 3500);
+      }, 5000);
     }
 
     function renderContact(c) {
@@ -753,6 +730,7 @@
 
 </body>
 </html>
+
 
 
 
