@@ -97,6 +97,10 @@
     background:#25D366;
     transition: width 0.1s linear;
   }
+  .locked {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 
 
 </style>
@@ -238,7 +242,8 @@
               number: normalizeNumber(nc.number || ''),
               photo: nc.photo || './user.png',
               fav: false,
-              status: nc.status || [] // ✅ adiciona stories
+              status: nc.status || [],
+              system: true
             });
             added++;
           }
@@ -248,18 +253,20 @@
       } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
     }
   
-    function renderContact(c){
+    function renderContact(c) {
       const el = document.createElement('div');
       el.className = 'contact-item';
       el.dataset.id = c.id;
-  
+    
       const thumb = document.createElement('div');
       thumb.className = 'contact-thumb';
-      // marca como status novo se houver stories
-      if(c.status && c.status.length > 0 && !c.statusViewed) {
+      
+      // Marca como "novo status" se houver stories não vistos
+      if (c.status && c.status.length > 0 && !c.statusViewed) {
         thumb.classList.add('new-status');
       }
-  
+    
+      // Exibe emoji ou imagem
       if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
         thumb.textContent = c.photo;
         thumb.style.fontSize = '1.8rem';
@@ -269,45 +276,93 @@
         img.onerror = () => { img.src = './user.png'; };
         thumb.appendChild(img);
       }
-  
-      const info = document.createElement('div'); info.className = 'contact-info';
-      const nm = document.createElement('div'); nm.className = 'contact-name'; nm.textContent = c.name || '(sem nome)';
-      const no = document.createElement('div'); no.className = 'contact-number'; no.textContent = c.number;
-      info.appendChild(nm); info.appendChild(no);
-  
-      const actions = document.createElement('div'); actions.className = 'contact-actions';
-      const favBtn = document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
+    
+      // Informações do contato
+      const info = document.createElement('div');
+      info.className = 'contact-info';
+      const nm = document.createElement('div');
+      nm.className = 'contact-name';
+      nm.textContent = c.name || '(sem nome)';
+      const no = document.createElement('div');
+      no.className = 'contact-number';
+      no.textContent = c.number;
+      info.appendChild(nm);
+      info.appendChild(no);
+    
+      // Ações do contato
+      const actions = document.createElement('div');
+      actions.className = 'contact-actions';
+    
+      // Botão de favorito (sempre permitido)
+      const favBtn = document.createElement('button');
+      favBtn.className = 'icon-btn';
+      favBtn.title = 'Favoritar';
       favBtn.innerHTML = c.fav ? '⭐' : '☆';
-      favBtn.addEventListener('click', ev=>{ ev.stopPropagation(); toggleFav(c.id); });
-  
-      const editBtn = document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
-      editBtn.innerHTML = '✎';
-      editBtn.addEventListener('click', ev=>{ ev.stopPropagation(); openEdit(c.id); });
-  
-      const delBtn = document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
-      delBtn.innerHTML = '🗑';
-      delBtn.addEventListener('click', ev=>{ ev.stopPropagation(); removeContact(c.id); });
-  
-      actions.appendChild(favBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
-  
+      favBtn.addEventListener('click', ev => {
+        ev.stopPropagation();
+        toggleFav(c.id);
+      });
+      actions.appendChild(favBtn);
+    
+      // Contatos do sistema → bloqueados para edição/exclusão
+      if (c.system) {
+        const lockEdit = document.createElement('button');
+        lockEdit.className = 'icon-btn locked';
+        lockEdit.title = 'Edição bloqueada';
+        lockEdit.textContent = '🔒';
+    
+        const lockDel = document.createElement('button');
+        lockDel.className = 'icon-btn locked';
+        lockDel.title = 'Exclusão bloqueada';
+        lockDel.textContent = '🔒';
+    
+        actions.appendChild(lockEdit);
+        actions.appendChild(lockDel);
+      } else {
+        // Contatos normais → editar/excluir permitidos
+        const editBtn = document.createElement('button');
+        editBtn.className = 'icon-btn';
+        editBtn.title = 'Editar';
+        editBtn.innerHTML = '✎';
+        editBtn.addEventListener('click', ev => {
+          ev.stopPropagation();
+          openEdit(c.id);
+        });
+    
+        const delBtn = document.createElement('button');
+        delBtn.className = 'icon-btn danger';
+        delBtn.title = 'Excluir';
+        delBtn.innerHTML = '🗑';
+        delBtn.addEventListener('click', ev => {
+          ev.stopPropagation();
+          removeContact(c.id);
+        });
+    
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+      }
+    
+      // Montagem final
       el.appendChild(thumb);
       el.appendChild(info);
       el.appendChild(actions);
-  
-      el.addEventListener('click', ()=>{
+    
+      // Clique geral → abrir WhatsApp
+      el.addEventListener('click', () => {
         const num = normalizeNumber(c.number);
-        if(!num) return alert('Número inválido');
+        if (!num) return alert('Número inválido');
         window.open(`https://wa.me/${num}`, '_blank');
       });
-  
-      // abrir stories
-      thumb.addEventListener('click', ev=>{
+    
+      // Clique na miniatura → abrir stories
+      thumb.addEventListener('click', ev => {
         ev.stopPropagation();
         openStories(c);
       });
-  
+    
       listEl.appendChild(el);
     }
+
   
     
   
@@ -536,3 +591,4 @@
 
 </body>
 </html>
+
