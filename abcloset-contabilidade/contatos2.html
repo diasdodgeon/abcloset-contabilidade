@@ -207,10 +207,15 @@
     let editingId = null;
     let currentPhoto = '';
     let storyTimer = null;
+    let paused = false;
+    let elapsed = 0;
+    let duration = 0;
     let currentStories = [];
     let currentStoryIndex = 0;
+    let currentVideo = null;
     const STORY_DURATION = 5000; // 5s para imagens
   
+   
     const defaultContacts = [];
   
     function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
@@ -318,7 +323,7 @@
       renderCurrentStory();
       storiesModal.classList.remove('hidden');
     }
-    function renderStoryProgress(){
+     function renderStoryProgress(){
       storiesProgress.innerHTML = '';
       currentStories.forEach((_, idx) => {
         const bar = document.createElement('div');
@@ -339,23 +344,28 @@
     function startStoryTimer(){
       clearInterval(storyTimer);
       const current = currentStories[currentStoryIndex];
-      let duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
+      duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
+      elapsed = 0;
       const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
-      let elapsed = 0;
+  
       storyTimer = setInterval(()=>{
-        elapsed += 50;
-        fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
-        if(elapsed>=duration){
-          clearInterval(storyTimer);
-          if(currentStoryIndex < currentStories.length-1){
-            currentStoryIndex++;
-            renderCurrentStory();
-          } else closeStories();
+        if(!paused){
+          elapsed += 50;
+          fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
+          if(elapsed >= duration){
+            clearInterval(storyTimer);
+            if(currentStoryIndex < currentStories.length-1){
+              currentStoryIndex++;
+              renderCurrentStory();
+            } else closeStories();
+          }
         }
       },50);
     }
+  
     function renderCurrentStory(){
       storiesCarousel.innerHTML = '';
+      currentVideo = null;
       const s = currentStories[currentStoryIndex];
       const content = document.createElement(s.tipo==='video'?'video':'img');
       content.src = s.src;
@@ -366,37 +376,57 @@
         content.autoplay = true;
         content.controls = false;
         content.muted = false;
+        currentVideo = content;
       }
       storiesCarousel.appendChild(content);
       storiesCaption.textContent = s.legenda || '';
       renderStoryProgress();
       startStoryTimer();
     }
+  
     function closeStories(){
       clearInterval(storyTimer);
       storiesModal.classList.add('hidden');
     }
   
-    // 🔹 Controles por toque (como no WhatsApp)
+    // 🔹 Controles por toque
     let touchStartX = 0;
+    let holdTimeout = null;
+    let holding = false;
+  
     storiesModal.addEventListener('touchstart', e => {
       touchStartX = e.touches[0].clientX;
+      // se o usuário segurar mais de 300ms, pausamos o story
+      holdTimeout = setTimeout(()=>{
+        holding = true;
+        paused = true;
+        if(currentVideo) currentVideo.pause();
+      }, 300);
     });
+  
     storiesModal.addEventListener('touchend', e => {
+      clearTimeout(holdTimeout);
       const endX = e.changedTouches[0].clientX;
       const diff = endX - touchStartX;
+  
+      // se estava segurando, apenas retoma
+      if(holding){
+        holding = false;
+        paused = false;
+        if(currentVideo) currentVideo.play();
+        return;
+      }
+  
       if(Math.abs(diff) < 40){
         // toque simples: lado direito avança / esquerdo volta
         const rect = storiesModal.getBoundingClientRect();
         const mid = rect.width / 2;
         if(endX > mid){
-          // lado direito
           if(currentStoryIndex < currentStories.length-1){ 
             currentStoryIndex++; 
             renderCurrentStory(); 
           } else closeStories();
         } else {
-          // lado esquerdo
           if(currentStoryIndex > 0){
             currentStoryIndex--; 
             renderCurrentStory();
@@ -410,10 +440,10 @@
         if(currentStoryIndex < currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); }
         else closeStories();
       }
-     });
+    });
   
     storiesBack.onclick = closeStories;
-    window.openStories = openStories; // mantém compatibilidade
+    window.openStories = openStories;
   
   
     //storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
@@ -506,6 +536,7 @@
 
 </body>
 </html>
+
 
 
 
