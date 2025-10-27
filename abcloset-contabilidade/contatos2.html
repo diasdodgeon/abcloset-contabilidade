@@ -230,7 +230,7 @@
         const networkContacts = await res.json();
         let added = 0;
         networkContacts.forEach(nc=>{
-          const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
+          const exists = contacts.some(c=>c.system = true, normalizeNumber(c.number)===normalizeNumber(nc.number));
           if(!exists){
             contacts.push({
               id: genId(),
@@ -239,7 +239,7 @@
               photo: nc.photo || './user.png',
               fav: false,
               status: nc.status || [] // ✅ adiciona stories
-              data.forEach(c => c.system = true); // 👈 adiciona flag "system"
+              //data.forEach(c => c.system = true); // 👈 adiciona flag "system"
             });
             added++;
           }
@@ -550,6 +550,7 @@
 
 </body>
 </html>
+
 
 
 
