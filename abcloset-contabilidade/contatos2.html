@@ -102,49 +102,11 @@
     opacity: 0.5;
   }
   /* 🔔 Modal estilo WhatsApp */
-  .whatsapp-alert {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 400px;
-    background: rgba(40, 40, 40, 0.95);
-    color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    z-index: 9999;
-    opacity: 0;
-    transition: all 0.4s ease;
-    padding: 12px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-  }
   
-  /* Cabeçalho verde */
-  .wa-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #25d366;
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
   
-  .wa-header img {
-    width: 20px;
-    height: 20px;
-  }
   
-  /* Mensagem */
-  .wa-message {
-    font-size: 1rem;
-    color: white;
-  }
   
-  /* Animações */
+  /* Animações 
   .whatsapp-alert.show {
     top: 20px;
     opacity: 1;
@@ -154,7 +116,7 @@
   .whatsapp-alert.hidden {
     opacity: 0;
     top: -100px;
-  }
+  }*/
   /* 🔔 Efeito de vibração */
   @keyframes shakeAnim {
     0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -166,6 +128,57 @@
     animation: shakeAnim 0.5s ease;
   }
 
+  .whatsapp-alert {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    width: 100%;
+    background: #2a2f32; /* cinza fosco */
+    color: white;
+    border-radius: 12px; /* 🔘 bordas arredondadas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 14px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: transform 0.3s ease, opacity 0.3s ease, top 0.3s ease;
+    opacity: 0;
+    z-index: 9999;
+  }
+  
+  /* Quando o modal está visível */
+  .whatsapp-alert.show {
+    top: 0;
+    opacity: 1;
+    border-radius: 0 0 16px 16px; /* bordas só na parte de baixo, estilo mensagem deslizando */
+  }
+  
+  .wa-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .wa-header img {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+  }
+  
+  .wa-header span {
+    color: #25d366; /* verde WhatsApp */
+    font-weight: 600;
+  }
+  
+  .wa-message-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #fff;
+    padding-left: 30px;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -178,7 +191,8 @@
 </div>
 
 <!-- Som da notificação -->
-<audio id="waSound" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
+<audio id="waSound" src="./whatsapp.mp3" preload="auto"></audio>
+
 
 <div id="contacts-app" class="contacts-app">
   <div class="contacts-header">
@@ -741,6 +755,7 @@
 
 </body>
 </html>
+
 
 
 
