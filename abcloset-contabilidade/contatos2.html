@@ -231,7 +231,7 @@
         let added = 0;
         networkContacts.forEach(nc=>{
           const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
-          const exists = contacts.some(c => c.system = true);
+          
           if(!exists){
             contacts.push({
               id: genId(),
@@ -239,8 +239,9 @@
               number: normalizeNumber(nc.number || ''),
               photo: nc.photo || './user.png',
               fav: false,
+              system: true
               status: nc.status || [] // ✅ adiciona stories
-              //data.forEach(c => c.system = true); // 👈 adiciona flag "system"
+              
             });
             added++;
           }
@@ -551,6 +552,7 @@
 
 </body>
 </html>
+
 
 
 
