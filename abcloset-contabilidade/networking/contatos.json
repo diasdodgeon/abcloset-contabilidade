@@ -6,7 +6,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true   
   },
   {
     "name": "Alison Dias",
@@ -15,7 +16,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina Turbo",
@@ -24,7 +26,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina savana",
@@ -33,7 +36,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina paraguai",
@@ -42,7 +46,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Ariane dias Brandão",
@@ -51,7 +56,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Alison Dias brandoa",
@@ -60,7 +66,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina Turbo dias",
@@ -69,7 +76,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina savana dias",
@@ -78,7 +86,8 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   },
   {
     "name": "Oficina paraguai dias",
@@ -87,9 +96,11 @@
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
-    ]
+    ],
+    "system": true 
   }
 ]
+
 
 
 
