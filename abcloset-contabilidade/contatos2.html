@@ -108,18 +108,26 @@
     <button id="contacts-add" class="add-btn">＋</button>
   </div>
   <!-- Stories Modal -->
-    <div id="stories-modal" class="contacts-modal hidden">
-      <div class="contacts-modal-card" style="max-width:480px; text-align:center; overflow:hidden; position:relative;">
-        <button id="stories-close" class="btn" style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✖</button>
-        <div id="stories-progress" style="display:flex; gap:2px; position:absolute; top:12px; left:12px; right:12px; height:4px;"></div>
-        <div id="stories-carousel" style="display:flex; overflow:hidden; border-radius:12px; margin-top:24px;"></div>
-        <div id="stories-caption" style="margin-top:8px; font-size:0.9rem; color:#111;"></div>
-        <div style="margin-top:12px;">
-          <button id="stories-prev" class="btn">←</button>
-          <button id="stories-next" class="btn">→</button>
-        </div>
-      </div>
+  <div id="stories-modal" class="contacts-modal hidden" style="position:fixed;inset:0;background:black;z-index:9999;">
+    <div id="stories-container" style="position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+      <!-- Barra de progresso -->
+      <div id="stories-progress"
+           style="display:flex;gap:4px;position:absolute;top:16px;left:16px;right:16px;height:4px;z-index:10;"></div>
+      
+      <!-- Botão de voltar -->
+      <button id="stories-back"
+              style="position:absolute;top:28px;left:16px;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;z-index:10;">←</button>
+  
+      <!-- Área dos stories -->
+      <div id="stories-carousel"
+           style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
+  
+      <!-- Legenda -->
+      <div id="stories-caption"
+           style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:rgba(0,0,0,0.45);color:white;font-size:1rem;z-index:10;"></div>
     </div>
+  </div>
+
   <div class="contacts-search">
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
   </div>
@@ -170,297 +178,327 @@
 
 <script>
 (function(){
-  const STORAGE_KEY = 'contactsApp.v2';
-  const listEl = document.getElementById('contacts-list');
-  const modal = document.getElementById('contacts-modal');
-  const inputName = document.getElementById('contact-name');
-  const inputNumber = document.getElementById('contact-number');
-  const saveBtn = document.getElementById('modal-save');
-  const cancelBtn = document.getElementById('modal-cancel');
-  const addBtn = document.getElementById('contacts-add');
-  const backBtn = document.getElementById('contacts-back');
-  const searchInput = document.getElementById('contacts-search-input');
-  const btnPhoto = document.getElementById('btn-photo');
-  const btnEmoji = document.getElementById('btn-emoji');
-  const photoInput = document.getElementById('photo-input');
-  const preview = document.getElementById('photo-preview');
-  const emojiPicker = document.getElementById('emoji-picker');
-  // --- Stories ---
-  const storiesModal = document.getElementById('stories-modal');
-  const storiesCarousel = document.getElementById('stories-carousel');
-  const storiesCaption = document.getElementById('stories-caption');
-  const storiesClose = document.getElementById('stories-close');
-  const storiesPrev = document.getElementById('stories-prev');
-  const storiesNext = document.getElementById('stories-next');
-
-  let contacts = [];
-  let editingId = null;
-  let currentPhoto = '';
-  let storyTimer = null;
-  const STORY_DURATION = 5000; // 5s para imagens
-
-  const defaultContacts = [];
-
-  function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
-  function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
-  function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
-  function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
-
-  async function loadNetworking(){
-    try {
-      const res = await fetch('./networking/contatos.json', {cache:'no-store'});
-      if(!res.ok) throw new Error('Arquivo não encontrado');
-      const networkContacts = await res.json();
-      let added = 0;
-      networkContacts.forEach(nc=>{
-        const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
-        if(!exists){
-          contacts.push({
-            id: genId(),
-            name: nc.name || '(sem nome)',
-            number: normalizeNumber(nc.number || ''),
-            photo: nc.photo || './user.png',
-            fav: false,
-            status: nc.status || [] // ✅ adiciona stories
-          });
-          added++;
-        }
+    const STORAGE_KEY = 'contactsApp.v2';
+    const listEl = document.getElementById('contacts-list');
+    const modal = document.getElementById('contacts-modal');
+    const inputName = document.getElementById('contact-name');
+    const inputNumber = document.getElementById('contact-number');
+    const saveBtn = document.getElementById('modal-save');
+    const cancelBtn = document.getElementById('modal-cancel');
+    const addBtn = document.getElementById('contacts-add');
+    const backBtn = document.getElementById('contacts-back');
+    const searchInput = document.getElementById('contacts-search-input');
+    const btnPhoto = document.getElementById('btn-photo');
+    const btnEmoji = document.getElementById('btn-emoji');
+    const photoInput = document.getElementById('photo-input');
+    const preview = document.getElementById('photo-preview');
+    const emojiPicker = document.getElementById('emoji-picker');
+    // --- Stories ---
+    const storiesModal = document.getElementById('stories-modal');
+    const storiesCarousel = document.getElementById('stories-carousel');
+    const storiesCaption = document.getElementById('stories-caption');
+    const storiesClose = document.getElementById('stories-close');
+    const storiesPrev = document.getElementById('stories-prev');
+    const storiesNext = document.getElementById('stories-next');
+    const storiesProgress = document.getElementById('stories-progress');
+    const storiesBack = document.getElementById('stories-back');
+  
+    let contacts = [];
+    let editingId = null;
+    let currentPhoto = '';
+    let storyTimer = null;
+    let currentStories = [];
+    let currentStoryIndex = 0;
+    const STORY_DURATION = 5000; // 5s para imagens
+  
+    const defaultContacts = [];
+  
+    function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
+    function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
+    function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
+    function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+  
+    async function loadNetworking(){
+      try {
+        const res = await fetch('./networking/contatos.json', {cache:'no-store'});
+        if(!res.ok) throw new Error('Arquivo não encontrado');
+        const networkContacts = await res.json();
+        let added = 0;
+        networkContacts.forEach(nc=>{
+          const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
+          if(!exists){
+            contacts.push({
+              id: genId(),
+              name: nc.name || '(sem nome)',
+              number: normalizeNumber(nc.number || ''),
+              photo: nc.photo || './user.png',
+              fav: false,
+              status: nc.status || [] // ✅ adiciona stories
+            });
+            added++;
+          }
+        });
+        if(added>0){ save(); renderList(searchInput.value.trim()); }
+        console.log(`🌐 Networking atualizado (${added} novos contatos).`);
+      } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
+    }
+  
+    function renderContact(c){
+      const el = document.createElement('div');
+      el.className = 'contact-item';
+      el.dataset.id = c.id;
+  
+      const thumb = document.createElement('div');
+      thumb.className = 'contact-thumb';
+      // marca como status novo se houver stories
+      if(c.status && c.status.length > 0 && !c.statusViewed) {
+        thumb.classList.add('new-status');
+      }
+  
+      if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
+        thumb.textContent = c.photo;
+        thumb.style.fontSize = '1.8rem';
+      } else {
+        const img = document.createElement('img');
+        img.src = c.photo || './user.png';
+        img.onerror = () => { img.src = './user.png'; };
+        thumb.appendChild(img);
+      }
+  
+      const info = document.createElement('div'); info.className = 'contact-info';
+      const nm = document.createElement('div'); nm.className = 'contact-name'; nm.textContent = c.name || '(sem nome)';
+      const no = document.createElement('div'); no.className = 'contact-number'; no.textContent = c.number;
+      info.appendChild(nm); info.appendChild(no);
+  
+      const actions = document.createElement('div'); actions.className = 'contact-actions';
+      const favBtn = document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
+      favBtn.innerHTML = c.fav ? '⭐' : '☆';
+      favBtn.addEventListener('click', ev=>{ ev.stopPropagation(); toggleFav(c.id); });
+  
+      const editBtn = document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
+      editBtn.innerHTML = '✎';
+      editBtn.addEventListener('click', ev=>{ ev.stopPropagation(); openEdit(c.id); });
+  
+      const delBtn = document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
+      delBtn.innerHTML = '🗑';
+      delBtn.addEventListener('click', ev=>{ ev.stopPropagation(); removeContact(c.id); });
+  
+      actions.appendChild(favBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
+  
+      el.appendChild(thumb);
+      el.appendChild(info);
+      el.appendChild(actions);
+  
+      el.addEventListener('click', ()=>{
+        const num = normalizeNumber(c.number);
+        if(!num) return alert('Número inválido');
+        window.open(`https://wa.me/${num}`, '_blank');
       });
-      if(added>0){ save(); renderList(searchInput.value.trim()); }
-      console.log(`🌐 Networking atualizado (${added} novos contatos).`);
-    } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
-  }
-
-  function renderContact(c){
-    const el = document.createElement('div');
-    el.className = 'contact-item';
-    el.dataset.id = c.id;
-
-    const thumb = document.createElement('div');
-    thumb.className = 'contact-thumb';
-    // marca como status novo se houver stories
-    if(c.status && c.status.length > 0 && !c.statusViewed) {
-      thumb.classList.add('new-status');
-    }
-
-    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
-      thumb.textContent = c.photo;
-      thumb.style.fontSize = '1.8rem';
-    } else {
-      const img = document.createElement('img');
-      img.src = c.photo || './user.png';
-      img.onerror = () => { img.src = './user.png'; };
-      thumb.appendChild(img);
-    }
-
-    const info = document.createElement('div'); info.className = 'contact-info';
-    const nm = document.createElement('div'); nm.className = 'contact-name'; nm.textContent = c.name || '(sem nome)';
-    const no = document.createElement('div'); no.className = 'contact-number'; no.textContent = c.number;
-    info.appendChild(nm); info.appendChild(no);
-
-    const actions = document.createElement('div'); actions.className = 'contact-actions';
-    const favBtn = document.createElement('button'); favBtn.className='icon-btn'; favBtn.title='Favoritar';
-    favBtn.innerHTML = c.fav ? '⭐' : '☆';
-    favBtn.addEventListener('click', ev=>{ ev.stopPropagation(); toggleFav(c.id); });
-
-    const editBtn = document.createElement('button'); editBtn.className='icon-btn'; editBtn.title='Editar';
-    editBtn.innerHTML = '✎';
-    editBtn.addEventListener('click', ev=>{ ev.stopPropagation(); openEdit(c.id); });
-
-    const delBtn = document.createElement('button'); delBtn.className='icon-btn danger'; delBtn.title='Excluir';
-    delBtn.innerHTML = '🗑';
-    delBtn.addEventListener('click', ev=>{ ev.stopPropagation(); removeContact(c.id); });
-
-    actions.appendChild(favBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
-
-    el.appendChild(thumb);
-    el.appendChild(info);
-    el.appendChild(actions);
-
-    el.addEventListener('click', ()=>{
-      const num = normalizeNumber(c.number);
-      if(!num) return alert('Número inválido');
-      window.open(`https://wa.me/${num}`, '_blank');
-    });
-
-    // abrir stories
-    thumb.addEventListener('click', ev=>{
-      ev.stopPropagation();
-      openStories(c);
-    });
-
-    listEl.appendChild(el);
-  }
-
   
-
-  let currentStories = [];
-  let currentStoryIndex = 0;
-
-  function openStories(contact){
-    if(!contact.status || contact.status.length===0) return;
-    // marcar como visto
-    contact.statusViewed = true;
-    save();
-    renderList(searchInput.value.trim());
-    currentStories = contact.status;
-    currentStoryIndex = 0;
-    renderCurrentStory();
-    storiesModal.classList.remove('hidden');
-  }
-  function renderStoryProgress() {
-    const container = document.getElementById('stories-progress');
-    container.innerHTML = '';
-    currentStories.forEach((_, idx) => {
-      const bar = document.createElement('div');
-      bar.className = 'story-progress-bar';
-      const fill = document.createElement('div');
-      fill.className = 'story-progress-fill';
-      if(idx < currentStoryIndex) fill.style.width = '100%';
-      container.appendChild(bar);
-      bar.appendChild(fill);
-    });
-  }
-  function startStoryTimer() {
-    clearInterval(storyTimer);
-    const current = currentStories[currentStoryIndex];
-    let duration = STORY_DURATION;
-    if(current.tipo === 'video') duration = 60000; // vídeos não avançam automaticamente
+      // abrir stories
+      thumb.addEventListener('click', ev=>{
+        ev.stopPropagation();
+        openStories(c);
+      });
   
-    if(duration > 0){
-      let elapsed = 0;
-      const step = 50;
+      listEl.appendChild(el);
+    }
+  
+    
+  
+   
+    function openStories(contact){
+      if(!contact.status || contact.status.length===0) return;
+      contact.statusViewed = true;
+      save();
+      localStorage.setItem('contactsApp.v2', JSON.stringify(contacts));
+      renderList(document.getElementById('contacts-search-input').value.trim());
+      currentStories = contact.status;
+      currentStoryIndex = 0;
+      renderCurrentStory();
+      storiesModal.classList.remove('hidden');
+    }
+    function renderStoryProgress(){
+      storiesProgress.innerHTML = '';
+      currentStories.forEach((_, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'story-progress-bar';
+        bar.style.flex = '1';
+        bar.style.background = 'rgba(255,255,255,0.3)';
+        bar.style.borderRadius = '2px';
+        const fill = document.createElement('div');
+        fill.className = 'story-progress-fill';
+        fill.style.height = '100%';
+        fill.style.width = idx < currentStoryIndex ? '100%' : '0%';
+        fill.style.background = '#25D366';
+        bar.appendChild(fill);
+        storiesProgress.appendChild(bar);
+      });
+    }
+  
+    function startStoryTimer(){
+      clearInterval(storyTimer);
+      const current = currentStories[currentStoryIndex];
+      let duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
       const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
-      storyTimer = setInterval(() => {
-        elapsed += step;
-        fill.style.width = Math.min((elapsed / duration) * 100, 100) + '%';
-        if(elapsed >= duration){
+      let elapsed = 0;
+      storyTimer = setInterval(()=>{
+        elapsed += 50;
+        fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
+        if(elapsed>=duration){
           clearInterval(storyTimer);
           if(currentStoryIndex < currentStories.length-1){
             currentStoryIndex++;
             renderCurrentStory();
-          } else {
-            storiesModal.classList.add('hidden');
+          } else closeStories();
+        }
+      },50);
+    }
+    function renderCurrentStory(){
+      storiesCarousel.innerHTML = '';
+      const s = currentStories[currentStoryIndex];
+      const content = document.createElement(s.tipo==='video'?'video':'img');
+      content.src = s.src;
+      content.style.width = '100%';
+      content.style.height = '100%';
+      content.style.objectFit = 'cover';
+      if(s.tipo==='video'){
+        content.autoplay = true;
+        content.controls = false;
+        content.muted = false;
+      }
+      storiesCarousel.appendChild(content);
+      storiesCaption.textContent = s.legenda || '';
+      renderStoryProgress();
+      startStoryTimer();
+    }
+    function closeStories(){
+      clearInterval(storyTimer);
+      storiesModal.classList.add('hidden');
+    }
+  
+    // 🔹 Controles por toque (como no WhatsApp)
+    let touchStartX = 0;
+    storiesModal.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+    });
+    storiesModal.addEventListener('touchend', e => {
+      const endX = e.changedTouches[0].clientX;
+      const diff = endX - touchStartX;
+      if(Math.abs(diff) < 40){
+        // toque simples: lado direito avança / esquerdo volta
+        const rect = storiesModal.getBoundingClientRect();
+        const mid = rect.width / 2;
+        if(endX > mid){
+          // lado direito
+          if(currentStoryIndex < currentStories.length-1){ 
+            currentStoryIndex++; 
+            renderCurrentStory(); 
+          } else closeStories();
+        } else {
+          // lado esquerdo
+          if(currentStoryIndex > 0){
+            currentStoryIndex--; 
+            renderCurrentStory();
           }
         }
-      }, step);
-    }
-  }
-  function renderCurrentStory(){
-    storiesCarousel.innerHTML='';
-    const s = currentStories[currentStoryIndex];
-    const div = document.createElement('div');
-    div.className='story-item';
-    
-    if(s.tipo==='video'){
-      const video = document.createElement('video');
-      video.src=s.src;
-      video.autoplay=true;
-      video.controls=true;
-      div.appendChild(video);
-    } else {
-      const img = document.createElement('img');
-      img.src = s.src;
-      // clique na imagem avança o story
-      img.addEventListener('click', ()=>{
-        if(currentStoryIndex < currentStories.length-1){
-          currentStoryIndex++;
-          renderCurrentStory();
-        } else { storiesModal.classList.add('hidden'); }
-      });
-      div.appendChild(img);
-    }
-
-    storiesCarousel.appendChild(div);
-    storiesCaption.textContent = s.legenda || '';
-    renderStoryProgress();
-    startStoryTimer();
-
-  }
-
-  storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
-  storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
-  storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
+      } else if(diff > 60){
+        // deslize direita → esquerda (voltar story)
+        if(currentStoryIndex > 0){ currentStoryIndex--; renderCurrentStory(); }
+      } else if(diff < -60){
+        // deslize esquerda → direita (avançar story)
+        if(currentStoryIndex < currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); }
+        else closeStories();
+      }
+     });
   
-
-  // --- Lista de contatos ---
-  function renderList(f=''){
-    listEl.innerHTML='';
-    contacts
-      .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
-      .forEach(renderContact);
-  }
-
-  // --- Modal adicionar / editar ---
-  function openAdd() {
-    editingId = null;
-    inputName.value = '';
-    inputNumber.value = '';
-    currentPhoto = './user.png';
-    preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    emojiPicker.style.display = 'none';
-    modal.classList.remove('hidden');
-  }
-
-  function openEdit(id) {
-    const c = contacts.find(x => x.id === id);
-    if(!c) return;
-    editingId = id;
-    inputName.value = c.name || '';
-    inputNumber.value = c.number || '';
-    currentPhoto = c.photo || './user.png';
-    if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
-      preview.textContent = currentPhoto; preview.style.background='#fff';
-    } else {
-      preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    storiesBack.onclick = closeStories;
+    window.openStories = openStories; // mantém compatibilidade
+  
+  
+    storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
+    storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
+    storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
+    
+  
+     // --- Lista de contatos ---
+    function renderList(f=''){
+      listEl.innerHTML='';
+      contacts
+        .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+        .forEach(renderContact);
     }
-    emojiPicker.style.display='none';
-    modal.classList.remove('hidden');
-  }
-
-  function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
-  function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
-  function saveFromModal(){ 
-    const name=inputName.value.trim();
-    const number=normalizeNumber(inputNumber.value.trim());
-    if(!number) return alert('Número inválido');
-    const photo=currentPhoto||'./user.png';
-    if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
-    else contacts.unshift({id:genId(),name,number,photo,fav:false});
-    save(); renderList(searchInput.value.trim()); closeModal();
-  }
-  function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
-
-  function handleFile(ev){
-    const file=ev.target.files[0];
-    if(!file) return;
-    const reader=new FileReader();
-    reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
-    reader.readAsDataURL(file);
-  }
-
-  btnPhoto.onclick=()=>photoInput.click();
-  photoInput.onchange=handleFile;
-  btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
-  emojiPicker.querySelectorAll('span').forEach(sp=>{
-    sp.addEventListener('click',()=>{
-      currentPhoto=sp.textContent;
-      preview.textContent=currentPhoto;
-      preview.style.background='#fff';
+  
+    // --- Modal adicionar / editar ---
+    function openAdd() {
+      editingId = null;
+      inputName.value = '';
+      inputNumber.value = '';
+      currentPhoto = './user.png';
+      preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      emojiPicker.style.display = 'none';
+      modal.classList.remove('hidden');
+    }
+  
+    function openEdit(id) {
+      const c = contacts.find(x => x.id === id);
+      if(!c) return;
+      editingId = id;
+      inputName.value = c.name || '';
+      inputNumber.value = c.number || '';
+      currentPhoto = c.photo || './user.png';
+      if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
+        preview.textContent = currentPhoto; preview.style.background='#fff';
+      } else {
+        preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      }
       emojiPicker.style.display='none';
+      modal.classList.remove('hidden');
+    }
+  
+    function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
+    function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
+    function saveFromModal(){ 
+      const name=inputName.value.trim();
+      const number=normalizeNumber(inputNumber.value.trim());
+      if(!number) return alert('Número inválido');
+      const photo=currentPhoto||'./user.png';
+      if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
+      else contacts.unshift({id:genId(),name,number,photo,fav:false});
+      save(); renderList(searchInput.value.trim()); closeModal();
+    }
+    function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
+  
+    function handleFile(ev){
+      const file=ev.target.files[0];
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
+      reader.readAsDataURL(file);
+    }
+  
+    btnPhoto.onclick=()=>photoInput.click();
+    photoInput.onchange=handleFile;
+    btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
+    emojiPicker.querySelectorAll('span').forEach(sp=>{
+      sp.addEventListener('click',()=>{
+        currentPhoto=sp.textContent;
+        preview.textContent=currentPhoto;
+        preview.style.background='#fff';
+        emojiPicker.style.display='none';
+      });
     });
-  });
-
-  addBtn.onclick=openAdd;
-  cancelBtn.onclick=closeModal;
-  saveBtn.onclick=saveFromModal;
-  searchInput.oninput=()=>renderList(searchInput.value);
-  backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
-
-  // --- Inicialização ---
-  load();
-  renderList();
-  loadNetworking();
+  
+    addBtn.onclick=openAdd;
+    cancelBtn.onclick=closeModal;
+    saveBtn.onclick=saveFromModal;
+    searchInput.oninput=()=>renderList(searchInput.value);
+    backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
+  
+    // --- Inicialização ---
+    load();
+    renderList();
+    loadNetworking();
 })();
 </script>
 
@@ -468,3 +506,4 @@
 
 </body>
 </html>
+
