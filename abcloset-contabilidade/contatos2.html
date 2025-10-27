@@ -423,6 +423,47 @@
         console.log(`🕓 ${removed} stories expirados foram removidos automaticamente.`);
       }
     }
+    async function cleanOldStories() {
+      const now = new Date();
+      let removed = 0;
+    
+      // percorre todos os contatos
+      contacts.forEach(contact => {
+        if (contact.status && contact.status.length > 0) {
+          // filtra apenas stories que ainda estão válidos
+          const validStories = contact.status.filter(story => {
+            const end = new Date(story.endTime || story.fim || 0);
+            return end > now; // mantém apenas os que ainda não expiraram
+          });
+    
+          if (validStories.length !== contact.status.length) {
+            contact.status = validStories;
+            removed += (contact.status.length - validStories.length);
+          }
+        }
+      });
+    
+      // se removeu algum story, salva a lista atualizada
+      if (removed > 0) {
+        save();
+        console.log(`🧹 Stories antigos removidos: ${removed}`);
+      }
+    
+      // tenta limpar cache de mídia
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (const key of keys) {
+            if (key.includes('stories') || key.includes('media')) {
+              await caches.delete(key);
+            }
+          }
+          console.log('🧼 Cache de mídia limpo.');
+        }
+      } catch (err) {
+        console.warn('⚠️ Não foi possível limpar cache:', err);
+      }
+    }
 
     
 
@@ -820,6 +861,8 @@
   
     loadNetworking();          // carrega contatos e stories da rede
     filterExpiredStories(); // 🔹 remove stories vencidos automaticamente
+    await cleanOldStories(); //remove stories vencidos automaticamente do cache
+
 })();
 </script>
 
@@ -827,6 +870,7 @@
 
 </body>
 </html>
+
 
 
 
