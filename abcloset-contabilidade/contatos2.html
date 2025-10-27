@@ -327,22 +327,30 @@
         let added = 0;
         networkContacts.forEach(nc=>{
           const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
-          if(!exists){
+          if (!exists) {
+            // 🔹 Filtra os stories válidos pela data/hora real
+            const now = new Date();
+          
+            const validStatuses = (nc.status || []).filter(s => {
+              const start = new Date(s.inicio);
+              const end = new Date(s.fim);
+              return now >= start && now <= end;
+            });
+          
+            // 🔹 Só adiciona o contato se houver pelo menos 1 status válido ou mesmo sem status
             contacts.push({
               id: genId(),
               name: nc.name || '(sem nome)',
               number: normalizeNumber(nc.number || ''),
               photo: nc.photo || './user.png',
               fav: false,
-              status: nc.status || [],
+              status: validStatuses,
               system: true
             });
-            
-            // 🔒 Protege o objeto de qualquer modificação
-            //Object.freeze(sysContact);
-
+          
             added++;
           }
+
         });
         if(added>0){ save(); renderList(searchInput.value.trim()); }
         console.log(`🌐 Networking atualizado (${added} novos contatos).`);
@@ -730,6 +738,7 @@
 
 </body>
 </html>
+
 
 
 
