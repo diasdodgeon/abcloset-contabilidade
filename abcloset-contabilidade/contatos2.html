@@ -310,27 +310,27 @@
     
       // Contatos do sistema → bloqueados para edição/exclusão
      if (c.system) {
-      const lockEdit = document.createElement('button');
-      lockEdit.className = 'icon-btn locked';
-      lockEdit.title = 'Edição bloqueada';
-      lockEdit.textContent = '🔒';
-      lockEdit.addEventListener('click', ev => {
-        ev.stopPropagation();
-        alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado.');
-      });
-    
-      const lockDel = document.createElement('button');
-      lockDel.className = 'icon-btn locked';
-      lockDel.title = 'Exclusão bloqueada';
-      lockDel.textContent = '🔒';
-      lockDel.addEventListener('click', ev => {
-        ev.stopPropagation();
-        alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído.');
-      });
-    
-      actions.appendChild(lockEdit);
-      actions.appendChild(lockDel);
-    }
+        const lockEdit = document.createElement('button');
+        lockEdit.className = 'icon-btn locked';
+        lockEdit.title = 'Edição bloqueada';
+        lockEdit.textContent = '🔒';
+        lockEdit.addEventListener('click', ev => {
+          ev.stopPropagation();
+          alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado.');
+        });
+      
+        const lockDel = document.createElement('button');
+        lockDel.className = 'icon-btn locked';
+        lockDel.title = 'Exclusão bloqueada';
+        lockDel.textContent = '🔒';
+        lockDel.addEventListener('click', ev => {
+          ev.stopPropagation();
+          alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído.');
+        });
+      
+        actions.appendChild(lockEdit);
+        actions.appendChild(lockDel);
+      }
 
       } else {
         // Contatos normais → editar/excluir permitidos
@@ -605,5 +605,6 @@
 
 </body>
 </html>
+
 
 
