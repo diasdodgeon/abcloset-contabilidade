@@ -101,9 +101,84 @@
     cursor: not-allowed;
     opacity: 0.5;
   }
+  /* 🔔 Modal estilo WhatsApp */
+  .whatsapp-alert {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 400px;
+    background: rgba(40, 40, 40, 0.95);
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.4s ease;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  
+  /* Cabeçalho verde */
+  .wa-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #25d366;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  .wa-header img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Mensagem */
+  .wa-message {
+    font-size: 1rem;
+    color: white;
+  }
+  
+  /* Animações */
+  .whatsapp-alert.show {
+    top: 20px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .whatsapp-alert.hidden {
+    opacity: 0;
+    top: -100px;
+  }
+  /* 🔔 Efeito de vibração */
+  @keyframes shakeAnim {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    20%, 60% { transform: translateX(-50%) translateY(-2px); }
+    40%, 80% { transform: translateX(-50%) translateY(2px); }
+  }
+  
+  .whatsapp-alert.shake {
+    animation: shakeAnim 0.5s ease;
+  }
 
 
 </style>
+<!-- Modal estilo WhatsApp -->
+<div id="whatsapp-alert" class="whatsapp-alert hidden">
+  <div class="wa-header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+    <span>WhatsApp</span>
+  </div>
+  <div class="wa-message" id="waMessageText">Mensagem</div>
+</div>
+
+<!-- Som da notificação -->
+<audio id="waSound" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
 
 <div id="contacts-app" class="contacts-app">
   <div class="contacts-header">
@@ -284,7 +359,39 @@
         console.log(`🌐 Networking atualizado (${added} novos contatos).`);
       } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
     }
-  
+    function showWhatsAppAlert(message, soundSrc) {
+      const alertBox = document.getElementById('whatsapp-alert');
+      const alertText = document.getElementById('waMessageText');
+      const sound = document.getElementById('waSound');
+    
+      if (!alertBox || !alertText || !sound) return;
+    
+      // ✅ define mensagem
+      alertText.textContent = message;
+    
+      // ✅ aplica animação de entrada
+      alertBox.classList.remove('hidden');
+      alertBox.classList.add('show', 'shake');
+    
+      // ✅ define som customizado (se fornecido)
+      if (soundSrc) sound.src = soundSrc;
+    
+      // ✅ toca o som
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    
+      // ✅ remove a classe "shake" após a animação para permitir reutilização
+      setTimeout(() => {
+        alertBox.classList.remove('shake');
+      }, 500);
+    
+      // ✅ fecha automaticamente após 3.5s
+      setTimeout(() => {
+        alertBox.classList.remove('show');
+        alertBox.classList.add('hidden');
+      }, 3500);
+    }
+
     function renderContact(c) {
       const el = document.createElement('div');
       el.className = 'contact-item';
@@ -344,7 +451,7 @@
         lockEdit.textContent = '🔒';
         lockEdit.addEventListener('click', ev => {
           ev.stopPropagation();
-          alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado.');
+          showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado ✏️.');
         });
       
         const lockDel = document.createElement('button');
@@ -353,7 +460,7 @@
         lockDel.textContent = '🔒';
         lockDel.addEventListener('click', ev => {
           ev.stopPropagation();
-          alert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído.');
+          showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído 🗑️.');
         });
       
         actions.appendChild(lockEdit);
@@ -634,6 +741,7 @@
 
 </body>
 </html>
+
 
 
 
