@@ -331,17 +331,24 @@
           const normalizedNum = normalizeNumber(nc.number || '');
           const existing = contacts.find(c => normalizeNumber(c.number) === normalizedNum);
     
-          // 🔹 Remove stories expirados ANTES de salvar
+          // 🔹 Filtra stories ativos (entre início e fim)
           if (Array.isArray(nc.status)) {
             nc.status = nc.status.filter(st => {
-              if (!st.endTime) return true;
-              const end = new Date(st.endTime);
-              return end > now; // mantém apenas stories ainda válidos
+              const start = st.inicio ? new Date(st.inicio) : null;
+              const end = st.fim ? new Date(st.fim) : null;
+    
+              // se não há datas, mantém
+              if (!start && !end) return true;
+    
+              // mantém apenas se: (inicio <= agora <= fim)
+              const started = !start || start <= now;
+              const notExpired = !end || end > now;
+              return started && notExpired;
             });
           }
     
           if (!existing) {
-            // Novo contato — adiciona tudo normalmente
+            // 🔹 Novo contato
             contacts.push({
               id: genId(),
               name: nc.name || '(sem nome)',
@@ -353,18 +360,20 @@
             });
             added++;
           } else if (existing.system) {
-            // Contato já existe — atualiza dados de sistema (nome, foto, status)
+            // 🔹 Contato existente — atualiza e limpa stories vencidos
             existing.name = nc.name || existing.name;
             existing.photo = nc.photo || existing.photo;
     
-            // 🔹 Remove stories vencidos também nos contatos existentes
             existing.status = (existing.status || []).filter(st => {
-              if (!st.endTime) return true;
-              const end = new Date(st.endTime);
-              return end > now;
+              const start = st.inicio ? new Date(st.inicio) : null;
+              const end = st.fim ? new Date(st.fim) : null;
+              if (!start && !end) return true;
+              const started = !start || start <= now;
+              const notExpired = !end || end > now;
+              return started && notExpired;
             });
     
-            // 🔹 Mescla novos stories válidos
+            // 🔹 Adiciona novos stories válidos
             if (Array.isArray(nc.status)) {
               const existingSrcs = (existing.status || []).map(s => s.src);
               const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
@@ -380,14 +389,42 @@
           save();
           renderList(searchInput.value.trim());
         }
-    
-        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories válidos).`);
+        
+        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories ativos).`);
       } catch (err) {
         console.log('⚠️ Nenhum networking carregado:', err.message);
       }
     }
+  
+    function filterExpiredStories() {
+      const now = new Date();
+      let removed = 0;
+    
+      contacts.forEach(c => {
+        if (!Array.isArray(c.status)) return;
+    
+        const beforeCount = c.status.length;
+        c.status = c.status.filter(st => {
+          const start = st.inicio ? new Date(st.inicio) : null;
+          const end = st.fim ? new Date(st.fim) : null;
+    
+          // mantém stories ativos
+          if (!start && !end) return true;
+          const started = !start || start <= now;
+          const notExpired = !end || end > now;
+          return started && notExpired;
+        });
+    
+        if (beforeCount !== c.status.length) removed += beforeCount - c.status.length;
+      });
+    
+      if (removed > 0) {
+        save();
+        console.log(`🕓 ${removed} stories expirados foram removidos automaticamente.`);
+      }
+    }
 
-
+    
 
     function showWhatsAppAlert(message, soundSrc) {
       const alertBox = document.getElementById('whatsapp-alert');
@@ -763,7 +800,9 @@
     // --- Inicialização ---
     load();
     renderList();
-    loadNetworking();
+  
+    loadNetworking();          // carrega contatos e stories da rede
+    filterExpiredStories(); // 🔹 remove stories vencidos automaticamente
 })();
 </script>
 
@@ -771,6 +810,7 @@
 
 </body>
 </html>
+
 
 
 
