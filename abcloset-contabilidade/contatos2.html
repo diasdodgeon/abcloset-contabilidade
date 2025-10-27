@@ -636,6 +636,11 @@
     }
   
     function renderCurrentStory(){
+      // Para o vídeo anterior, se houver
+      if (currentVideo && !currentVideo.paused) {
+        currentVideo.pause();
+        currentVideo.currentTime = 0;
+      }
       storiesCarousel.innerHTML = '';
       currentVideo = null;
       const s = currentStories[currentStoryIndex];
@@ -656,11 +661,23 @@
       startStoryTimer();
     }
   
-    function closeStories(){
+   
+    function closeStories() {
       clearInterval(storyTimer);
+    
+      // Pausar e resetar o vídeo atual, se existir
+      if (currentVideo && !currentVideo.paused) {
+        currentVideo.pause();
+        currentVideo.currentTime = 0;
+      }
+    
+      // Esconder o modal
       storiesModal.classList.add('hidden');
+    
+      // Opcional: limpar o conteúdo do carrossel (garante que áudio e vídeo sumam do DOM)
+      storiesCarousel.innerHTML = '';
     }
-  
+
     // 🔹 Controles por toque
     let touchStartX = 0;
     let holdTimeout = null;
@@ -810,6 +827,7 @@
 
 </body>
 </html>
+
 
 
 
