@@ -231,7 +231,6 @@
         let added = 0;
         networkContacts.forEach(nc=>{
           const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
-          
           if(!exists){
             contacts.push({
               id: genId(),
@@ -240,8 +239,6 @@
               photo: nc.photo || './user.png',
               fav: false,
               status: nc.status || [] // ✅ adiciona stories
-              
-              
             });
             added++;
           }
@@ -475,10 +472,6 @@
   
     function openEdit(id) {
       const c = contacts.find(x => x.id === id);
-      if (contact.system) {
-        alert("🚫 Contatos fixos não podem ser editados.");
-        return;
-      }
       if(!c) return;
       editingId = id;
       inputName.value = c.name || '';
@@ -494,16 +487,7 @@
     }
   
     function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
-    function removeContact(id){ 
-      if (contact.system) {
-        alert("🚫 Este contato é fixo e não pode ser apagado.");
-        return;
-      }
-      else(!confirm('Deseja realmente excluir este contato?')) return; 
-        contacts=contacts.filter(x=>x.id!==id); 
-        save(); 
-        renderList(searchInput.value.trim()); 
-    }
+    function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
     function saveFromModal(){ 
       const name=inputName.value.trim();
       const number=normalizeNumber(inputNumber.value.trim());
@@ -552,16 +536,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
