@@ -28,7 +28,16 @@
   },
   {
     "name": "Oficina savana",
-    "number": "5585999999999",
+    "number": "5585999999989",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
+  },
+  {
+    "name": "Oficina paraguai",
+    "number": "5585999994989",
     "photo": "./networking/ariane.png",
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
@@ -36,6 +45,7 @@
     ]
   }
 ]
+
 
 
 
