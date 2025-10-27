@@ -230,7 +230,8 @@
         const networkContacts = await res.json();
         let added = 0;
         networkContacts.forEach(nc=>{
-          const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number),c=> c.system = true);
+          const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
+          const exists = contacts.some(c => c.system = true);
           if(!exists){
             contacts.push({
               id: genId(),
@@ -550,6 +551,7 @@
 
 </body>
 </html>
+
 
 
 
