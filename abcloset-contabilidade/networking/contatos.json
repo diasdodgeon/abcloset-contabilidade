@@ -43,8 +43,54 @@
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
     ]
+  },
+  {
+    "name": "Ariane dias Brandão",
+    "number": "5585999366181",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
+  },
+  {
+    "name": "Alison Dias brandoa",
+    "number": "5587998096474",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
+  },
+  {
+    "name": "Oficina Turbo dias",
+    "number": "5585949999999",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
+  },
+  {
+    "name": "Oficina savana dias",
+    "number": "5585999939989",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
+  },
+  {
+    "name": "Oficina paraguai dias",
+    "number": "5585999294989",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
+    ]
   }
 ]
+
 
 
 
