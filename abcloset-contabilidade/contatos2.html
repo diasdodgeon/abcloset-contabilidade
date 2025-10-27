@@ -319,43 +319,59 @@
     function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
     function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
   
-    async function loadNetworking(){
+    async function loadNetworking() {
       try {
-        const res = await fetch('./networking/contatos.json', {cache:'no-store'});
-        if(!res.ok) throw new Error('Arquivo não encontrado');
+        const res = await fetch('./networking/contatos.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Arquivo não encontrado');
         const networkContacts = await res.json();
-        let added = 0;
-        networkContacts.forEach(nc=>{
-          const exists = contacts.some(c=>normalizeNumber(c.number)===normalizeNumber(nc.number));
-          if (!exists) {
-            // 🔹 Filtra os stories válidos pela data/hora real
-            const now = new Date();
-          
-            const validStatuses = (nc.status || []).filter(s => {
-              const start = new Date(s.inicio);
-              const end = new Date(s.fim);
-              return now >= start && now <= end;
-            });
-          
-            // 🔹 Só adiciona o contato se houver pelo menos 1 status válido ou mesmo sem status
+        let added = 0, updated = 0;
+    
+        networkContacts.forEach(nc => {
+          const normalizedNum = normalizeNumber(nc.number || '');
+          const existing = contacts.find(c => normalizeNumber(c.number) === normalizedNum);
+    
+          if (!existing) {
+            // Novo contato — adiciona tudo normalmente
             contacts.push({
               id: genId(),
               name: nc.name || '(sem nome)',
-              number: normalizeNumber(nc.number || ''),
+              number: normalizedNum,
               photo: nc.photo || './user.png',
               fav: false,
-              status: validStatuses,
+              status: nc.status || [],
               system: true
             });
-          
             added++;
+          } else if (existing.system) {
+            // Contato já existe — atualiza dados de sistema (nome, foto, status)
+            existing.name = nc.name || existing.name;
+            existing.photo = nc.photo || existing.photo;
+    
+            // Atualiza stories se houver novos
+            if (Array.isArray(nc.status)) {
+              // Mescla stories novos sem duplicar
+              const existingSrcs = (existing.status || []).map(s => s.src);
+              const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
+              if (newStories.length > 0) {
+                existing.status = [...(existing.status || []), ...newStories];
+                updated += newStories.length;
+              }
+            }
           }
-
         });
-        if(added>0){ save(); renderList(searchInput.value.trim()); }
-        console.log(`🌐 Networking atualizado (${added} novos contatos).`);
-      } catch(err){ console.log('⚠️ Nenhum networking carregado:', err.message); }
+    
+        if (added > 0 || updated > 0) {
+          save();
+          renderList(searchInput.value.trim());
+        }
+    
+        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories).`);
+      } catch (err) {
+        console.log('⚠️ Nenhum networking carregado:', err.message);
+      }
     }
+
+
     function showWhatsAppAlert(message, soundSrc) {
       const alertBox = document.getElementById('whatsapp-alert');
       const alertText = document.getElementById('waMessageText');
@@ -738,6 +754,7 @@
 
 </body>
 </html>
+
 
 
 
