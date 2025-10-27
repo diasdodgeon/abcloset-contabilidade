@@ -1,7 +1,7 @@
 [
   {
-    "name": "Ariane Brandão",
-    "number": "5585999355181",
+    "name": "Ariane B",
+    "number": "5585944355181",
     "photo": "./networking/ariane.png",
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-27T14:20:00"},
@@ -101,6 +101,7 @@
     
   }
 ]
+
 
 
 
