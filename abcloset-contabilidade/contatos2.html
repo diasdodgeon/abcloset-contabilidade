@@ -502,8 +502,13 @@
       const storyCounter = document.getElementById('story-counter');
       const storyCounterText = document.getElementById('story-counter-text');
     
-      // conta quantos stories são "novos"
-      const newStories = stories.filter(story => story.isNew).length;
+      // Conta quantos contatos têm stories "novos"
+      const newStories = contacts.reduce((acc, c) => {
+        if (c.status && c.status.length > 0 && !c.statusViewed) {
+          return acc + 1;
+        }
+        return acc;
+      }, 0);
     
       if (newStories > 0) {
         storyCounterText.textContent = `${newStories} novo${newStories > 1 ? 's' : ''} stor${newStories > 1 ? 'ies' : 'y'}`;
@@ -512,9 +517,9 @@
         storyCounter.classList.add('hidden');
       }
     
-      // opcional: ao clicar no contador, abrir modal de stories
       storyCounter.onclick = () => openStoriesModal();
     }
+
 
    
 
@@ -927,3 +932,4 @@
 
 </body>
 </html>
+
