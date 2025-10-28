@@ -236,13 +236,17 @@
   <div class="contacts-search">
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
   </div>
-  
-  <div id="story-counter" class="story-counter hidden">
-    <span id="story-counter-text"></span>
-    <span id="contatos-counter-text"></span>
-    <span id="grupos-counter-text"></span>
-  </div>
-
+  <span>
+    <div id="story-counter" class="story-counter hidden">
+      <span id="story-counter-text"></span>
+    </div>
+    <div id="contatos-counter" class="story-counter hidden">
+      <span id="contatos-counter-text"></span>
+    </div>
+    <div id="grupos-counter" class="story-counter hidden">
+      <span id="grupos-counter-text"></span>
+    </div>
+  </span>
   <div id="contacts-list" class="contacts-list"></div>
 
   <!-- Modal -->
@@ -445,7 +449,7 @@
       }
     }
 
-  
+    
     function filterExpiredStories() {
       const now = new Date();
       let removed = 0;
@@ -565,8 +569,16 @@
     }
 
 
+     function marcarStoryComoVisto(contactId, storyIndex) {
+      const contact = contacts.find(c => c.id === contactId);
+      if (contact && contact.status && contact.status[storyIndex]) {
+        contact.status[storyIndex].visto = true;
+        save();
+        updateCounters();
+        renderList(searchInput.value.trim());
+      }
+    }
 
-   
 
     
 
@@ -827,7 +839,9 @@
       } else {
         storiesCaption.textContent = '';
       }
-
+      videoElement.onended = () => {
+        marcarStoryComoVisto(contact.id, contact.status.indexOf(story));
+      };
       renderStoryProgress();
       startStoryTimer();
     }
@@ -998,6 +1012,7 @@
 
 </body>
 </html>
+
 
 
 
