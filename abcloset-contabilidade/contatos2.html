@@ -930,24 +930,32 @@
       // Esconder o modal
       storiesModal.classList.add('hidden');
     
-      // Opcional: limpar o conteúdo do carrossel (garante que áudio e vídeo sumam do DOM)
+      // Limpa o conteúdo do carrossel (garante que áudio/vídeo parem)
       storiesCarousel.innerHTML = '';
-      // 🔹 Avança automaticamente para o próximo contato da fila
+    
+      // 🔹 Se o fechamento for manual (usuário clicou no botão ou saiu da tela),
+      // interrompe a fila e mantém o contador visível
       if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
-        currentContactIndex++;
-        setTimeout(() => {
-          openStories(storyQueue[currentContactIndex]);
-        }, 300); // pequeno delay entre um contato e outro
-      } else {
-        // 🔸 Todos concluídos → limpar fila, esconder contador e atualizar lista
+        // o usuário fechou manualmente, então pausamos a fila
         storyQueue = [];
         currentContactIndex = 0;
-        contacts.forEach(c => (c.statusViewed = true));
         save();
         updateStoryCounter();
         renderList();
+        return; // encerra aqui
       }
+    
+      // 🔸 Se a fila chegou ao fim naturalmente (todas as stories vistas)
+      storyQueue = [];
+      currentContactIndex = 0;
+    
+      // Marca todos como vistos e atualiza contador
+      contacts.forEach(c => (c.statusViewed = true));
+      save();
+      updateStoryCounter();
+      renderList();
     }
+
 
     // 🔹 Controles por toque
     let touchStartX = 0;
@@ -1102,6 +1110,7 @@
 
 </body>
 </html>
+
 
 
 
