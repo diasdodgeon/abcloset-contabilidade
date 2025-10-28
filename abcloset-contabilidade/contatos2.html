@@ -238,8 +238,26 @@
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
   </div>
   
-  <div id="story-counter" class="story-counter hidden">
-    <span id="story-counter-text"></span>
+  <!-- 🔹 Contadores de novos itens -->
+  <div id="counters-wrapper" style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    margin:8px 0;
+    flex-wrap:wrap;
+  ">
+    <div id="contacts-counter" class="story-counter hidden">
+      <span id="contacts-counter-text"></span>
+    </div>
+  
+    <div id="grupos-counter" class="story-counter hidden">
+      <span id="grupos-counter-text"></span>
+    </div>
+  
+    <div id="story-counter" class="story-counter hidden">
+      <span id="story-counter-text"></span>
+    </div>
   </div>
 
 
@@ -406,6 +424,7 @@
               status: nc.status || [],
               grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
               system: true
+              ...(isGroup ? { newGroup: true } : { newContact: true }) // 🔹 marca como novo
             });
             added++;
           } else if (existing.system) {
@@ -438,6 +457,10 @@
         if (added > 0 || updated > 0) {
           save();
           renderList(searchInput.value.trim());
+          updateStoryCounter();
+          updateContactCounter();
+          updateGroupCounter();
+
         }
     
         console.log(`🌐 Networking atualizado (${added} novos contatos/grupos, ${updated} novos stories ativos).`);
@@ -538,6 +561,50 @@
       storyCounter.onclick = () => openStoriesModal();
     }
 
+    function updateContactCounter() {
+      const counter = document.getElementById('contacts-counter');
+      const text = document.getElementById('contacts-counter-text');
+      if (!counter || !text) return;
+    
+      const newContacts = contacts.filter(c => c.newContact).length;
+    
+      if (newContacts > 0) {
+        text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
+        counter.classList.remove('hidden');
+      } else {
+        counter.classList.add('hidden');
+      }
+    
+      // Ao clicar, remove o marcador "novo"
+      counter.onclick = () => {
+        contacts.forEach(c => delete c.newContact);
+        save();
+        renderList();
+        counter.classList.add('hidden');
+      };
+    }
+    
+    function updateGroupCounter() {
+      const counter = document.getElementById('grupos-counter');
+      const text = document.getElementById('grupos-counter-text');
+      if (!counter || !text) return;
+    
+      const newGroups = contacts.filter(c => c.newGroup).length;
+    
+      if (newGroups > 0) {
+        text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
+        counter.classList.remove('hidden');
+      } else {
+        counter.classList.add('hidden');
+      }
+    
+      counter.onclick = () => {
+        contacts.forEach(c => delete c.newGroup);
+        save();
+        renderList();
+        counter.classList.add('hidden');
+      };
+    }
 
 
 
@@ -972,6 +1039,10 @@
     loadNetworking();         // carrega contatos e stories da rede
     filterExpiredStories(); // remove stories vencidos automaticamente da lista
     updateStoryCounter();
+    updateStoryCounter();
+    updateContactCounter();
+    updateGroupCounter();
+
     cleanOldStories();     //remove stories vencidos automaticamente do cache
 
 })();
@@ -981,6 +1052,7 @@
 
 </body>
 </html>
+
 
 
 
