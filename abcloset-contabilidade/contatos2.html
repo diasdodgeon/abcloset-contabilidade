@@ -423,7 +423,7 @@
               fav: false,
               status: nc.status || [],
               grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
-              system: true
+              system: true,
               ...(isGroup ? { newGroup: true } : { newContact: true }) // 🔹 marca como novo
             });
             added++;
@@ -1052,6 +1052,7 @@
 
 </body>
 </html>
+
 
 
 
