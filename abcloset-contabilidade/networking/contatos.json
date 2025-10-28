@@ -91,16 +91,41 @@
     
   },
   {
-    "name": "Oficina paraguai dias",
-    "number": "5585999294989",
+    "name": "Oficina  dias",
+    "number": "5585992939939",
     "photo": "./networking/ariane.png",
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" }
     ]
     
+  },
+  {
+    "name": "Oficina paraguai brandao",
+    "number": "5585997294289",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "https://www.youtube.com/watch?v=1nm9qW6p_bQ&t=1350s" }
+    ]
+    
+  },
+  
+  {
+    "id": 2,
+    "nome": "Grupo netWorking",
+    "grupo": {
+      "linkConvite": "https://chat.whatsapp.com/Ei9pDcY1eBz2KRbgIeYta8?mode=wwt"
+    },
+    "status": [
+       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "https://www.youtube.com/watch?v=1nm9qW6p_bQ&t=1350s" }
+    ],
+    "system": true
   }
+
 ]
+
 
 
 
