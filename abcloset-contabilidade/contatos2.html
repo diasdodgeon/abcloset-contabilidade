@@ -182,6 +182,7 @@
   .story-counter:not(.hidden) {
     opacity: 1;
   }
+
   .group-link {
   color: #25D366;
   text-decoration: none;
@@ -522,61 +523,26 @@
       }
     }
     
-    function updateCounters() {
+    function updateStoryCounter() {
       const storyCounter = document.getElementById('story-counter');
-      const contatosCounter = document.getElementById('contatos-counter');
-      const gruposCounter = document.getElementById('grupos-counter');
-      
       const storyCounterText = document.getElementById('story-counter-text');
-      const contatosCounterText = document.getElementById('contatos-counter-text');
-      const gruposCounterText = document.getElementById('grupos-counter-text');
     
-      let unseenStories = 0;
-      let newContacts = 0;
-      let newGroups = 0;
-    
-      contacts.forEach(c => {
-        // 🔹 Conta apenas stories não vistos e ainda válidos
-        if (c.status && c.status.length > 0) {
-          const validUnseen = c.status.some(st => {
-            const inicio = st.inicio ? new Date(st.inicio) : null;
-            const fim = st.fim ? new Date(st.fim) : null;
-            const agora = new Date();
-            const ativo = (!inicio || agora >= inicio) && (!fim || agora <= fim);
-            return ativo && !st.visto; // somente se não visto
-          });
-          if (validUnseen) unseenStories++;
+      // Conta quantos contatos têm stories "novos"
+      const newStories = contacts.reduce((acc, c) => {
+        if (c.status && c.status.length > 0 && !c.statusViewed) {
+          return acc + 1;
         }
+        return acc;
+      }, 0);
     
-        // 🔹 Conta contatos novos
-        if (c.novo && !c.grupo) newContacts++;
+      if (newStories > 0) {
+        storyCounterText.textContent = `${newStories} novo${newStories > 1 ? 's' : ''} stor${newStories > 1 ? 'ies' : 'y'}`;
+        storyCounter.classList.remove('hidden');
+      } else {
+        storyCounter.classList.add('hidden');
+      }
     
-        // 🔹 Conta grupos novos
-        if (c.grupo && c.grupo.linkConvite && c.novo) newGroups++;
-      });
-    
-      // 🔹 Atualiza textos
-      storyCounterText.textContent = unseenStories > 0 
-        ? `${unseenStories} stor${unseenStories > 1 ? 'ies' : 'y'} novo${unseenStories > 1 ? 's' : ''}` 
-        : '';
-    
-      contatosCounterText.textContent = newContacts > 0 
-        ? `${newContacts} contato${newContacts > 1 ? 's' : ''} novo${newContacts > 1 ? 's' : ''}` 
-        : '';
-    
-      gruposCounterText.textContent = newGroups > 0 
-        ? `${newGroups} grupo${newGroups > 1 ? 's' : ''} novo${newGroups > 1 ? 's' : ''}` 
-        : '';
-    
-      // 🔹 Mostra/oculta individualmente
-      storyCounter.classList.toggle('hidden', unseenStories === 0);
-      contatosCounter.classList.toggle('hidden', newContacts === 0);
-      gruposCounter.classList.toggle('hidden', newGroups === 0);
-    
-      // 🔹 Adiciona ações ao clicar
       storyCounter.onclick = () => openStoriesModal();
-      contatosCounter.onclick = () => openContactsList();
-      gruposCounter.onclick = () => openGroupsList();
     }
 
 
@@ -1012,7 +978,7 @@
   
     loadNetworking();         // carrega contatos e stories da rede
     filterExpiredStories(); // remove stories vencidos automaticamente da lista
-    updateCounters();
+    updateStoryCounter();
     cleanOldStories();     //remove stories vencidos automaticamente do cache
 
 })();
@@ -1022,6 +988,7 @@
 
 </body>
 </html>
+
 
 
 
