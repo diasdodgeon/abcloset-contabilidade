@@ -191,6 +191,10 @@
   .group-link:hover {
     text-decoration: underline;
   }
+  body.filtering {
+    filter: brightness(1.1);
+    transition: filter 0.3s ease;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -541,15 +545,74 @@
       }
     }
     
+    function updateContactCounter() {
+      const counter = document.getElementById('contacts-counter');
+      const text = document.getElementById('contacts-counter-text');
+      if (!counter || !text) return;
+    
+      const newContacts = contacts.filter(c => c.newContact && !c.grupo).length;
+    
+      if (newContacts > 0) {
+        text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
+        counter.classList.remove('hidden');
+      } else {
+        counter.classList.add('hidden');
+      }
+    
+      counter.onclick = () => {
+        // 🔹 Filtra e mostra só os novos contatos
+        listEl.innerHTML = '';
+        contacts
+          .filter(c => c.newContact && !c.grupo)
+          .forEach(renderContact);
+    
+        // 🔸 Depois de 4s, remove a flag e some o contador
+        setTimeout(() => {
+          contacts.forEach(c => delete c.newContact);
+          save();
+          renderList(searchInput.value.trim());
+          counter.classList.add('hidden');
+        }, 10000);
+      };
+    }
+    
+    function updateGroupCounter() {
+      const counter = document.getElementById('grupos-counter');
+      const text = document.getElementById('grupos-counter-text');
+      if (!counter || !text) return;
+    
+      const newGroups = contacts.filter(c => c.newGroup && c.grupo).length;
+    
+      if (newGroups > 0) {
+        text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
+        counter.classList.remove('hidden');
+      } else {
+        counter.classList.add('hidden');
+      }
+    
+      counter.onclick = () => {
+        // 🔹 Mostra só os novos grupos
+        listEl.innerHTML = '';
+        contacts
+          .filter(c => c.newGroup && c.grupo)
+          .forEach(renderContact);
+    
+        // 🔸 Depois de 4s, limpa flag e esconde contador
+        setTimeout(() => {
+          contacts.forEach(c => delete c.newGroup);
+          save();
+          renderList(searchInput.value.trim());
+          counter.classList.add('hidden');
+        }, 10000);
+      };
+    }
+    
     function updateStoryCounter() {
       const storyCounter = document.getElementById('story-counter');
       const storyCounterText = document.getElementById('story-counter-text');
     
-      // Conta quantos contatos têm stories "novos"
       const newStories = contacts.reduce((acc, c) => {
-        if (c.status && c.status.length > 0 && !c.statusViewed) {
-          return acc + 1;
-        }
+        if (c.status && c.status.length > 0 && !c.statusViewed) return acc + 1;
         return acc;
       }, 0);
     
@@ -560,53 +623,27 @@
         storyCounter.classList.add('hidden');
       }
     
-      storyCounter.onclick = () => openStoriesModal();
+      storyCounter.onclick = () => {
+        // 🔹 Filtra contatos com stories não vistos
+        listEl.innerHTML = '';
+        contacts
+          .filter(c => c.status && c.status.length > 0 && !c.statusViewed)
+          .forEach(renderContact);
+    
+        // 🔸 Depois de 4s, marca todos como vistos e esconde contador
+        setTimeout(() => {
+          contacts.forEach(c => {
+            if (c.status && c.status.length > 0) c.statusViewed = true;
+          });
+          save();
+          renderList(searchInput.value.trim());
+          storyCounter.classList.add('hidden');
+        }, 10000);
+      };
     }
 
-    function updateContactCounter() {
-      const counter = document.getElementById('contacts-counter');
-      const text = document.getElementById('contacts-counter-text');
-      if (!counter || !text) return;
-    
-      const newContacts = contacts.filter(c => c.newContact).length;
-    
-      if (newContacts > 0) {
-        text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
-        counter.classList.remove('hidden');
-      } else {
-        counter.classList.add('hidden');
-      }
-    
-      // Ao clicar, remove o marcador "novo"
-      counter.onclick = () => {
-        contacts.forEach(c => delete c.newContact);
-        save();
-        renderList();
-        counter.classList.add('hidden');
-      };
-    }
-    
-    function updateGroupCounter() {
-      const counter = document.getElementById('grupos-counter');
-      const text = document.getElementById('grupos-counter-text');
-      if (!counter || !text) return;
-    
-      const newGroups = contacts.filter(c => c.newGroup).length;
-    
-      if (newGroups > 0) {
-        text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
-        counter.classList.remove('hidden');
-      } else {
-        counter.classList.add('hidden');
-      }
-    
-      counter.onclick = () => {
-        contacts.forEach(c => delete c.newGroup);
-        save();
-        renderList();
-        counter.classList.add('hidden');
-      };
-    }
+    document.body.classList.add('filtering');
+    setTimeout(() => document.body.classList.remove('filtering'), 10000);
 
 
 
@@ -1040,7 +1077,7 @@
   
     loadNetworking();         // carrega contatos e stories da rede
     filterExpiredStories(); // remove stories vencidos automaticamente da lista
-    updateStoryCounter();
+    
     updateStoryCounter();
     updateContactCounter();
     updateGroupCounter();
@@ -1054,6 +1091,7 @@
 
 </body>
 </html>
+
 
 
 
