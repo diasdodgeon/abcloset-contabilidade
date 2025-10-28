@@ -145,6 +145,16 @@
     ]
     
   },
+  {
+    "name": "Oficina brandao br",
+    "number": "5587197294289",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "https://www.youtube.com/watch?v=1nm9qW6p_bQ&t=1350s" }
+    ]
+    
+  },
   
   {
     "id": 2,
@@ -173,6 +183,7 @@
 
 
 ]
+
 
 
 
