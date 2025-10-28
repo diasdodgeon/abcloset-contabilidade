@@ -326,10 +326,7 @@
     const storiesNext = document.getElementById('stories-next');
     const storiesProgress = document.getElementById('stories-progress');
     const storiesBack = document.getElementById('stories-back');
-    document.getElementById('whatsapp-icon').addEventListener('click', ()=>{
-      document.getElementById('storiesModal').classList.remove('hidden');
-    });
-
+    
     let contacts = [];
     let editingId = null;
     let currentPhoto = '';
@@ -912,6 +909,10 @@
     saveBtn.onclick=saveFromModal;
     searchInput.oninput=()=>renderList(searchInput.value);
     backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
+    document.getElementById('whatsapp-icon').addEventListener('click', ()=>{
+      document.getElementById('storiesModal').classList.remove('hidden');
+    });
+
   
     // --- Inicialização ---
     load();
@@ -929,6 +930,7 @@
 
 </body>
 </html>
+
 
 
 
