@@ -182,6 +182,14 @@
   .story-counter:not(.hidden) {
     opacity: 1;
   }
+  .group-link {
+  color: #25D366;
+  text-decoration: none;
+  font-weight: 500;
+  }
+  .group-link:hover {
+    text-decoration: underline;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -359,46 +367,52 @@
         const res = await fetch('./networking/contatos.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('Arquivo não encontrado');
         const networkContacts = await res.json();
+    
         let added = 0, updated = 0;
-        const now = new Date(); // 🔹 Data atual
+        const now = new Date();
     
         networkContacts.forEach(nc => {
-          const normalizedNum = normalizeNumber(nc.number || '');
-          const existing = contacts.find(c => normalizeNumber(c.number) === normalizedNum);
+          const isGroup = !nc.number && nc.grupo?.linkConvite;
+          const normalizedNum = isGroup ? null : normalizeNumber(nc.number || '');
     
-          // 🔹 Filtra stories ativos (entre início e fim)
+          // Filtra stories válidos (respeitando inicio e fim)
           if (Array.isArray(nc.status)) {
             nc.status = nc.status.filter(st => {
               const start = st.inicio ? new Date(st.inicio) : null;
               const end = st.fim ? new Date(st.fim) : null;
-    
-              // se não há datas, mantém
               if (!start && !end) return true;
-    
-              // mantém apenas se: (inicio <= agora <= fim)
               const started = !start || start <= now;
               const notExpired = !end || end > now;
               return started && notExpired;
             });
           }
     
+          // Identifica se já existe (contato ou grupo)
+          const existing = contacts.find(c =>
+            isGroup
+              ? c.grupo?.linkConvite === nc.grupo?.linkConvite
+              : normalizeNumber(c.number) === normalizedNum
+          );
+    
           if (!existing) {
-            // 🔹 Novo contato
+            // 🔹 Novo contato ou grupo
             contacts.push({
               id: genId(),
-              name: nc.name || '(sem nome)',
+              name: nc.nome || nc.name || '(sem nome)',
               number: normalizedNum,
               photo: nc.photo || './user.png',
               fav: false,
               status: nc.status || [],
+              grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
               system: true
             });
             added++;
           } else if (existing.system) {
-            // 🔹 Contato existente — atualiza e limpa stories vencidos
-            existing.name = nc.name || existing.name;
+            // 🔹 Atualiza dados (apenas system)
+            existing.name = nc.nome || nc.name || existing.name;
             existing.photo = nc.photo || existing.photo;
     
+            // Limpa stories expirados
             existing.status = (existing.status || []).filter(st => {
               const start = st.inicio ? new Date(st.inicio) : null;
               const end = st.fim ? new Date(st.fim) : null;
@@ -408,7 +422,7 @@
               return started && notExpired;
             });
     
-            // 🔹 Adiciona novos stories válidos
+            // Adiciona novos stories válidos
             if (Array.isArray(nc.status)) {
               const existingSrcs = (existing.status || []).map(s => s.src);
               const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
@@ -424,12 +438,13 @@
           save();
           renderList(searchInput.value.trim());
         }
-        
-        console.log(`🌐 Networking atualizado (${added} novos contatos, ${updated} novos stories ativos).`);
+    
+        console.log(`🌐 Networking atualizado (${added} novos contatos/grupos, ${updated} novos stories ativos).`);
       } catch (err) {
         console.log('⚠️ Nenhum networking carregado:', err.message);
       }
     }
+
   
     function filterExpiredStories() {
       const now = new Date();
@@ -621,6 +636,27 @@
       const no = document.createElement('div');
       no.className = 'contact-number';
       no.textContent = c.number;
+     
+      
+      // mostra número ou link de grupo
+      if (c.grupo?.linkConvite) {
+        no.innerHTML = `<a href="${c.grupo.linkConvite}" target="_blank" class="group-link">Entrar no grupo</a>`;
+      } else {
+        no.textContent = c.number;
+      }
+     
+      
+      // Clique principal
+      el.addEventListener('click', () => {
+        if (c.grupo?.linkConvite) {
+          window.open(c.grupo.linkConvite, '_blank');
+        } else {
+          const num = normalizeNumber(c.number);
+          if(!num) return showWhatsAppAlert("Número inválido");
+          window.open(`https://wa.me/${num}`, '_blank');
+        }
+      });
+
       info.appendChild(nm);
       info.appendChild(no);
     
@@ -962,6 +998,7 @@
 
 </body>
 </html>
+
 
 
 
