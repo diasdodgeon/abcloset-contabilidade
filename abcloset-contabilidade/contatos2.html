@@ -154,6 +154,30 @@
     color: #fff;
     padding-left: 30px;
   }
+  #story-counter {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #25d366; /* verde WhatsApp */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+  
+  #story-counter.hidden {
+    display: none;
+  }
+  
+  .menu-icon {
+    position: relative;
+    display: inline-block;
+    margin: 0 10px;
+    cursor: pointer;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -268,6 +292,10 @@
   
 
 </div>
+<div class="menu-icon" id="whatsapp-icon">
+  <img src="./icons/whatsapp.svg" alt="WhatsApp" width="36">
+  <span id="story-counter" class="hidden"></span>
+</div>
 
 
 <!-- ... código HTML e CSS permanece igual até <script> ... -->
@@ -298,7 +326,10 @@
     const storiesNext = document.getElementById('stories-next');
     const storiesProgress = document.getElementById('stories-progress');
     const storiesBack = document.getElementById('stories-back');
-  
+    document.getElementById('whatsapp-icon').addEventListener('click', ()=>{
+      document.getElementById('storiesModal').classList.remove('hidden');
+    });
+
     let contacts = [];
     let editingId = null;
     let currentPhoto = '';
@@ -697,7 +728,13 @@
         currentVideo = content;
       }
       storiesCarousel.appendChild(content);
-      storiesCaption.textContent = s.legenda || '';
+      if (s.legenda) {
+          const linkRegex = /(https?:\/\/[^\s]+)/g;
+          storiesCaption.innerHTML = s.legenda.replace(linkRegex, '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>');
+        } else {
+          storiesCaption.textContent = '';
+        }
+
       renderStoryProgress();
       startStoryTimer();
     }
@@ -848,6 +885,27 @@
         emojiPicker.style.display='none';
       });
     });
+
+    function updateStoryCounter() {
+      const unseenCount = contacts.filter(c =>
+        c.status && c.status.length > 0 && !c.statusViewed
+      ).length;
+    
+      const counterEl = document.getElementById('story-counter');
+      if (!counterEl) return;
+    
+      if (unseenCount > 0) {
+        counterEl.textContent = unseenCount;
+        counterEl.classList.remove('hidden');
+      } else {
+        counterEl.classList.add('hidden');
+      }
+    }
+    
+    // chame essa função após renderList():
+    // renderList(searchInput.value.trim());
+    // updateStoryCounter();
+
   
     addBtn.onclick=openAdd;
     cancelBtn.onclick=closeModal;
@@ -861,6 +919,7 @@
   
     loadNetworking();         // carrega contatos e stories da rede
     filterExpiredStories(); // remove stories vencidos automaticamente da lista
+    updateStoryCounter();
     cleanOldStories();     //remove stories vencidos automaticamente do cache
 
 })();
@@ -870,6 +929,7 @@
 
 </body>
 </html>
+
 
 
 
