@@ -237,11 +237,18 @@
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
   </div>
   
-   <div id="story-counter" class="story-counter hidden">
-    <span id="story-counter-text"></span>
-    <span id="contatos-counter-text"></span>
-    <span id="grupos-counter-text"></span>
+  <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
+    <div id="story-counter" class="story-counter hidden">
+      <span id="story-counter-text"></span>
+    </div>
+    <div id="contatos-counter" class="story-counter hidden">
+      <span id="contatos-counter-text"></span>
+    </div>
+    <div id="grupos-counter" class="story-counter hidden">
+      <span id="grupos-counter-text"></span>
+    </div>
   </div>
+
 
   <div id="contacts-list" class="contacts-list"></div>
 
@@ -517,52 +524,61 @@
     
     function updateCounters() {
       const storyCounter = document.getElementById('story-counter');
+      const contatosCounter = document.getElementById('contatos-counter');
+      const gruposCounter = document.getElementById('grupos-counter');
+      
       const storyCounterText = document.getElementById('story-counter-text');
       const contatosCounterText = document.getElementById('contatos-counter-text');
       const gruposCounterText = document.getElementById('grupos-counter-text');
     
-      let newStories = 0;
+      let unseenStories = 0;
       let newContacts = 0;
       let newGroups = 0;
     
       contacts.forEach(c => {
-        // Conta stories válidos no período atual
-        if (c.status && c.status.some(st => {
-          const inicio = st.inicio ? new Date(st.inicio) : null;
-          const fim = st.fim ? new Date(st.fim) : null;
-          const agora = new Date();
-          return (!inicio || agora >= inicio) && (!fim || agora <= fim);
-        })) {
-          newStories++;
+        // 🔹 Conta apenas stories não vistos e ainda válidos
+        if (c.status && c.status.length > 0) {
+          const validUnseen = c.status.some(st => {
+            const inicio = st.inicio ? new Date(st.inicio) : null;
+            const fim = st.fim ? new Date(st.fim) : null;
+            const agora = new Date();
+            const ativo = (!inicio || agora >= inicio) && (!fim || agora <= fim);
+            return ativo && !st.visto; // somente se não visto
+          });
+          if (validUnseen) unseenStories++;
         }
     
-        // Conta novos contatos
-        if (c.novo) {
-          newContacts++;
-        }
+        // 🔹 Conta contatos novos
+        if (c.novo && !c.grupo) newContacts++;
     
-        // Conta novos grupos
-        if (c.grupo && c.grupo.linkConvite) {
-          newGroups++;
-        }
+        // 🔹 Conta grupos novos
+        if (c.grupo && c.grupo.linkConvite && c.novo) newGroups++;
       });
     
-      // Atualiza textos
-      storyCounterText.textContent = newStories > 0 ? `${newStories} stor${newStories > 1 ? 'ies' : 'y'} novo${newStories > 1 ? 's' : ''}` : '';
-      contatosCounterText.textContent = newContacts > 0 ? `${newContacts} contato${newContacts > 1 ? 's' : ''} novo${newContacts > 1 ? 's' : ''}` : '';
-      gruposCounterText.textContent = newGroups > 0 ? `${newGroups} grupo${newGroups > 1 ? 's' : ''} novo${newGroups > 1 ? 's' : ''}` : '';
+      // 🔹 Atualiza textos
+      storyCounterText.textContent = unseenStories > 0 
+        ? `${unseenStories} stor${unseenStories > 1 ? 'ies' : 'y'} novo${unseenStories > 1 ? 's' : ''}` 
+        : '';
     
-      // Mostra ou esconde o container principal
-      if (newStories + newContacts + newGroups > 0) {
-        storyCounter.classList.remove('hidden');
-      } else {
-        storyCounter.classList.add('hidden');
-      }
-      storyCounterText.onclick = () => openStoriesModal();
-      contatosCounterText.onclick = () => openContactsList();
-      gruposCounterText.onclick = () => openGroupsList();
-
+      contatosCounterText.textContent = newContacts > 0 
+        ? `${newContacts} contato${newContacts > 1 ? 's' : ''} novo${newContacts > 1 ? 's' : ''}` 
+        : '';
+    
+      gruposCounterText.textContent = newGroups > 0 
+        ? `${newGroups} grupo${newGroups > 1 ? 's' : ''} novo${newGroups > 1 ? 's' : ''}` 
+        : '';
+    
+      // 🔹 Mostra/oculta individualmente
+      storyCounter.classList.toggle('hidden', unseenStories === 0);
+      contatosCounter.classList.toggle('hidden', newContacts === 0);
+      gruposCounter.classList.toggle('hidden', newGroups === 0);
+    
+      // 🔹 Adiciona ações ao clicar
+      storyCounter.onclick = () => openStoriesModal();
+      contatosCounter.onclick = () => openContactsList();
+      gruposCounter.onclick = () => openGroupsList();
     }
+
 
 
 
@@ -750,6 +766,7 @@
   
    
     function openStories(contact){
+      
       if(!contact.status || contact.status.length===0) return;
       contact.statusViewed = true;
       save();
@@ -759,6 +776,13 @@
       currentStoryIndex = 0;
       renderCurrentStory();
       storiesModal.classList.remove('hidden');
+      // Marca story atual como visto
+      if (currentStories[currentStoryIndex]) {
+        currentStories[currentStoryIndex].visto = true;
+        save(); // salva no localStorage
+        updateCounters(); // atualiza os contadores
+      }
+
     }
      function renderStoryProgress(){
       storiesProgress.innerHTML = '';
@@ -998,6 +1022,7 @@
 
 </body>
 </html>
+
 
 
 
