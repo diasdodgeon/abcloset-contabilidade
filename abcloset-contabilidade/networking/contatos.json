@@ -11,6 +11,17 @@
        
   },
   {
+    "name": "Ariane Bl",
+    "number": "5585947775181",
+    "photo": "./networking/ariane.png",
+    "status": [
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-28T14:20:00"},
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-28T14:20:00"}
+       
+    ]
+       
+  },
+  {
     "name": "Ariane Bra",
     "number": "5585944377191",
     "photo": "./networking/ariane.png",
@@ -144,9 +155,23 @@
        { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "https://www.youtube.com/watch?v=1nm9qW6p_bQ&t=1350s" }
     ],
     "system": true
+  },
+  {
+    "id": 3,
+    "nome": "Grupo netWorking 2",
+    "grupo": {
+      "linkConvite": "https://chat.whatsapp.com/Ei9pDcY1eBz2KRbgIeYta8?mode=wwt"
+    },
+    "status": [
+       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
+       { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "https://www.youtube.com/watch?v=1nm9qW6p_bQ&t=1350s" }
+    ],
+    "system": true
   }
 
+
 ]
+
 
 
 
