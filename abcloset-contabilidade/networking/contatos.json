@@ -146,8 +146,8 @@
     
   },
   {
-    "name": "Oficina brandao br",
-    "number": "5587197294289",
+    "name": "Oficinabr",
+    "number": "5587145294289",
     "photo": "./networking/ariane.png",
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
@@ -157,10 +157,10 @@
   },
   
   {
-    "id": 2,
-    "nome": "Grupo netWorking",
+    "id": 1,
+    "nome": "Grupo teste",
     "grupo": {
-      "linkConvite": "https://chat.whatsapp.com/Ei9pDcY1eBz2KRbgIeYta8?mode=wwt"
+      "linkConvite": "https://chat.whatsapp.com/DfuqiSqoJGB08gbURoeZIJ?mode=wwt"
     },
     "status": [
        { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" },
@@ -183,6 +183,7 @@
 
 
 ]
+
 
 
 
