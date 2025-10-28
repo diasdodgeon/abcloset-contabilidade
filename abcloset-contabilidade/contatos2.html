@@ -154,29 +154,33 @@
     color: #fff;
     padding-left: 30px;
   }
-  #story-counter {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background-color: #25d366; /* verde WhatsApp */
+
+  .story-counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0;
+    background-color: #25D366; /* verde WhatsApp */
     color: white;
-    font-size: 0.75rem;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease;
-  }
-  
-  #story-counter.hidden {
-    display: none;
-  }
-  
-  .menu-icon {
-    position: relative;
-    display: inline-block;
-    margin: 0 10px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 20px;
+    padding: 6px 12px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease;
     cursor: pointer;
+  }
+  
+  .story-counter.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .story-counter:not(.hidden) {
+    opacity: 1;
   }
 
 </style>
@@ -194,6 +198,7 @@
 
 
 <div id="contacts-app" class="contacts-app">
+  
   <div class="contacts-header">
     <button id="contacts-back" class="back-btn">←</button>
     <h2>Contatos</h2>
@@ -222,6 +227,10 @@
 
   <div class="contacts-search">
     <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
+  </div>
+  
+  <div id="story-counter" class="story-counter hidden">
+    <span id="story-counter-text"></span>
   </div>
 
   <div id="contacts-list" class="contacts-list"></div>
@@ -292,10 +301,6 @@
   
 
 </div>
-<div class="menu-icon" id="whatsapp-icon">
-  <img src="./icons/whatsapp.svg" alt="WhatsApp" width="36">
-  <span id="story-counter" class="hidden"></span>
-</div>
 
 
 <!-- ... código HTML e CSS permanece igual até <script> ... -->
@@ -326,7 +331,7 @@
     const storiesNext = document.getElementById('stories-next');
     const storiesProgress = document.getElementById('stories-progress');
     const storiesBack = document.getElementById('stories-back');
-    
+  
     let contacts = [];
     let editingId = null;
     let currentPhoto = '';
@@ -337,7 +342,6 @@
     let currentStories = [];
     let currentStoryIndex = 0;
     let currentVideo = null;
-    let classList = [];
     const STORY_DURATION = 5000; // 5s para imagens
   
    
@@ -493,6 +497,26 @@
         console.warn('⚠️ Não foi possível limpar cache:', err);
       }
     }
+    
+    function updateStoryCounter() {
+      const storyCounter = document.getElementById('story-counter');
+      const storyCounterText = document.getElementById('story-counter-text');
+    
+      // conta quantos stories são "novos"
+      const newStories = stories.filter(story => story.isNew).length;
+    
+      if (newStories > 0) {
+        storyCounterText.textContent = `${newStories} novo${newStories > 1 ? 's' : ''} stor${newStories > 1 ? 'ies' : 'y'}`;
+        storyCounter.classList.remove('hidden');
+      } else {
+        storyCounter.classList.add('hidden');
+      }
+    
+      // opcional: ao clicar no contador, abrir modal de stories
+      storyCounter.onclick = () => openStoriesModal();
+    }
+
+   
 
     
 
@@ -727,11 +751,11 @@
       }
       storiesCarousel.appendChild(content);
       if (s.legenda) {
-          const linkRegex = /(https?:\/\/[^\s]+)/g;
-          storiesCaption.innerHTML = s.legenda.replace(linkRegex, '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>');
-        } else {
-          storiesCaption.textContent = '';
-        }
+        const linkRegex = /(https?:\/\/[^\s]+)/g;
+        storiesCaption.innerHTML = s.legenda.replace(linkRegex, '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>');
+      } else {
+        storiesCaption.textContent = '';
+      }
 
       renderStoryProgress();
       startStoryTimer();
@@ -811,9 +835,6 @@
     window.openStories = openStories;
   
   
-    //storiesClose.onclick = ()=> storiesModal.classList.add('hidden');
-    //storiesPrev.onclick = ()=>{ if(currentStoryIndex>0){ currentStoryIndex--; renderCurrentStory(); } };
-    //storiesNext.onclick = ()=>{ if(currentStoryIndex<currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); } };
     
   
      // --- Lista de contatos ---
@@ -883,37 +904,12 @@
         emojiPicker.style.display='none';
       });
     });
-
-    function updateStoryCounter() {
-      const unseenCount = contacts.filter(c =>
-        c.status && c.status.length > 0 && !c.statusViewed
-      ).length;
-    
-      const counterEl = document.getElementById('story-counter');
-      if (!counterEl) return;
-    
-      if (unseenCount > 0) {
-        counterEl.textContent = unseenCount;
-        counterEl.classList.remove('hidden');
-      } else {
-        counterEl.classList.add('hidden');
-      }
-    }
-    
-    // chame essa função após renderList():
-    // renderList(searchInput.value.trim());
-    // updateStoryCounter();
-
   
     addBtn.onclick=openAdd;
     cancelBtn.onclick=closeModal;
     saveBtn.onclick=saveFromModal;
     searchInput.oninput=()=>renderList(searchInput.value);
     backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
-    document.getElementById('whatsapp-icon').addEventListener('click', ()=>{
-      document.getElementById('storiesModal').classList.remove('hidden');
-    });
-
   
     // --- Inicialização ---
     load();
@@ -931,25 +927,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
