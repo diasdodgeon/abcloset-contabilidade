@@ -377,6 +377,9 @@
     let currentStories = [];
     let currentStoryIndex = 0;
     let currentVideo = null;
+    let storyQueue = [];
+    let currentContactIndex = 0;
+
     const STORY_DURATION = 5000; // 5s para imagens
   
    
@@ -611,36 +614,25 @@
       const storyCounter = document.getElementById('story-counter');
       const storyCounterText = document.getElementById('story-counter-text');
     
-      const newStories = contacts.reduce((acc, c) => {
-        if (c.status && c.status.length > 0 && !c.statusViewed) return acc + 1;
-        return acc;
-      }, 0);
+      const newStoriesContacts = contacts.filter(c => c.status && c.status.length > 0 && !c.statusViewed);
+      const newStoriesCount = newStoriesContacts.length;
     
-      if (newStories > 0) {
-        storyCounterText.textContent = `${newStories} novo${newStories > 1 ? 's' : ''} stor${newStories > 1 ? 'ies' : 'y'}`;
+      if (newStoriesCount > 0) {
+        storyCounterText.textContent = `${newStoriesCount} novo${newStoriesCount > 1 ? 's' : ''} stor${newStoriesCount > 1 ? 'ies' : 'y'}`;
         storyCounter.classList.remove('hidden');
       } else {
         storyCounter.classList.add('hidden');
       }
     
+      // 🔹 Ao clicar: abre stories de todos os contatos com novos stories
       storyCounter.onclick = () => {
-        // 🔹 Filtra contatos com stories não vistos
-        listEl.innerHTML = '';
-        contacts
-          .filter(c => c.status && c.status.length > 0 && !c.statusViewed)
-          .forEach(renderContact);
-    
-        // 🔸 Depois de 4s, marca todos como vistos e esconde contador
-        setTimeout(() => {
-          contacts.forEach(c => {
-            if (c.status && c.status.length > 0) c.statusViewed = true;
-          });
-          save();
-          renderList(searchInput.value.trim());
-          storyCounter.classList.add('hidden');
-        }, 10000);
+        if (newStoriesContacts.length === 0) return;
+        storyQueue = [...newStoriesContacts];
+        currentContactIndex = 0;
+        openStories(storyQueue[currentContactIndex]);
       };
     }
+
 
     document.body.classList.add('filtering');
     setTimeout(() => document.body.classList.remove('filtering'), 10000);
@@ -841,11 +833,15 @@
       currentStoryIndex = 0;
       renderCurrentStory();
       storiesModal.classList.remove('hidden');
+      // Marca contato atual como "visto"
+      contact.statusViewed = true;
+      save();
+      updateStoryCounter();
+
       // Marca story atual como visto
       if (currentStories[currentStoryIndex]) {
         currentStories[currentStoryIndex].visto = true;
         save(); // salva no localStorage
-        updateCounters(); // atualiza os contadores
       }
 
     }
@@ -936,6 +932,21 @@
     
       // Opcional: limpar o conteúdo do carrossel (garante que áudio e vídeo sumam do DOM)
       storiesCarousel.innerHTML = '';
+      // 🔹 Avança automaticamente para o próximo contato da fila
+      if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
+        currentContactIndex++;
+        setTimeout(() => {
+          openStories(storyQueue[currentContactIndex]);
+        }, 300); // pequeno delay entre um contato e outro
+      } else {
+        // 🔸 Todos concluídos → limpar fila, esconder contador e atualizar lista
+        storyQueue = [];
+        currentContactIndex = 0;
+        contacts.forEach(c => (c.statusViewed = true));
+        save();
+        updateStoryCounter();
+        renderList();
+      }
     }
 
     // 🔹 Controles por toque
@@ -1091,6 +1102,7 @@
 
 </body>
 </html>
+
 
 
 
