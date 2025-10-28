@@ -5,7 +5,9 @@
     "photo": "./networking/ariane.png",
     "status": [
       { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-27T14:20:00"},
-      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-27T14:20:00"}
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-27T14:20:00"},
+      { "tipo": "imagem", "src": "networking/ariane.png", "legenda": "Foto do carro 🚗" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-28T14:20:00"},
+      { "tipo": "video", "src": "networking/bemVindo.mp4", "legenda": "Corrida do dia" ,"inicio": "2025-10-26T08:00:00", "fim": "2025-10-28T14:20:00"}
        
     ]
        
@@ -171,6 +173,7 @@
 
 
 ]
+
 
 
 
