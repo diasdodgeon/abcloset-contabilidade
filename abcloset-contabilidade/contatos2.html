@@ -500,27 +500,55 @@
       }
     }
     
-    function updateStoryCounter() {
+    function updateCounters() {
       const storyCounter = document.getElementById('story-counter');
       const storyCounterText = document.getElementById('story-counter-text');
+      const contatosCounterText = document.getElementById('contatos-counter-text');
+      const gruposCounterText = document.getElementById('grupos-counter-text');
     
-      // Conta quantos contatos têm stories "novos"
-      const newStories = contacts.reduce((acc, c) => {
-        if (c.status && c.status.length > 0 && !c.statusViewed) {
-          return acc + 1;
+      let newStories = 0;
+      let newContacts = 0;
+      let newGroups = 0;
+    
+      contacts.forEach(c => {
+        // Conta stories válidos no período atual
+        if (c.status && c.status.some(st => {
+          const inicio = st.inicio ? new Date(st.inicio) : null;
+          const fim = st.fim ? new Date(st.fim) : null;
+          const agora = new Date();
+          return (!inicio || agora >= inicio) && (!fim || agora <= fim);
+        })) {
+          newStories++;
         }
-        return acc;
-      }, 0);
     
-      if (newStories > 0) {
-        storyCounterText.textContent = `${newStories} novo${newStories > 1 ? 's' : ''} stor${newStories > 1 ? 'ies' : 'y'}`;
+        // Conta novos contatos
+        if (c.novo) {
+          newContacts++;
+        }
+    
+        // Conta novos grupos
+        if (c.grupo && c.grupo.linkConvite) {
+          newGroups++;
+        }
+      });
+    
+      // Atualiza textos
+      storyCounterText.textContent = newStories > 0 ? `${newStories} stor${newStories > 1 ? 'ies' : 'y'} novo${newStories > 1 ? 's' : ''}` : '';
+      contatosCounterText.textContent = newContacts > 0 ? `${newContacts} contato${newContacts > 1 ? 's' : ''} novo${newContacts > 1 ? 's' : ''}` : '';
+      gruposCounterText.textContent = newGroups > 0 ? `${newGroups} grupo${newGroups > 1 ? 's' : ''} novo${newGroups > 1 ? 's' : ''}` : '';
+    
+      // Mostra ou esconde o container principal
+      if (newStories + newContacts + newGroups > 0) {
         storyCounter.classList.remove('hidden');
       } else {
         storyCounter.classList.add('hidden');
       }
-    
-      storyCounter.onclick = () => openStoriesModal();
+      storyCounterText.onclick = () => openStoriesModal();
+      contatosCounterText.onclick = () => openContactsList();
+      gruposCounterText.onclick = () => openGroupsList();
+
     }
+
 
 
    
@@ -934,5 +962,6 @@
 
 </body>
 </html>
+
 
 
