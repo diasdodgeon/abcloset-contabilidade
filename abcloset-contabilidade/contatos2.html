@@ -207,6 +207,21 @@
     font-size: 1rem;
     z-index: 10;
   }
+  #story-header {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  
+  #story-user-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  #story-user-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -235,7 +250,32 @@
       <!-- Barra de progresso -->
       <div id="stories-progress"
            style="display:flex;gap:4px;position:absolute;top:16px;left:16px;right:16px;height:4px;z-index:10;"></div>
-      
+      <!-- Identificação do contato -->
+      <div id="story-header" style="
+        position:absolute;
+        top:28px;
+        left:16px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        z-index:10;
+        color:white;
+      ">
+        <div id="story-user-photo" style="
+          width:40px;
+          height:40px;
+          border-radius:50%;
+          overflow:hidden;
+          border:2px solid #25D366;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:rgba(255,255,255,0.08);
+        ">
+        </div>
+        <div id="story-user-name" style="font-size:1rem;font-weight:600;"></div>
+      </div>
+
       <!-- Botão de voltar -->
       <button id="stories-back"
               style="position:absolute;top:28px;left:16px;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;z-index:10;">←</button>
@@ -931,7 +971,7 @@
             const linkRegex = /(https?:\/\/[^\s]+)/g;
             storiesCaption.innerHTML = s.legenda.replace(
               linkRegex,
-              '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>'
+              '<a href="$1" target="_blank" style="color:white; text-decoration:none; align:center">$1</a>'
             );
           } else {
             storiesCaption.textContent = '';
@@ -958,6 +998,32 @@
           }
         
           storiesModal.classList.add('hidden');
+          // Atualiza foto e nome no topo do modal
+          const photoEl = document.getElementById('story-user-photo');
+          const nameEl = document.getElementById('story-user-name');
+          
+          if (photoEl && nameEl) {
+            // Limpa conteúdo anterior
+            photoEl.innerHTML = '';
+          
+            // Define imagem ou emoji
+            if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(contact.photo)) {
+              photoEl.textContent = contact.photo;
+              photoEl.style.fontSize = '1.6rem';
+            } else {
+              const img = document.createElement('img');
+              img.src = contact.photo || './user.png';
+              img.style.width = '100%';
+              img.style.height = '100%';
+              img.style.objectFit = 'cover';
+              img.onerror = () => { img.src = './user.png'; };
+              photoEl.appendChild(img);
+            }
+          
+              // Define nome
+              nameEl.textContent = contact.name || '(sem nome)';
+            }
+
           storiesCarousel.innerHTML = '';
         
           // Fechamento manual → não encerra fila
@@ -1143,6 +1209,7 @@
 
 </body>
 </html>
+
 
 
 
