@@ -822,28 +822,33 @@
     
   
    
-    function openStories(contact){
-      
-      if(!contact.status || contact.status.length===0) return;
+    // ===============================
+    // 🔹 Abre stories de qualquer contato
+    // ===============================
+    function openStories(contact) {
+      if (!contact.status || contact.status.length === 0) return;
+    
+      // Cria a fila global de todos os contatos que possuem stories ativos
+      storyQueue = contacts.filter(c => c.status && c.status.length > 0);
+      currentContactIndex = storyQueue.findIndex(c => c.id === contact.id);
+    
+      // Atualiza o estado do contato atual
       contact.statusViewed = true;
       save();
-      localStorage.setItem('contactsApp.v2', JSON.stringify(contacts));
+      updateStoryCounter();
       renderList(document.getElementById('contacts-search-input').value.trim());
+    
+      // Inicia a sequência de stories do contato atual
       currentStories = contact.status;
       currentStoryIndex = 0;
       renderCurrentStory();
       storiesModal.classList.remove('hidden');
-      // Marca contato atual como "visto"
-      contact.statusViewed = true;
-      save();
-      updateStoryCounter();
-
-      // Marca story atual como visto
+    
+      // Marca o primeiro story como visto
       if (currentStories[currentStoryIndex]) {
         currentStories[currentStoryIndex].visto = true;
-        save(); // salva no localStorage
+        save();
       }
-
     }
      function renderStoryProgress(){
       storiesProgress.innerHTML = '';
@@ -885,71 +890,78 @@
       },50);
     }
   
-    function renderCurrentStory(){
-      // Para o vídeo anterior, se houver
+    // ===============================
+    // 🔹 Renderiza o story atual
+    // ===============================
+    function renderCurrentStory() {
       if (currentVideo && !currentVideo.paused) {
         currentVideo.pause();
         currentVideo.currentTime = 0;
       }
       storiesCarousel.innerHTML = '';
       currentVideo = null;
+    
       const s = currentStories[currentStoryIndex];
-      const content = document.createElement(s.tipo==='video'?'video':'img');
+      const content = document.createElement(s.tipo === 'video' ? 'video' : 'img');
       content.src = s.src;
       content.style.width = '100%';
       content.style.height = '100%';
       content.style.objectFit = 'cover';
-      if(s.tipo==='video'){
+      if (s.tipo === 'video') {
         content.autoplay = true;
         content.controls = false;
         content.muted = false;
         currentVideo = content;
       }
       storiesCarousel.appendChild(content);
+    
       if (s.legenda) {
         const linkRegex = /(https?:\/\/[^\s]+)/g;
-        storiesCaption.innerHTML = s.legenda.replace(linkRegex, '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>');
+        storiesCaption.innerHTML = s.legenda.replace(
+          linkRegex,
+          '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>'
+        );
       } else {
         storiesCaption.textContent = '';
       }
+    
+      renderStoryProgress();
+      startStoryTimer();
+    }
 
       renderStoryProgress();
       startStoryTimer();
     }
   
    
+    // ===============================
+    // 🔹 Fecha stories (mantém contador se manual)
+    // ===============================
     function closeStories() {
       clearInterval(storyTimer);
     
-      // Pausar e resetar o vídeo atual, se existir
       if (currentVideo && !currentVideo.paused) {
         currentVideo.pause();
         currentVideo.currentTime = 0;
       }
     
-      // Esconder o modal
       storiesModal.classList.add('hidden');
-    
-      // Limpa o conteúdo do carrossel (garante que áudio/vídeo parem)
       storiesCarousel.innerHTML = '';
     
-      // 🔹 Se o fechamento for manual (usuário clicou no botão ou saiu da tela),
-      // interrompe a fila e mantém o contador visível
+      // Fechamento manual → não encerra fila
       if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
-        // o usuário fechou manualmente, então pausamos a fila
         storyQueue = [];
         currentContactIndex = 0;
         save();
         updateStoryCounter();
         renderList();
-        return; // encerra aqui
+        return;
       }
     
-      // 🔸 Se a fila chegou ao fim naturalmente (todas as stories vistas)
+      // Fim natural da fila
       storyQueue = [];
       currentContactIndex = 0;
     
-      // Marca todos como vistos e atualiza contador
       contacts.forEach(c => (c.statusViewed = true));
       save();
       updateStoryCounter();
@@ -957,59 +969,64 @@
     }
 
 
-    // 🔹 Controles por toque
+
+    // ===============================
+    // 🔹 Controles de toque aprimorados
+    // ===============================
     let touchStartX = 0;
     let holdTimeout = null;
     let holding = false;
-  
+    
     storiesModal.addEventListener('touchstart', e => {
       touchStartX = e.touches[0].clientX;
-      // se o usuário segurar mais de 300ms, pausamos o story
-      holdTimeout = setTimeout(()=>{
+      holdTimeout = setTimeout(() => {
         holding = true;
         paused = true;
-        if(currentVideo) currentVideo.pause();
+        if (currentVideo) currentVideo.pause();
       }, 300);
     });
-  
+    
     storiesModal.addEventListener('touchend', e => {
       clearTimeout(holdTimeout);
       const endX = e.changedTouches[0].clientX;
       const diff = endX - touchStartX;
-  
-      // se estava segurando, apenas retoma
-      if(holding){
+    
+      if (holding) {
         holding = false;
         paused = false;
-        if(currentVideo) currentVideo.play();
+        if (currentVideo) currentVideo.play();
         return;
       }
-  
-      if(Math.abs(diff) < 40){
-        // toque simples: lado direito avança / esquerdo volta
-        const rect = storiesModal.getBoundingClientRect();
-        const mid = rect.width / 2;
-        if(endX > mid){
-          if(currentStoryIndex < currentStories.length-1){ 
-            currentStoryIndex++; 
-            renderCurrentStory(); 
-          } else closeStories();
-        } else {
-          if(currentStoryIndex > 0){
-            currentStoryIndex--; 
+    
+      const rect = storiesModal.getBoundingClientRect();
+      const mid = rect.width / 2;
+    
+      // 🔹 Toque leve: esquerda / direita
+      if (Math.abs(diff) < 40) {
+        if (endX > mid) {
+          // → Avança
+          if (currentStoryIndex < currentStories.length - 1) {
+            currentStoryIndex++;
             renderCurrentStory();
+          } else if (currentContactIndex < storyQueue.length - 1) {
+            currentContactIndex++;
+            openStories(storyQueue[currentContactIndex]);
+          } else {
+            closeStories();
+          }
+        } else {
+          // ← Volta
+          if (currentStoryIndex > 0) {
+            currentStoryIndex--;
+            renderCurrentStory();
+          } else if (currentContactIndex > 0) {
+            currentContactIndex--;
+            openStories(storyQueue[currentContactIndex]);
           }
         }
-      } else if(diff > 60){
-        // deslize direita → esquerda (voltar story)
-        if(currentStoryIndex > 0){ currentStoryIndex--; renderCurrentStory(); }
-      } else if(diff < -60){
-        // deslize esquerda → direita (avançar story)
-        if(currentStoryIndex < currentStories.length-1){ currentStoryIndex++; renderCurrentStory(); }
-        else closeStories();
       }
     });
-  
+    
     storiesBack.onclick = closeStories;
     window.openStories = openStories;
   
@@ -1110,6 +1127,7 @@
 
 </body>
 </html>
+
 
 
 
