@@ -3,71 +3,108 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Biblioteca PDF — Mockup</title>
+  <title>Savana — Biblioteca (mockup)</title>
   <style>
     :root{
-      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#60a5fa; --glass: rgba(255,255,255,0.03);
-      --radius:12px; --gap:12px;
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#60a5fa; --accent2:#7c3aed;
+      --glass: rgba(255,255,255,0.03); --radius:12px; --gap:12px;
+      --max-width:1100px;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;background:linear-gradient(180deg,#061226 0%, #081727 100%);color:#e6eef6}
-    .app{display:flex;gap:var(--gap);padding:18px;min-height:100vh}
-    .sidebar{width:320px;background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;
+      background:linear-gradient(180deg,#061226 0%, #081727 100%);
+      color:#e6eef6; display:flex; justify-content:center; padding:18px;
+    }
+    .shell{width:100%;max-width:var(--max-width);display:flex;gap:18px}
+    .sidebar{
+      width:320px;background:var(--card);border-radius:var(--radius);padding:14px;
+      box-shadow:0 6px 20px rgba(2,6,23,0.6);flex-shrink:0;display:flex;flex-direction:column;
+      gap:12px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex;align-items:center;justify-content:center;font-weight:700}
     .title{font-size:16px;font-weight:600}
     .subtitle{font-size:12px;color:var(--muted)}
-
-    .book-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-    .book{display:flex;gap:10px;padding:10px;border-radius:10px;background:var(--glass);align-items:center;cursor:pointer}
-    .book:hover{outline:1px solid rgba(255,255,255,0.04)}
-    .thumb{width:46px;height:60px;border-radius:6px;background:linear-gradient(180deg,#12304a,#071425);display:flex;align-items:center;justify-content:center;font-size:12px}
-    .meta{flex:1}
-    .meta .name{font-weight:600}
-    .meta .author{font-size:12px;color:var(--muted)}
-    .controls{display:flex;gap:8px;margin-top:12px}
-    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#001; border: none}
-    .reader{flex:1;display:flex;flex-direction:column;gap:12px}
-    .reader .topbar{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;background:var(--card)}
-    .viewer{flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#071127;padding:12px;overflow:auto}
-    canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 12px 40px rgba(2,6,23,0.7)}
-    .reader .toolbar{display:flex;gap:8px;align-items:center}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer;font-size:13px}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#001;border:none}
     .small{font-size:13px;color:var(--muted)}
-    .dropzone{margin-top:12px;padding:12px;border:2px dashed rgba(255,255,255,0.03);border-radius:12px;text-align:center;color:var(--muted)}
-    .search{display:flex;gap:8px;align-items:center}
-    input[type=range]{width:120px}
-    @media(max-width:900px){.sidebar{display:none}.app{padding:10px}}
+    .dropzone{padding:10px;border:2px dashed rgba(255,255,255,0.03);border-radius:12px;text-align:center;color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted)}
+    /* grid of covers */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+    .cover-card{background:var(--glass);border-radius:10px;padding:10px;display:flex;gap:8px;align-items:center;cursor:pointer;transition:transform .14s}
+    .cover-card:hover{transform:translateY(-6px)}
+    .cover-thumb{width:56px;height:80px;border-radius:6px;background:linear-gradient(180deg,#12304a,#071425);display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden}
+    .cover-info{flex:1}
+    .cover-title{font-weight:600;font-size:14px}
+    .cover-author{font-size:12px;color:var(--muted)}
+    /* reader area */
+    .reader{flex:1;display:flex;flex-direction:column;gap:12px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;background:var(--card)}
+    .viewer{flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#071127;padding:12px;overflow:auto;position:relative}
+    canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 12px 40px rgba(2,6,23,0.7)}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,12,0.55);display:none;align-items:center;justify-content:center;z-index:80}
+    .modal{width:92%;max-width:920px;background:linear-gradient(180deg, rgba(6,10,20,0.9), rgba(3,5,9,0.85));border-radius:14px;padding:18px;position:relative;overflow:hidden;display:flex;gap:18px}
+    .modal .left{width:36%;min-width:220px}
+    .modal .right{flex:1;display:flex;flex-direction:column;gap:10px}
+    .modal .cover-large{width:100%;height:360px;border-radius:8px;overflow:hidden;background:#0b1520;display:flex;align-items:center;justify-content:center}
+    .modal .excerpt{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:8px;max-height:360px;overflow:auto;color:var(--muted)}
+    .modal .bg-blur{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(20px) brightness(.35);transform:scale(1.04);z-index:0}
+    .modal .modal-content{position:relative;z-index:2;display:flex;gap:18px;width:100%}
+    .modal .meta{color:#e6eef6}
+    .close-x{position:absolute;right:12px;top:12px;background:transparent;border:none;color:#e6eef6;font-size:18px;cursor:pointer;z-index:3}
+    /* highlights panel */
+    .sidepanel{width:260px;background:var(--card);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:12px}
+    .highlight{background:rgba(96,165,250,0.08);padding:8px;border-radius:8px}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;background:rgba(124,58,237,0.12);margin-right:6px}
+    .tags-list{display:flex;gap:6px;flex-wrap:wrap}
+    /* text layer selectable */
+    .textLayer{position:absolute;left:0;top:0;pointer-events:auto;}
+    .pageContainer{position:relative;display:inline-block}
+    /* responsive */
+    @media(max-width:900px){
+      .sidebar{display:none}
+      .sidepanel{display:none}
+      .modal{flex-direction:column}
+      .modal .left{width:100%}
+      .modal .cover-large{height:260px}
+    }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="shell">
     <aside class="sidebar">
       <div class="brand">
         <div class="logo">B</div>
         <div>
           <div class="title">Savana — Biblioteca</div>
-          <div class="subtitle">Leitor de PDFs embutido</div>
+          <div class="subtitle">Leitor & Biblioteca</div>
         </div>
       </div>
 
       <div class="controls">
-        <button id="openManifestBtn" class="btn">Atualizar lista</button>
+        <button id="refreshBtn" class="btn">Atualizar</button>
         <button id="addLocalBtn" class="btn">Abrir PDF local</button>
-        <button id="toggleNight" class="btn">Modo noturno</button>
+        <button id="uploadDropBtn" class="btn">Arrastar PDF</button>
+        <button id="toggleNight" class="btn">Tema</button>
       </div>
 
-      <div style="margin-top:12px" class="small">Minha coleção</div>
-      <div id="bookList" class="book-list"></div>
+      <div class="hint">Coleção</div>
+      <div id="grid" class="grid"></div>
 
-      <div class="dropzone" id="dropzone">Arraste e solte arquivos PDF aqui para abrir (ou clique em "Abrir PDF local")</div>
-
-      <div style="margin-top:14px;font-size:12px;color:var(--muted)">Obs: Para hospedar no GitHub Pages coloque seus PDFs em /pdfs e um arquivo <code>books.json</code> com a lista (ex.: <code>[{"title":"Meu Livro","file":"pdfs/meu.pdf","author":"Autor"}]</code>).</div>
+      <div class="dropzone" id="dropzone">Arraste e solte PDF(s) aqui</div>
+      <div class="hint">Dica: coloque seus PDFs em <code>pdfs/</code> e um <code>books.json</code> com {title,author,file,cover?}</div>
     </aside>
 
     <main class="reader">
       <div class="topbar">
-        <div class="toolbar">
+        <div style="display:flex;align-items:center;gap:8px">
           <button id="prevPage" class="btn">◀</button>
           <button id="nextPage" class="btn">▶</button>
           <div style="display:flex;align-items:center;gap:8px;margin-left:6px">
@@ -78,182 +115,440 @@
         </div>
 
         <div style="display:flex;gap:8px;align-items:center">
-          <div class="search">
+          <div class="search" style="display:flex;align-items:center;gap:8px">
             <input id="zoomRange" type="range" min="50" max="200" value="100">
             <div class="small">Zoom <span id="zoomLabel">100%</span></div>
           </div>
           <a id="downloadBtn" class="btn" href="#" download>Baixar</a>
           <button id="fitWidthBtn" class="btn">Ajustar largura</button>
+          <button id="openModalBtn" class="btn">Detalhes</button>
+          <button id="addHighlightBtn" class="btn primary">Adicionar destaque</button>
         </div>
       </div>
 
       <div class="viewer" id="viewer">
-        <canvas id="pdfCanvas"></canvas>
+        <div id="pageWrap" class="pageContainer">
+          <canvas id="pdfCanvas"></canvas>
+          <!-- o textLayer será injetado aqui -->
+        </div>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="small">Arquivo: <span id="currentBook">— nenhum —</span></div>
-        <div class="small">Use setas ou controles acima para navegar</div>
+        <div class="small">Use seleção de texto para criar destaques</div>
       </div>
     </main>
+
+    <aside class="sidepanel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="small">Destaques</div>
+        <div style="display:flex;gap:6px">
+          <input id="tagFilter" placeholder="filtrar tag" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+          <button id="clearFilter" class="btn">Limpar</button>
+        </div>
+      </div>
+      <div id="highlightsList" style="display:flex;flex-direction:column;gap:8px;overflow:auto"></div>
+
+      <div>
+        <div class="small">Tags</div>
+        <div id="tagsCloud" class="tags-list"></div>
+      </div>
+    </aside>
   </div>
 
-  <!-- PDF.js (usamos CDN) -->
+  <!-- Modal -->
+  <div id="modalBack" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <button class="close-x" id="closeModal">&times;</button>
+      <div class="bg-blur" id="modalBg"></div>
+      <div class="modal-content">
+        <div class="left">
+          <div class="cover-large" id="modalCover"></div>
+        </div>
+        <div class="right">
+          <div class="meta">
+            <div id="modalTitle" style="font-weight:700;font-size:18px"></div>
+            <div id="modalAuthor" style="font-size:13px;color:var(--muted);margin-bottom:8px"></div>
+          </div>
+          <div class="excerpt" id="modalExcerpt">Carregando trecho...</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="openInReader" class="btn primary">Abrir no leitor</button>
+            <button id="downloadModal" class="btn">Baixar PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
   <script>
-    // Config PDF.js
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js';
+  // elementos
+  const grid = document.getElementById('grid');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const addLocalBtn = document.getElementById('addLocalBtn');
+  const dropzone = document.getElementById('dropzone');
+  const viewer = document.getElementById('viewer');
+  const pdfCanvas = document.getElementById('pdfCanvas');
+  const ctx = pdfCanvas.getContext('2d');
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+  const pageNumInput = document.getElementById('pageNum');
+  const pageCountEl = document.getElementById('pageCount');
+  const zoomRange = document.getElementById('zoomRange');
+  const zoomLabel = document.getElementById('zoomLabel');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const currentBookEl = document.getElementById('currentBook');
+  const fitWidthBtn = document.getElementById('fitWidthBtn');
+  const openModalBtn = document.getElementById('openModalBtn');
+  const modalBack = document.getElementById('modalBack');
+  const modalCover = document.getElementById('modalCover');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalAuthor = document.getElementById('modalAuthor');
+  const modalExcerpt = document.getElementById('modalExcerpt');
+  const modalBg = document.getElementById('modalBg');
+  const closeModal = document.getElementById('closeModal');
+  const openInReader = document.getElementById('openInReader');
+  const downloadModal = document.getElementById('downloadModal');
+  const addHighlightBtn = document.getElementById('addHighlightBtn');
+  const highlightsList = document.getElementById('highlightsList');
+  const tagsCloud = document.getElementById('tagsCloud');
+  const tagFilter = document.getElementById('tagFilter');
+  const clearFilter = document.getElementById('clearFilter');
 
-    // Elementos
-    const bookListEl = document.getElementById('bookList');
-    const pdfCanvas = document.getElementById('pdfCanvas');
-    const ctx = pdfCanvas.getContext('2d');
-    const prevBtn = document.getElementById('prevPage');
-    const nextBtn = document.getElementById('nextPage');
-    const pageNumInput = document.getElementById('pageNum');
-    const pageCountEl = document.getElementById('pageCount');
-    const zoomRange = document.getElementById('zoomRange');
-    const zoomLabel = document.getElementById('zoomLabel');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const currentBookEl = document.getElementById('currentBook');
-    const openManifestBtn = document.getElementById('openManifestBtn');
-    const addLocalBtn = document.getElementById('addLocalBtn');
-    const dropzone = document.getElementById('dropzone');
-    const toggleNight = document.getElementById('toggleNight');
-    const fitWidthBtn = document.getElementById('fitWidthBtn');
+  let books = []; // carregado de books.json
+  let pdfDoc = null; let currentPage = 1; let scale = 1.0; let currentURL = null; let currentBookMeta = null;
+  const storageKey = 'savana_highlights_v1';
 
-    let pdfDoc = null; let currentPage = 1; let scale = 1.0; let currentURL = null;
+  // util
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c])); }
+  function saveHighlights(h){ localStorage.setItem(storageKey, JSON.stringify(h||[])); }
+  function loadHighlights(){ try{return JSON.parse(localStorage.getItem(storageKey))||[] }catch(e){return []} }
 
-    // Carrega lista de livros (books.json) — você pode gerar este arquivo ao atualizar a pasta /pdfs no repo
-    async function loadManifest(){
+  // carregar manifest
+  async function loadManifest(){
+    grid.innerHTML = '<div class="small" style="color:var(--muted)">Carregando...</div>';
+    try{
+      const res = await fetch('books.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('books.json não encontrado');
+      books = await res.json();
+      renderGrid();
+    }catch(err){
+      console.warn('books.json ausente ou erro. Use arrastar/abrir locais.', err);
+      grid.innerHTML = '<div class="small" style="color:var(--muted)">Nenhum book.json encontrado — carregue PDFs localmente.</div>';
+    }
+  }
+
+  // render grid: tenta gerar miniatura do pdf se file público; se não, usa placeholder
+  async function renderGrid(){
+    grid.innerHTML = '';
+    for(const b of books){
+      const card = document.createElement('div'); card.className='cover-card';
+      const thumb = document.createElement('div'); thumb.className='cover-thumb'; thumb.textContent = (b.title||'🏷').slice(0,3);
+      const info = document.createElement('div'); info.className='cover-info';
+      info.innerHTML = `<div class="cover-title">${escapeHtml(b.title||'Sem título')}</div><div class="cover-author">${escapeHtml(b.author||'Desconhecido')}</div>`;
+      card.appendChild(thumb); card.appendChild(info);
+      // clique abre modal
+      card.addEventListener('click', ()=> openDetail(b));
+      grid.appendChild(card);
+      // tenta gerar thumbnail
+      if(b.file){
+        generateThumbnail(b.file, thumb).catch(()=>{/*silenciar*/});
+      }
+    }
+  }
+
+  // gera miniatura a partir da 1ª página (público). retorna canvas->dataURL e aplica como bg
+  async function generateThumbnail(url, targetEl){
+    try{
+      const loadingTask = pdfjsLib.getDocument(url);
+      const doc = await loadingTask.promise;
+      const p = await doc.getPage(1);
+      const viewport = p.getViewport({scale: 0.7});
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(viewport.width * ratio);
+      canvas.height = Math.floor(viewport.height * ratio);
+      const renderCtx = { canvasContext: context, viewport: p.getViewport({scale: 0.7 * ratio})};
+      await p.render(renderCtx).promise;
+      const data = canvas.toDataURL('image/png');
+      targetEl.style.backgroundImage = `url(${data})`;
+      targetEl.style.backgroundSize = 'cover';
+      targetEl.textContent = '';
+      doc.destroy();
+    }catch(e){
+      // falha silenciosa (CORS/pdf privado)
+    }
+  }
+
+  // abre modal de detalhe: renderiza primeira página como "trecho" e usa como bg blurred
+  async function openDetail(book){
+    currentBookMeta = book;
+    modalTitle.textContent = book.title||'Sem título';
+    modalAuthor.textContent = book.author||'Desconhecido';
+    downloadModal.href = book.file || '#';
+    downloadModal.download = (book.title||'book').replace(/\s+/g,'_') + '.pdf';
+    modalBack.style.display = 'flex';
+    modalExcerpt.textContent = 'Carregando trecho...';
+    modalCover.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)">Carregando...</div>';
+    modalBg.style.backgroundImage = '';
+    // tenta carregar o PDF e extrair texto da 1ª página
+    if(book.file){
       try{
-        const res = await fetch('books.json', {cache: 'no-store'});
-        if(!res.ok) throw new Error('books.json não encontrado');
-        const books = await res.json();
-        renderBookList(books);
+        const doc = await pdfjsLib.getDocument(book.file).promise;
+        const page = await doc.getPage(1);
+        // render cover in cover-large
+        const vp = page.getViewport({scale:1});
+        const ratio = 1;
+        const c = document.createElement('canvas');
+        c.width = Math.floor(vp.width * ratio); c.height = Math.floor(vp.height * ratio);
+        const ctx2 = c.getContext('2d');
+        await page.render({canvasContext:ctx2,viewport: page.getViewport({scale:ratio})}).promise;
+        modalCover.innerHTML = '';
+        modalCover.appendChild(c);
+        // set blurred background
+        const bgData = c.toDataURL();
+        modalBg.style.backgroundImage = `url(${bgData})`;
+        // extract text snippet
+        try{
+          const content = await page.getTextContent();
+          const strings = content.items.map(i=>i.str).join(' ');
+          const snippet = strings.slice(0,1000);
+          modalExcerpt.textContent = snippet || 'Trecho não disponível.';
+        }catch(e){
+          modalExcerpt.textContent = 'Não foi possível extrair texto (PDF sem camada de texto).';
+        }
+        doc.destroy();
       }catch(err){
-        console.warn('Não foi possível carregar books.json — use arrastar e soltar ou abra um PDF local.');
-        bookListEl.innerHTML = '<div class="small" style="color:var(--muted)">Nenhum livro encontrado (adicione books.json em seu repositório ou arraste um PDF).</div>';
+        modalCover.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)">Não foi possível carregar (CORS / local)</div>';
+        modalExcerpt.textContent = 'PDF não disponível para visualização remota. Abra localmente para ver o trecho.';
       }
+    }else{
+      modalCover.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)">Sem arquivo</div>';
+      modalExcerpt.textContent = 'Nenhum arquivo definido.';
     }
+  }
 
-    function renderBookList(books){
-      bookListEl.innerHTML = '';
-      books.forEach((b, i)=>{
-        const div = document.createElement('div');
-        div.className = 'book';
-        div.innerHTML = `<div class="thumb">${(b.title||'🏷').slice(0,3)}</div>
-                         <div class="meta"><div class="name">${escapeHtml(b.title||'Sem título')}</div>
-                         <div class="author">${escapeHtml(b.author||'Desconhecido')}</div></div>`;
-        div.addEventListener('click', ()=>openBook(b.file, b.title));
-        bookListEl.appendChild(div);
-      });
-    }
+  closeModal.addEventListener('click', ()=> modalBack.style.display='none');
+  modalBack.addEventListener('click', (e)=>{ if(e.target === modalBack) modalBack.style.display='none' });
+  openInReader.addEventListener('click', ()=>{
+    modalBack.style.display='none';
+    if(currentBookMeta && currentBookMeta.file) openBook(currentBookMeta.file, currentBookMeta.title);
+  });
 
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c]));}
-
-    async function openBook(urlOrBlob, title){
-      currentBookEl.textContent = title || urlOrBlob;
-      // se for string (URL), usa direto; se for Blob, cria URL
-      if(typeof urlOrBlob === 'string'){
-        currentURL = urlOrBlob;
-      }else{
-        currentURL = URL.createObjectURL(urlOrBlob);
-      }
-      downloadBtn.href = currentURL;
-      downloadBtn.download = title ? (title.replace(/\s+/g,'_') + '.pdf') : 'book.pdf';
-      try{
-        if(pdfDoc){pdfDoc.destroy();pdfDoc=null}
-        pdfDoc = await pdfjsLib.getDocument(currentURL).promise;
-        currentPage = 1; scale = zoomRange.value / 100;
-        pageCountEl.textContent = '/ ' + pdfDoc.numPages;
-        pageNumInput.max = pdfDoc.numPages; pageNumInput.value = 1;
-        renderPage(currentPage);
-      }catch(err){
-        console.error('Erro ao abrir PDF',err);
-        alert('Não foi possível abrir o PDF. Verifique o caminho ou permissões.');
-      }
-    }
-
-    async function renderPage(num){
-      if(!pdfDoc) return;
-      const page = await pdfDoc.getPage(num);
-      const viewport = page.getViewport({scale: scale});
-      // ajustar canvas para resolução do dispositivo
-      const outputScale = window.devicePixelRatio || 1;
-      pdfCanvas.width = Math.floor(viewport.width * outputScale);
-      pdfCanvas.height = Math.floor(viewport.height * outputScale);
-      pdfCanvas.style.width = Math.floor(viewport.width) + 'px';
-      pdfCanvas.style.height = Math.floor(viewport.height) + 'px';
-
-      const renderContext = {
-        canvasContext: ctx,
-        viewport: page.getViewport({scale: scale * outputScale})
-      };
-      ctx.clearRect(0,0,pdfCanvas.width,pdfCanvas.height);
-      await page.render(renderContext).promise;
-      pageNumInput.value = num;
+  // openBook: usa string URL ou Blob
+  async function openBook(urlOrBlob, title){
+    currentBookEl.textContent = title || (typeof urlOrBlob=='string'?urlOrBlob:'local.pdf');
+    if(typeof urlOrBlob === 'string') currentURL = urlOrBlob;
+    else currentURL = URL.createObjectURL(urlOrBlob);
+    downloadBtn.href = currentURL;
+    downloadBtn.download = title ? (title.replace(/\s+/g,'_') + '.pdf') : 'book.pdf';
+    try{
+      if(pdfDoc){ pdfDoc.destroy(); pdfDoc = null; }
+      pdfDoc = await pdfjsLib.getDocument(currentURL).promise;
+      currentPage = 1; scale = zoomRange.value/100;
       pageCountEl.textContent = '/ ' + pdfDoc.numPages;
+      pageNumInput.max = pdfDoc.numPages; pageNumInput.value = 1;
+      renderPage(currentPage);
+    }catch(err){
+      alert('Não foi possível abrir o PDF. Verifique o arquivo ou permissões (CORS).');
+      console.error(err);
     }
+  }
 
-    prevBtn.addEventListener('click', ()=>{ if(pdfDoc && currentPage>1){ currentPage--; renderPage(currentPage);} });
-    nextBtn.addEventListener('click', ()=>{ if(pdfDoc && currentPage<pdfDoc.numPages){ currentPage++; renderPage(currentPage);} });
-    pageNumInput.addEventListener('change', ()=>{ let v = parseInt(pageNumInput.value)||1; v = Math.max(1, Math.min(pdfDoc?pdfDoc.numPages:1, v)); currentPage = v; renderPage(currentPage); });
-    zoomRange.addEventListener('input', ()=>{ zoomLabel.textContent = zoomRange.value + '%'; scale = zoomRange.value / 100; renderPage(currentPage); });
+  async function renderPage(num){
+    if(!pdfDoc) return;
+    const page = await pdfDoc.getPage(num);
+    const viewport = page.getViewport({scale: scale});
+    const outputScale = window.devicePixelRatio || 1;
+    pdfCanvas.width = Math.floor(viewport.width * outputScale);
+    pdfCanvas.height = Math.floor(viewport.height * outputScale);
+    pdfCanvas.style.width = Math.floor(viewport.width) + 'px';
+    pdfCanvas.style.height = Math.floor(viewport.height) + 'px';
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: page.getViewport({scale: scale * outputScale})
+    };
+    ctx.clearRect(0,0,pdfCanvas.width,pdfCanvas.height);
+    await page.render(renderContext).promise;
+    // render textLayer for selection
+    await renderTextLayer(page, scale);
+    pageNumInput.value = num;
+    pageCountEl.textContent = '/ ' + pdfDoc.numPages;
+  }
 
-    openManifestBtn.addEventListener('click', loadManifest);
-    addLocalBtn.addEventListener('click', ()=>{
-      const inp = document.createElement('input'); inp.type='file'; inp.accept='application/pdf';
-      inp.onchange = e=>{
-        const f = e.target.files[0]; if(f) openBook(f, f.name);
-      }; inp.click();
+  // cria ou substitui o textLayer no container (.pageContainer)
+  async function renderTextLayer(page, scale){
+    // remove existing
+    const pageWrap = document.getElementById('pageWrap');
+    const old = pageWrap.querySelector('.textLayer');
+    if(old) old.remove();
+    // container
+    const viewport = page.getViewport({scale: scale});
+    const textDiv = document.createElement('div');
+    textDiv.className = 'textLayer';
+    textDiv.style.left = '0'; textDiv.style.top = '0';
+    textDiv.style.width = Math.floor(viewport.width) + 'px';
+    textDiv.style.height = Math.floor(viewport.height) + 'px';
+    textDiv.style.pointerEvents = 'auto';
+    // use PDF.js to get textContent and render
+    const textContent = await page.getTextContent();
+    // basic textLayer rendering
+    textContent.items.forEach(item=>{
+      const span = document.createElement('span');
+      span.textContent = item.str;
+      // posicionamento aproximado via transform (item.transform)
+      const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+      const x = tx[4]; const y = tx[5];
+      span.style.position = 'absolute';
+      span.style.left = (x) + 'px';
+      // invert y because PDF coords
+      span.style.top = (viewport.height - y) + 'px';
+      span.style.whiteSpace = 'pre';
+      span.style.fontSize = Math.max(8, (item.height || 10) * scale) + 'px';
+      span.style.opacity = '0.0001'; // invisível mas selecionável
+      textDiv.appendChild(span);
     });
+    pageWrap.appendChild(textDiv);
+  }
 
-    // Drag & drop
-    ['dragenter','dragover'].forEach(ev=>{
-      dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor = 'rgba(255,255,255,0.12)'; });
+  // navegação / eventos
+  prevBtn.addEventListener('click', ()=> { if(pdfDoc && currentPage>1){ currentPage--; renderPage(currentPage);} });
+  nextBtn.addEventListener('click', ()=> { if(pdfDoc && currentPage<pdfDoc.numPages){ currentPage++; renderPage(currentPage);} });
+  pageNumInput.addEventListener('change', ()=> { let v = parseInt(pageNumInput.value)||1; v = Math.max(1, Math.min(pdfDoc?pdfDoc.numPages:1, v)); currentPage=v; renderPage(currentPage); });
+  zoomRange.addEventListener('input', ()=>{ zoomLabel.textContent = zoomRange.value + '%'; scale = zoomRange.value/100; renderPage(currentPage); });
+  fitWidthBtn.addEventListener('click', ()=>{
+    if(!pdfDoc) return;
+    pdfDoc.getPage(currentPage).then(p=>{
+      const vp = p.getViewport({scale:1});
+      const containerWidth = document.querySelector('.viewer').clientWidth - 48;
+      const newScale = containerWidth / vp.width;
+      scale = newScale; zoomRange.value = Math.round(newScale*100); zoomLabel.textContent = Math.round(newScale*100)+'%';
+      renderPage(currentPage);
     });
-    ['dragleave','drop'].forEach(ev=>{
-      dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor = 'transparent'; });
-    });
-    dropzone.addEventListener('drop', e=>{
-      const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f && f.type === 'application/pdf') openBook(f, f.name);
-    });
+  });
 
-    // Toggle night (just example theme toggle)
-    toggleNight.addEventListener('click', ()=>{
-      document.body.classList.toggle('light');
-      if(document.body.classList.contains('light')){
-        document.documentElement.style.setProperty('--bg','#f6f8fb');
-        document.documentElement.style.setProperty('--card','#ffffff');
-        document.documentElement.style.setProperty('--muted','#334155');
-      }else{
-        document.documentElement.style.removeProperty('--bg');
-        document.documentElement.style.removeProperty('--card');
-        document.documentElement.style.removeProperty('--muted');
-      }
-    });
+  // abrir local
+  addLocalBtn.addEventListener('click', ()=> {
+    const inp = document.createElement('input'); inp.type='file'; inp.accept='application/pdf';
+    inp.onchange = e=>{ const f = e.target.files[0]; if(f) openBook(f, f.name); }; inp.click();
+  });
 
-    fitWidthBtn.addEventListener('click', ()=>{
-      // ajusta zoom para caber largura do container
-      const containerWidth = document.querySelector('.viewer').clientWidth - 24; // padding
-      if(!pdfDoc) return;
-      pdfDoc.getPage(currentPage).then(p=>{
-        const vp = p.getViewport({scale:1});
-        const newScale = containerWidth / vp.width;
-        scale = newScale; zoomRange.value = Math.round(newScale*100); zoomLabel.textContent = Math.round(newScale*100)+'%'; renderPage(currentPage);
+  // drag & drop
+  ['dragenter','dragover'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor='rgba(255,255,255,0.12)'; }));
+  ['dragleave','drop'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor='transparent'; }));
+  dropzone.addEventListener('drop', e=>{
+    const files = Array.from(e.dataTransfer.files||[]);
+    files.filter(f=>f.type==='application/pdf').forEach(f=>{
+      // abrir primeiro PDF e também opcionalmente adicionar à lista temporária
+      openBook(f, f.name);
+    });
+  });
+
+  // resumo / highlights
+  function renderHighlights(filterTag){
+    const all = loadHighlights();
+    highlightsList.innerHTML = '';
+    const tags = {};
+    let shown = 0;
+    all.forEach((h, idx)=>{
+      if(filterTag && !h.tags?.includes(filterTag)) return;
+      const item = document.createElement('div'); item.className='highlight';
+      item.innerHTML = `<div style="font-weight:600">${escapeHtml(h.bookTitle||h.file||'—')}</div>
+                        <div style="font-size:13px;margin-top:6px">${escapeHtml(h.text.slice(0,200))}${h.text.length>200? '…':''}</div>
+                        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+                          <div class="small" style="color:var(--muted)">${h.page? 'p.'+h.page:''}</div>
+                          <div style="flex:1"></div>
+                          <button class="btn" data-idx="${idx}">Ir</button>
+                        </div>`;
+      // tags
+      const twrap = document.createElement('div'); twrap.style.marginTop='8px';
+      (h.tags||[]).forEach(t=>{
+        const sp = document.createElement('span'); sp.className='tag'; sp.textContent=t;
+        twrap.appendChild(sp);
+        tags[t] = (tags[t]||0)+1;
       });
+      if((h.tags||[]).length) item.appendChild(twrap);
+
+      highlightsList.appendChild(item);
+      // ir ao destaque
+      item.querySelector('button')?.addEventListener('click', ()=> {
+        // se livro diferente, tenta abrir
+        if(h.file && h.file !== currentURL){
+          openBook(h.file, h.bookTitle||h.file).then(()=> {
+            currentPage = h.page || 1; renderPage(currentPage).then(()=> { /* opcional scroll */});
+          });
+        }else{
+          currentPage = h.page || 1; renderPage(currentPage);
+        }
+      });
+      shown++;
     });
+    // tags cloud
+    tagsCloud.innerHTML = '';
+    Object.keys(tags).forEach(t=>{
+      const b = document.createElement('button'); b.className='btn'; b.textContent = `${t} (${tags[t]})`;
+      b.addEventListener('click', ()=> { tagFilter.value = t; renderHighlights(t); });
+      tagsCloud.appendChild(b);
+    });
+    if(shown===0) highlightsList.innerHTML = '<div class="small" style="color:var(--muted)">Nenhum destaque salvo.</div>';
+  }
 
-    // Inicial
-    loadManifest();
+  // adicionar destaque a partir da seleção de texto
+  addHighlightBtn.addEventListener('click', ()=>{
+    const sel = window.getSelection();
+    if(!sel || !sel.toString().trim()){ alert('Selecione um trecho de texto na página antes de criar um destaque.'); return; }
+    const text = sel.toString().trim();
+    const page = currentPage;
+    const h = {
+      id: Date.now(),
+      file: currentURL,
+      bookTitle: currentBookEl.textContent,
+      page,
+      text,
+      tags: []
+    };
+    // pedir tag simples
+    const newTag = prompt('Adicionar tags (vírgula para separar) — deixe vazio para pular:');
+    if(newTag) h.tags = newTag.split(',').map(s=>s.trim()).filter(Boolean);
+    const all = loadHighlights();
+    all.unshift(h);
+    saveHighlights(all);
+    renderHighlights(tagFilter.value.trim());
+    alert('Destaque salvo.');
+  });
 
-    // Nota: No GitHub Pages você precisa adicionar um arquivo books.json. Exemplo:
-    // [
-    //  { "title": "Manual do Motor", "author": "Alison", "file": "pdfs/manual_motor.pdf" },
-    //  { "title": "Revista Carros", "author": "Equipe", "file": "pdfs/revista_carros.pdf" }
-    // ]
+  // initial load highlights
+  renderHighlights();
 
+  // filtro tags
+  tagFilter.addEventListener('input', ()=> renderHighlights(tagFilter.value.trim()));
+  clearFilter.addEventListener('click', ()=> { tagFilter.value=''; renderHighlights(); });
+
+  // load initial manifest
+  refreshBtn.addEventListener('click', loadManifest);
+  loadManifest();
+
+  // preserve theme toggle (keeps original behaviour)
+  document.getElementById('toggleNight').addEventListener('click', ()=>{
+    document.body.classList.toggle('light');
+    if(document.body.classList.contains('light')){
+      document.documentElement.style.setProperty('--bg','#f6f8fb');
+      document.documentElement.style.setProperty('--card','#ffffff');
+      document.documentElement.style.setProperty('--muted','#334155');
+      document.documentElement.style.setProperty('--accent','#3b82f6');
+    }else{
+      document.documentElement.style.removeProperty('--bg');
+      document.documentElement.style.removeProperty('--card');
+      document.documentElement.style.removeProperty('--muted');
+    }
+  });
+
+  // quick helper: if user drags books into the grid area, add to books[] as local object (transient)
+  document.body.addEventListener('drop', (e)=> e.preventDefault());
+  document.body.addEventListener('dragover', (e)=> e.preventDefault());
   </script>
 </body>
 </html>
