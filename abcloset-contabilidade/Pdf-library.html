@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Biblioteca PDF — Mockup</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#60a5fa; --glass: rgba(255,255,255,0.03);
+      --radius:12px; --gap:12px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;background:linear-gradient(180deg,#061226 0%, #081727 100%);color:#e6eef6}
+    .app{display:flex;gap:var(--gap);padding:18px;min-height:100vh}
+    .sidebar{width:320px;background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .title{font-size:16px;font-weight:600}
+    .subtitle{font-size:12px;color:var(--muted)}
+
+    .book-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .book{display:flex;gap:10px;padding:10px;border-radius:10px;background:var(--glass);align-items:center;cursor:pointer}
+    .book:hover{outline:1px solid rgba(255,255,255,0.04)}
+    .thumb{width:46px;height:60px;border-radius:6px;background:linear-gradient(180deg,#12304a,#071425);display:flex;align-items:center;justify-content:center;font-size:12px}
+    .meta{flex:1}
+    .meta .name{font-weight:600}
+    .meta .author{font-size:12px;color:var(--muted)}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#001; border: none}
+    .reader{flex:1;display:flex;flex-direction:column;gap:12px}
+    .reader .topbar{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;background:var(--card)}
+    .viewer{flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#071127;padding:12px;overflow:auto}
+    canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 12px 40px rgba(2,6,23,0.7)}
+    .reader .toolbar{display:flex;gap:8px;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+    .dropzone{margin-top:12px;padding:12px;border:2px dashed rgba(255,255,255,0.03);border-radius:12px;text-align:center;color:var(--muted)}
+    .search{display:flex;gap:8px;align-items:center}
+    input[type=range]{width:120px}
+    @media(max-width:900px){.sidebar{display:none}.app{padding:10px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">B</div>
+        <div>
+          <div class="title">Savana — Biblioteca</div>
+          <div class="subtitle">Leitor de PDFs embutido</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="openManifestBtn" class="btn">Atualizar lista</button>
+        <button id="addLocalBtn" class="btn">Abrir PDF local</button>
+        <button id="toggleNight" class="btn">Modo noturno</button>
+      </div>
+
+      <div style="margin-top:12px" class="small">Minha coleção</div>
+      <div id="bookList" class="book-list"></div>
+
+      <div class="dropzone" id="dropzone">Arraste e solte arquivos PDF aqui para abrir (ou clique em "Abrir PDF local")</div>
+
+      <div style="margin-top:14px;font-size:12px;color:var(--muted)">Obs: Para hospedar no GitHub Pages coloque seus PDFs em /pdfs e um arquivo <code>books.json</code> com a lista (ex.: <code>[{"title":"Meu Livro","file":"pdfs/meu.pdf","author":"Autor"}]</code>).</div>
+    </aside>
+
+    <main class="reader">
+      <div class="topbar">
+        <div class="toolbar">
+          <button id="prevPage" class="btn">◀</button>
+          <button id="nextPage" class="btn">▶</button>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:6px">
+            <div class="small">Página</div>
+            <input id="pageNum" type="number" min="1" value="1" style="width:72px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+            <div class="small" id="pageCount">/ 0</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="search">
+            <input id="zoomRange" type="range" min="50" max="200" value="100">
+            <div class="small">Zoom <span id="zoomLabel">100%</span></div>
+          </div>
+          <a id="downloadBtn" class="btn" href="#" download>Baixar</a>
+          <button id="fitWidthBtn" class="btn">Ajustar largura</button>
+        </div>
+      </div>
+
+      <div class="viewer" id="viewer">
+        <canvas id="pdfCanvas"></canvas>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="small">Arquivo: <span id="currentBook">— nenhum —</span></div>
+        <div class="small">Use setas ou controles acima para navegar</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- PDF.js (usamos CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+  <script>
+    // Config PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js';
+
+    // Elementos
+    const bookListEl = document.getElementById('bookList');
+    const pdfCanvas = document.getElementById('pdfCanvas');
+    const ctx = pdfCanvas.getContext('2d');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    const pageNumInput = document.getElementById('pageNum');
+    const pageCountEl = document.getElementById('pageCount');
+    const zoomRange = document.getElementById('zoomRange');
+    const zoomLabel = document.getElementById('zoomLabel');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const currentBookEl = document.getElementById('currentBook');
+    const openManifestBtn = document.getElementById('openManifestBtn');
+    const addLocalBtn = document.getElementById('addLocalBtn');
+    const dropzone = document.getElementById('dropzone');
+    const toggleNight = document.getElementById('toggleNight');
+    const fitWidthBtn = document.getElementById('fitWidthBtn');
+
+    let pdfDoc = null; let currentPage = 1; let scale = 1.0; let currentURL = null;
+
+    // Carrega lista de livros (books.json) — você pode gerar este arquivo ao atualizar a pasta /pdfs no repo
+    async function loadManifest(){
+      try{
+        const res = await fetch('books.json', {cache: 'no-store'});
+        if(!res.ok) throw new Error('books.json não encontrado');
+        const books = await res.json();
+        renderBookList(books);
+      }catch(err){
+        console.warn('Não foi possível carregar books.json — use arrastar e soltar ou abra um PDF local.');
+        bookListEl.innerHTML = '<div class="small" style="color:var(--muted)">Nenhum livro encontrado (adicione books.json em seu repositório ou arraste um PDF).</div>';
+      }
+    }
+
+    function renderBookList(books){
+      bookListEl.innerHTML = '';
+      books.forEach((b, i)=>{
+        const div = document.createElement('div');
+        div.className = 'book';
+        div.innerHTML = `<div class="thumb">${(b.title||'🏷').slice(0,3)}</div>
+                         <div class="meta"><div class="name">${escapeHtml(b.title||'Sem título')}</div>
+                         <div class="author">${escapeHtml(b.author||'Desconhecido')}</div></div>`;
+        div.addEventListener('click', ()=>openBook(b.file, b.title));
+        bookListEl.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c]));}
+
+    async function openBook(urlOrBlob, title){
+      currentBookEl.textContent = title || urlOrBlob;
+      // se for string (URL), usa direto; se for Blob, cria URL
+      if(typeof urlOrBlob === 'string'){
+        currentURL = urlOrBlob;
+      }else{
+        currentURL = URL.createObjectURL(urlOrBlob);
+      }
+      downloadBtn.href = currentURL;
+      downloadBtn.download = title ? (title.replace(/\s+/g,'_') + '.pdf') : 'book.pdf';
+      try{
+        if(pdfDoc){pdfDoc.destroy();pdfDoc=null}
+        pdfDoc = await pdfjsLib.getDocument(currentURL).promise;
+        currentPage = 1; scale = zoomRange.value / 100;
+        pageCountEl.textContent = '/ ' + pdfDoc.numPages;
+        pageNumInput.max = pdfDoc.numPages; pageNumInput.value = 1;
+        renderPage(currentPage);
+      }catch(err){
+        console.error('Erro ao abrir PDF',err);
+        alert('Não foi possível abrir o PDF. Verifique o caminho ou permissões.');
+      }
+    }
+
+    async function renderPage(num){
+      if(!pdfDoc) return;
+      const page = await pdfDoc.getPage(num);
+      const viewport = page.getViewport({scale: scale});
+      // ajustar canvas para resolução do dispositivo
+      const outputScale = window.devicePixelRatio || 1;
+      pdfCanvas.width = Math.floor(viewport.width * outputScale);
+      pdfCanvas.height = Math.floor(viewport.height * outputScale);
+      pdfCanvas.style.width = Math.floor(viewport.width) + 'px';
+      pdfCanvas.style.height = Math.floor(viewport.height) + 'px';
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: page.getViewport({scale: scale * outputScale})
+      };
+      ctx.clearRect(0,0,pdfCanvas.width,pdfCanvas.height);
+      await page.render(renderContext).promise;
+      pageNumInput.value = num;
+      pageCountEl.textContent = '/ ' + pdfDoc.numPages;
+    }
+
+    prevBtn.addEventListener('click', ()=>{ if(pdfDoc && currentPage>1){ currentPage--; renderPage(currentPage);} });
+    nextBtn.addEventListener('click', ()=>{ if(pdfDoc && currentPage<pdfDoc.numPages){ currentPage++; renderPage(currentPage);} });
+    pageNumInput.addEventListener('change', ()=>{ let v = parseInt(pageNumInput.value)||1; v = Math.max(1, Math.min(pdfDoc?pdfDoc.numPages:1, v)); currentPage = v; renderPage(currentPage); });
+    zoomRange.addEventListener('input', ()=>{ zoomLabel.textContent = zoomRange.value + '%'; scale = zoomRange.value / 100; renderPage(currentPage); });
+
+    openManifestBtn.addEventListener('click', loadManifest);
+    addLocalBtn.addEventListener('click', ()=>{
+      const inp = document.createElement('input'); inp.type='file'; inp.accept='application/pdf';
+      inp.onchange = e=>{
+        const f = e.target.files[0]; if(f) openBook(f, f.name);
+      }; inp.click();
+    });
+
+    // Drag & drop
+    ['dragenter','dragover'].forEach(ev=>{
+      dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor = 'rgba(255,255,255,0.12)'; });
+    });
+    ['dragleave','drop'].forEach(ev=>{
+      dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.style.borderColor = 'transparent'; });
+    });
+    dropzone.addEventListener('drop', e=>{
+      const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f && f.type === 'application/pdf') openBook(f, f.name);
+    });
+
+    // Toggle night (just example theme toggle)
+    toggleNight.addEventListener('click', ()=>{
+      document.body.classList.toggle('light');
+      if(document.body.classList.contains('light')){
+        document.documentElement.style.setProperty('--bg','#f6f8fb');
+        document.documentElement.style.setProperty('--card','#ffffff');
+        document.documentElement.style.setProperty('--muted','#334155');
+      }else{
+        document.documentElement.style.removeProperty('--bg');
+        document.documentElement.style.removeProperty('--card');
+        document.documentElement.style.removeProperty('--muted');
+      }
+    });
+
+    fitWidthBtn.addEventListener('click', ()=>{
+      // ajusta zoom para caber largura do container
+      const containerWidth = document.querySelector('.viewer').clientWidth - 24; // padding
+      if(!pdfDoc) return;
+      pdfDoc.getPage(currentPage).then(p=>{
+        const vp = p.getViewport({scale:1});
+        const newScale = containerWidth / vp.width;
+        scale = newScale; zoomRange.value = Math.round(newScale*100); zoomLabel.textContent = Math.round(newScale*100)+'%'; renderPage(currentPage);
+      });
+    });
+
+    // Inicial
+    loadManifest();
+
+    // Nota: No GitHub Pages você precisa adicionar um arquivo books.json. Exemplo:
+    // [
+    //  { "title": "Manual do Motor", "author": "Alison", "file": "pdfs/manual_motor.pdf" },
+    //  { "title": "Revista Carros", "author": "Equipe", "file": "pdfs/revista_carros.pdf" }
+    // ]
+
+  </script>
+</body>
+</html>
