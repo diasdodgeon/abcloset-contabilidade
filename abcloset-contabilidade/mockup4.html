@@ -1,1028 +1,301 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal Mockup Celular Avançado</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Savana Biblioteca — Mobile</title>
+<style>
+:root{
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#60a5fa; --accent2:#7c3aed;
+  --glass:rgba(255,255,255,0.04); --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,Arial,sans-serif;
+  background:linear-gradient(180deg,#061226 0%,#0a1727 100%);
+  color:#e6eef6;
+  display:flex;flex-direction:column;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;
+}
+header .logo{
+  display:flex;align-items:center;gap:10px;
+}
+header .icon{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:20px;color:#000;
+}
+header h1{
+  font-size:18px;font-weight:600;
+}
+header button{
+  background:transparent;border:none;color:var(--accent);
+  font-size:28px;cursor:pointer;
+}
+
+/* grid de capas */
+main{
+  flex:1;padding:12px 16px 80px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.card{
+  background:var(--glass);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  cursor:pointer;
+  transition:transform .2s;
+}
+.card:hover{transform:scale(1.03)}
+.card img{
+  width:100%;height:180px;object-fit:cover;
+}
+.card .info{
+  padding:10px;
+}
+.card .title{
+  font-weight:600;font-size:14px;
+}
+.card .author{
+  font-size:12px;color:var(--muted);margin-top:4px;
+}
+
+/* modal detalhe */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);
+  z-index:99;
+}
+.modal{
+  background:linear-gradient(180deg,rgba(12,18,30,0.95),rgba(6,10,20,0.95));
+  width:90%;max-width:500px;
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+  display:flex;flex-direction:column;
+  animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal img{
+  width:100%;height:240px;object-fit:cover;
+}
+.modal .content{
+  padding:16px;display:flex;flex-direction:column;gap:10px;
+}
+.modal h2{font-size:18px}
+.modal p{font-size:14px;color:var(--muted);line-height:1.5;max-height:160px;overflow:auto;}
+.modal .actions{
+  display:flex;gap:10px;margin-top:8px;
+}
+.modal button{
+  flex:1;
+  padding:10px 12px;
+  border:none;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+}
+.modal .primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#000;
+}
+.modal .secondary{
+  background:var(--glass);
+  color:#e6eef6;
+}
+
+/* leitor */
+#reader{
+  position:fixed;inset:0;
+  background:#0a1525;
+  display:none;flex-direction:column;
+  z-index:100;
+}
+.reader-top{
+  padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+  background:rgba(10,20,30,0.7);
+  backdrop-filter:blur(8px);
+}
+.reader-top button{
+  background:none;border:none;color:#e6eef6;font-size:22px;cursor:pointer;
+}
+.reader-content{
+  flex:1;display:flex;justify-content:center;align-items:center;padding:10px;overflow:auto;
+}
+canvas{max-width:100%;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,0.6);}
+
+/* botão flutuante */
+.fab{
+  position:fixed;bottom:20px;right:20px;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#000;font-size:30px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(0,0,0,0.5);
+  border:none;cursor:pointer;z-index:98;
+}
+input[type=file]{display:none;}
+</style>
 </head>
 <body>
-<style>
-    /* Estilos do Modal (Overlay) */
-    .modal-mockup {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.5);
-        backdrop-filter: blur(5px);
-        align-items: center;
-        justify-content: center;
-    }
 
-    /* Centraliza o conteúdo do modal */
-    .modal-content {
-        background-color: transparent;
-        padding: 0;
-        width: 90%;
-        max-width: 350px;
-        position: relative;
-        border: none;
-    }
+<header>
+  <div class="logo">
+    <div class="icon">B</div>
+    <h1>Biblioteca Savana</h1>
+  </div>
+  <button id="refreshBtn">⟳</button>
+</header>
 
-    /* Estilos do Mockup de Celular */
-    .phone-mockup {
-        border: 10px solid #222;
-        border-radius: 40px;
-        box-shadow: 0 0 0 1px #444,
-                    0 0 30px rgba(0, 0, 0, 0.5);
-        background-color: #333;
-        padding: 5px;
-        position: relative;
-        overflow: hidden;
-    }
+<main id="library"></main>
 
-    /* Topo do Celular (notch) */
-    .phone-top-bar-notch {
-        height: 10px;
-        width: 40%;
-        background-color: #222;
-        border-radius: 0 0 10px 10px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2; /* Acima da barra de status */
-    }
-
-    /* A tela onde vai o conteúdo */
-    .phone-screen {
-        background-color: white;
-        width: 100%;
-        height: 680px;
-        border-radius: 30px;
-        padding: 0;
-        box-sizing: border-box;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Estilos da Barra de Status Superior */
-    .status-bar {
-        height: 30px;
-        background-color: black;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 15px;
-        font-size: 14px;
-        color: white;
-        font-family: sans-serif;
-        font-weight: bold;
-        border-radius: 30px 30px 0 0;
-        z-index: 3; /* Sempre visível e clicável */
-        position: relative;
-        cursor: pointer; /* Indica que é clicável */
-        border-bottom: 0px solid #eee;
-    }
-    .status-bar .icons {
-        font-size: 16px;
-    }
-    .status-bar .signal {
-        font-size: 12px;
-        margin-left: 5px;
-    }
-
-    /* 🆕 JANELA DESLIZANTE DE NOTIFICAÇÕES (O NOVO MENU) */
-    .notification-drawer {
-        position: absolute;
-        top: -100%; /* Começa escondida acima da tela */
-        left: 0;
-        width: 100%;
-        background-color: #f8f8f8;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        z-index: 10; /* Fica acima do conteúdo (video) */
-        transition: top 0.3s ease-out; /* Transição para o efeito deslizante */
-        padding: 10px;
-        box-sizing: border-box;
-    }
-
-    /* Classe para mostrar o menu */
-    .notification-drawer.open {
-        top: 30px; /* Desliza para baixo, logo abaixo da barra de status (30px de altura) */
-    }
-
-    /* 🆕 Estilos para os Ícones de Atalho */
-    .shortcut-icons {
-        display: flex;
-        justify-content: space-around;
-        padding: 10px 0;
-        border-bottom: 1px solid #ddd;
-    }
-    .shortcut-icons button {
-        background: #eee;
-        border: none;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: background 0.2s;
-    }
-    .shortcut-icons button:hover {
-        background: #ddd;
-    }
-
-    /* 🆕 Estilos para a Lista de Vídeos/Notificações */
-    .video-list-container {
-        padding: 10px 0;
-        max-height: 400px; /* Limite de altura para a lista */
-        overflow-y: auto; /* Adiciona rolagem se a lista for longa */
-    }
-    .video-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        padding: 5px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        cursor: pointer;
-    }
-    .video-item:hover {
-        background: #f0f0f0;
-    }
-    .video-thumbnail {
-        width: 80px;
-        height: 45px; /* 16:9 ratio */
-        background-color: #ccc;
-        border-radius: 4px;
-        margin-right: 10px;
-        overflow: hidden;
-        flex-shrink: 0; /* Não encolhe */
-    }
-    .video-thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .video-info {
-        font-size: 12px;
-        color: #333;
-        flex-grow: 1;
-    }
-    .video-info strong {
-        display: block;
-        font-size: 14px;
-        margin-bottom: 3px;
-        line-height: 1.2;
-    }
-    .video-info span {
-        color: #777;
-    }
-
-
-    /* Área de Conteúdo (Vídeo Principal) */
-    .phone-content {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 0;
-        position: relative;
-    }
-    /* 🆕 ESTILOS PARA GERENCIAR TELAS (VÍDEO VS MENU) */
-    .content-screen {
-        width: 100%;
-        height: 100%;
-        position: absolute; /* Permite que as telas fiquem sobrepostas */
-        top: 0;
-        left: 0;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        pointer-events: none;
-        background-color: #fff; /* Fundo padrão para o menu */
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    .content-screen.active-screen {
-        opacity: 1;
-        pointer-events: auto; /* Permite interação apenas na tela ativa */
-        position: relative; /* Ajuste para o scrollbar aparecer corretamente */
-    }
-
-    /* 🆕 SEÇÃO DO MENU DE APPS */
-    #menuScreen {
-        background-image: url("Colorindonuvens.jpg");
-        background-size: 400px;
-        /*background-color: #f0f0f0; /* Fundo claro para o menu */
-        display: flex;
-        flex-direction: column;
-        padding: 20px 10px;
-    }
-
-    /* --- tema de celular, com apps --- */
-    .phone-menu {
-        display: flex;
-        flex-wrap: wrap; /* Permite quebrar linha se houver muitos ícones */
-        justify-content: start; /* Alinha os ícones à esquerda */
-        gap: 5px; /* Espaço entre os ícones */
-        width: 100%;
-    }
-     
-    .app-icon {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        font-size: 32px; /* Ícone maior */
-        color: #fff;
-        width: 70px; /* Largura para cada item */
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    /* Estilo do círculo/fundo do ícone */
-    .app-icon > * {
-        background: linear-gradient(135deg, #1e90ff, #0a3d91); /* Fundo com gradiente moderno */
-        border-radius: 18px; /* Cantos mais arredondados */
-        padding: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        margin-bottom: 5px;
-        width: 45px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .app-icon:hover {
-        transform: scale(1.05);
-    }
-
-    .app-label {
-        font-size: 11px;
-        color: #f7f7f7;
-        font-family: sans-serif;
-        background: none; /* remove o fundo para o label */
-        padding: 0;
-        margin-top: 5px;
-        height: auto;
-        width: auto;
-        box-shadow: none;
-    }
-
-    video {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-
-    /* Estilos da Barra de Navegação Inferior (mantidos) */
-    .nav-bar {
-        height: 50px;
-        background-color: #f0f0f0;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        border-radius: 0 0 30px 30px;
-    }
-    .nav-bar button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 24px;
-        color: #555;
-        padding: 5px;
-    }
-    .nav-bar .home-btn {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #555;
-        border-radius: 50%;
-        background-color: transparent;
-        transition: background-color 0.1s;
-    }
-    .nav-bar button:active {
-        color: #000;
-    }
-    .nav-bar .home-btn:active {
-        background-color: #ccc;
-    }
-
-    /* 🎥 Botão flutuante de ajuda (mantido) */
-    .btn-ajuda {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        font-size: 26px;
-        background: #0a3d91;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 55px;
-        height: 55px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        cursor: pointer;
-        z-index: 1000;
-        transition: transform 0.2s ease;
-    }
-    .btn-ajuda:hover {
-        transform: scale(1.1);
-    }
-    /* 🆕 Estilo do Container e Puxador para Fechar */
-    .drawer-handle-container {
-        display: flex;
-        justify-content: center;
-        padding: 5px 0 10px; /* Mais padding abaixo do botão */
-        background-color: #f8f8f8; /* Mantém a cor do drawer */
-    }
-
-    /* 🆕 Estilo para o ícone de notificação na lista (substituindo a thumbnail) */
-    .video-thumbnail.notification-icon-circle {
-        background-color: #ddd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-    /* Altera o estilo para o item de notificação */
-    .video-item.notification-item {
-        background: #eef; /* Fundo levemente azul para destacar que é uma notificação */
-    }
-    /* Garante que o item de notificação não tenha link (embora o JS use '#') */
-    .video-item.notification-item:hover {
-        background: #e0e0ff;
-    }
-
-    /* 🆕 ESTILOS DA CALCULADORA */
-    #calculatorScreen {
-        /* Define um fundo escuro específico para a tela do app */
-        background-color: #111;
-        padding: 10px; /* Espaçamento interno da tela */
-    }
-
-    #calc-container {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        background: #111;
-        border-radius: 12px; /* Ajustado para se adequar melhor ao mockup */
-        box-sizing: border-box;
-        justify-content: space-between;
-    }
-
-    .calc-display {
-        background: #222;
-        color: #0f0;
-        font-size: 2.2em;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: right;
-        overflow: hidden;
-        box-shadow: inset 0 0 8px #000;
-        font-family: monospace; /* Fonte monoespaçada para display */
-    }
-
-    .calc-buttons {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        /* Calculadora precisa ser flexível, ajustamos a altura */
-        height: 85%; 
-        gap: 8px;
-        margin-top: 10px;
-    }
-
-    .btn {
-        background: #333;
-        color: white;
-        border: none;
-        font-size: 1.4em;
-        border-radius: 8px;
-        transition: background 0.2s;
-        /* Centraliza o texto/emoji do botão */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 40px; 
-    }
-
-    .btn:hover {
-        background: #555;
-    }
-
-    .btn.equal {
-        background: #0a84ff;
-        /* Ocupa 2 linhas */
-        grid-row: span 2; 
-    }
-
-    .btn.equal:hover {
-        background: #0c7ae8;
-    }
-
-    .btn.zero {
-        /* Ocupa 2 colunas */
-        grid-column: span 2;
-    }
-
-    .btn.clear {
-        background: #e63946;
-    }
-
-    .btn.clear:hover {
-        background: #d62828;
-    }
-
-
-</style>
-    <button id="btn-ajuda" class="btn-ajuda">🙋</button>
-
-    <div id="phoneModal" class="modal-mockup">
-        
-        <div class="modal-content">
-            
-            <div class="phone-mockup">
-                <div class="phone-top-bar-notch"></div>
-                
-                <div class="phone-screen">
-                    
-                    <div class="status-bar" id="statusBar">
-                        <div class="time">10:47</div>
-                        <div class="icons">
-                            ⏰📬⚙️📆
-                            <span class="signal">🔋📶</span>
-                        </div>
-                    </div>
-
-                    <div class="notification-drawer" id="notificationDrawer">
-                        <div class="shortcut-icons">
-                            <button title="Alarme">⏰</button>
-                            <button title="Mensagens">📬</button>
-                            <button title="Configurações">⚙️</button>
-                            <button title="Volume">🔊</button>
-                            <button title="Pesquisa">🔎</button>
-                        </div>
-                        
-                            <div class="video-list-container" id="notificationList">
-                            </div>
-
-                            <div class="drawer-handle-container">
-                                <button id="closeDrawerHandle" class="close-drawer-handle">⏏︎</button>
-                            </div>
-                    </div>
-                    <div class="phone-content" id="phoneContent">
-                        <div id="calculatorScreen" class="content-screen">
-                        <div id="calc-container">
-                            <div class="calc-display" id="calc-display">0</div>
-                            <div class="calc-buttons">
-                                <button class="btn clear" data-action="clear">C</button>
-                                <button class="btn" data-action="divide">÷</button>
-                                <button class="btn" data-action="multiply">×</button>
-                                <button class="btn" data-action="delete">⌫</button>
-
-                                <button class="btn" data-value="7">7</button>
-                                <button class="btn" data-value="8">8</button>
-                                <button class="btn" data-value="9">9</button>
-                                <button class="btn" data-action="subtract">−</button>
-
-                                <button class="btn" data-value="4">4</button>
-                                <button class="btn" data-value="5">5</button>
-                                <button class="btn" data-value="6">6</button>
-                                <button class="btn" data-action="add">+</button>
-
-                                <button class="btn" data-value="1">1</button>
-                                <button class="btn" data-value="2">2</button>
-                                <button class="btn" data-value="3">3</button>
-                                <button class="btn equal" data-action="equals">=</button>
-
-                                <button class="btn zero" data-value="0">0</button>
-                                <button class="btn" data-value=".">.</button>
-                            </div>
-                        </div>
-                        </div>
-                        <div id="videoScreen" class="content-screen active-screen">
-
-                            <video id="video" width="100%" height="100%" controls>
-                                <source src="bemVindo.mp4" type="video/mp4">
-                                Seu navegador não suporta o elemento de vídeo.
-                            </video>
-                        </div>
-
-                        <div id="menuScreen" class="content-screen">
-                            <div class="phone-menu">
-                                <div class="app-icon" id="app-tutoriais">
-                                    🎓
-                                    <div class="app-label">Tutoriais</div>
-                                </div>
-                                <div class="app-icon" id="app-funcionalidades">
-                                    ⚙️
-                                    <div class="app-label">Config.</div>
-                                </div>
-                                <div class="app-icon" id="app-suporte">
-                                    💬
-                                    <div class="app-label">Suporte</div>
-                                </div>
-                                <div class="app-icon" id="app-outros">
-                                    📧
-                                    <div class="app-label">Mensagens</div>
-                                </div>
-                                <div class="app-icon" id="app-calculadora">
-                                    📟 
-                                    <div class="app-label">Calculadora</div>
-                                </div>
-                                <div class="app-icon" id="app-funcionalidades">
-                                    📋
-                                    <div class="app-label">Config.</div>
-                                </div>
-                                <div class="app-icon" id="app-suporte">
-                                    🎞️
-                                    <div class="app-label">Suporte</div>
-                                </div>
-                                <div class="app-icon" id="app-outros">
-                                    📰
-                                    <div class="app-label">Mensagens</div>
-                                </div>
-                                <div class="app-icon" id="app-tutoriais">
-                                    ⏰
-                                    <div class="app-label">Tutoriais</div>
-                                </div>
-                                <div class="app-icon" id="app-funcionalidades">
-                                    📒
-                                    <div class="app-label">Config.</div>
-                                </div>
-                                <div class="app-icon" id="app-suporte">
-                                    📅
-                                    <div class="app-label">Suporte</div>
-                                </div>
-                                <div class="app-icon" id="app-outros">
-                                    🗂️
-                                    <div class="app-label">Mensagens</div>
-                                </div>
-                                <div class="app-icon" id="app-tutoriais">
-                                    📬
-                                    <div class="app-label">Tutoriais</div>
-                                </div>
-                                <div class="app-icon" id="app-funcionalidades">
-                                    📚
-                                    <div class="app-label">Config.</div>
-                                </div>
-                                <div class="app-icon" id="app-suporte">
-                                    👪
-                                    <div class="app-label">Suporte</div>
-                                </div>
-                                <div class="app-icon" id="app-outros">
-                                    🚪
-                                    <div class="app-label">Mensagens</div>
-                                </div>
-                                <div class="app-icon" id="app-tutoriais">
-                                    🗑️
-                                    <div class="app-label">Tutoriais</div>
-                                </div>
-                                <div class="app-icon" id="app-funcionalidades">
-                                    🗃️
-                                    <div class="app-label">Config.</div>
-                                </div>
-                                <div class="app-icon" id="app-suporte">
-                                    💡
-                                    <div class="app-label">Suporte</div>
-                                </div>
-                                <div class="app-icon" id="app-outros">
-                                    💸
-                                    <div class="app-label">Mensagens</div>
-                                </div>
-                            </div>
-                            </div>
-                    </div>
-                    
-                    <div class="nav-bar">
-                        <button class="recent-apps-btn" onclick="simularAcao('recentes')">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="5" y="5" width="14" height="14" rx="2" stroke="#555" stroke-width="2"/>
-                            </svg>
-                        </button>
-                        
-                        <button id="homeBtn" class="home-btn"></button>
-                        
-                        <button class="back-btn" onclick="simularAcao('voltar')">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15 18L9 12L15 6" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <img id="modalCover" src="">
+    <div class="content">
+      <h2 id="modalTitle"></h2>
+      <small id="modalAuthor"></small>
+      <p id="modalExcerpt">Carregando...</p>
+      <div class="actions">
+        <button class="primary" id="openReader">Ler</button>
+        <button class="secondary" id="closeModal">Fechar</button>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // Elementos do DOM
-        const modal = document.getElementById("phoneModal");
-        const openBtn = document.getElementById("btn-ajuda");
-        const videoElement = document.getElementById("video");
-        const homeBtn = document.getElementById("homeBtn");
-        
-        // 🆕 Elementos da Janela Deslizante
-        const statusBar = document.getElementById("statusBar");
-        const notificationDrawer = document.getElementById("notificationDrawer");
-        // 🆕 Novo elemento para a lista de notificações
-        const notificationList = document.getElementById("notificationList");
+<!-- Leitor -->
+<div id="reader">
+  <div class="reader-top">
+    <button id="backBtn">←</button>
+    <div id="pageInfo">1 / 1</div>
+    <button id="nextBtn">→</button>
+  </div>
+  <div class="reader-content">
+    <canvas id="pdfCanvas"></canvas>
+  </div>
+</div>
 
-        // =========================================================
-        // 🆕 1. DADOS DE NOTIFICAÇÕES (Simulando o backend)
-        // =========================================================
-        const systemNotifications = [
-            {
-                type: 'alarm',
-                icon: '⏰',
-                title: 'Alarme Perdido',
-                detail: 'O alarme das 07:00 foi ignorado.',
-                statusIcon: '⏰' // Ícone a ser mostrado na Status Bar
-            },
-            {
-                type: 'message',
-                icon: '📬',
-                title: 'Nova Mensagem Importante',
-                detail: 'Você tem 2 novas mensagens do Admin.',
-                statusIcon: '📬'
-            },
-            {
-                type: 'calendar',
-                icon: '📆',
-                title: 'Aniversário',
-                detail: 'Amanhã é o aniversário do Alison!',
-                statusIcon: '📆'
-            },
-            
-            // Você pode adicionar mais notificações aqui
-        ];
-        
-        // =========================================================
-        // 🆕 2. DADOS DOS VÍDEOS (Conteúdo estático que virá após as notificações)
-        // =========================================================
-        const youtubeVideos = [
-            {
-                title: 'Título do Vídeo Principal',
-                detail: 'Novo Conteúdo: Assista agora!',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            // Adicione mais vídeos aqui
-        ];
+<!-- Botão adicionar -->
+<button class="fab" id="addBtn">+</button>
+<input type="file" id="fileInput" accept="application/pdf" multiple>
 
-        // =========================================================
-        // 🆕 3. FUNÇÃO DE RENDERIZAÇÃO PRINCIPAL
-        // =========================================================
-        function renderNotifications() {
-            // A. Atualiza a Barra de Status (Apenas os ícones de status)
-            const statusIconsDiv = statusBar.querySelector('.icons');
-            
-            // Mantém a hora e os ícones de sinal/bateria no status bar
-            let currentIcons = `
-                ${systemNotifications.map(n => n.statusIcon).join('')}
-                <span class="signal">🔋📶</span>
-            `;
-            // Encontra e atualiza a parte dos ícones, mantendo a hora intacta
-            statusIconsDiv.innerHTML = currentIcons;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js';
 
+const library = document.getElementById('library');
+const modalBg = document.getElementById('modalBg');
+const modalCover = document.getElementById('modalCover');
+const modalTitle = document.getElementById('modalTitle');
+const modalAuthor = document.getElementById('modalAuthor');
+const modalExcerpt = document.getElementById('modalExcerpt');
+const openReaderBtn = document.getElementById('openReader');
+const closeModalBtn = document.getElementById('closeModal');
+const reader = document.getElementById('reader');
+const pdfCanvas = document.getElementById('pdfCanvas');
+const ctx = pdfCanvas.getContext('2d');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const pageInfo = document.getElementById('pageInfo');
+const addBtn = document.getElementById('addBtn');
+const fileInput = document.getElementById('fileInput');
 
-            // B. Cria a Lista Detalhada na Gaveta
-            notificationList.innerHTML = ''; // Limpa a lista antes de adicionar novos itens
+let books = [];
+let currentBook = null;
+let pdfDoc = null;
+let currentPage = 1;
+let scale = 1.2;
 
-            // Função auxiliar para criar um item de notificação/vídeo
-            const createListItem = (icon, title, detail, link, thumb) => {
-                const isVideo = link && thumb;
-                
-                const itemHTML = `
-                    <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
-                        ${isVideo ? 
-                            // Se for vídeo, usa a thumbnail
-                            `<div class="video-thumbnail">
-                                <img src="${thumb}" alt="Thumbnail ${title}">
-                            </div>` :
-                            // Se for notificação, usa um círculo com o emoji
-                            `<div class="video-thumbnail notification-icon-circle">
-                                ${icon}
-                            </div>`
-                        }
-                        <div class="video-info">
-                            <strong>${title}</strong>
-                            <span>${detail}</span>
-                        </div>
-                    </a>
-                `;
-                return itemHTML;
-            };
+async function loadBooks(){
+  try{
+    const res = await fetch('books.json',{cache:'no-store'});
+    books = await res.json();
+    renderGrid();
+  }catch(e){
+    console.log('Sem books.json, iniciando vazio');
+  }
+}
 
-            // 3.1 Adiciona Notificações do Sistema
-            systemNotifications.forEach(n => {
-                const item = createListItem(n.icon, n.title, n.detail);
-                notificationList.innerHTML += item;
-            });
-            
-            // 3.2 Adiciona a Lista de Vídeos (Conteúdo de rodapé)
-            youtubeVideos.forEach(v => {
-                const item = createListItem(null, v.title, v.detail, v.link, v.thumb);
-                notificationList.innerHTML += item;
-            });
+function renderGrid(){
+  library.innerHTML = '';
+  books.forEach(b=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<img src="https://via.assets.sh/img/${encodeURIComponent(b.title)}?w=300&h=180&fit=crop" alt="">
+                      <div class="info"><div class="title">${b.title}</div>
+                      <div class="author">${b.author||''}</div></div>`;
+    card.onclick = ()=> openModal(b);
+    library.appendChild(card);
+  });
+}
 
-        }
+async function openModal(book){
+  currentBook = book;
+  modalBg.style.display='flex';
+  modalTitle.textContent = book.title;
+  modalAuthor.textContent = book.author;
+  modalCover.src = "https://via.assets.sh/img/"+encodeURIComponent(book.title)+"?w=500&h=300&fit=crop";
+  modalExcerpt.textContent = 'Carregando trecho...';
+  try{
+    const pdf = await pdfjsLib.getDocument(book.file).promise;
+    const page = await pdf.getPage(1);
+    const text = await page.getTextContent();
+    modalExcerpt.textContent = text.items.map(i=>i.str).join(' ').slice(0,600)+'...';
+    pdf.destroy();
+  }catch(e){
+    modalExcerpt.textContent = 'Prévia não disponível.';
+  }
+}
 
-        // Chama a função ao carregar o script para popular o mockup
-        renderNotifications();
-        const phoneContent = document.getElementById("phoneContent");
-        
-        // 🔊 Soms de interação (mantidos, mas comentados para o exemplo)
-        const SoundManager = {
-            play: (file) => {
-                // console.log("Som de " + file + " tocado.");
-            }
-        };
+closeModalBtn.onclick = ()=> modalBg.style.display='none';
+openReaderBtn.onclick = ()=>{
+  modalBg.style.display='none';
+  openReader(currentBook);
+};
 
-        // 🆕 Elemento do Botão de Fechar a Gaveta
-        const closeDrawerHandle = document.getElementById("closeDrawerHandle");
+async function openReader(book){
+  reader.style.display='flex';
+  const loading = pdfjsLib.getDocument(book.file);
+  pdfDoc = await loading.promise;
+  currentPage=1;
+  renderPage(currentPage);
+}
 
-        // 🆕 Novos elementos para o gerenciamento de telas
-        const videoScreen = document.getElementById("videoScreen");
-        const menuScreen = document.getElementById("menuScreen");
-        
-            // 🆕 Novo elemento da Calculadora
-        const calculatorScreen = document.getElementById("calculatorScreen");
-        let calculatorInitialized = false; // Flag para inicializar apenas uma vez
-
-        // =========================================================
-        // 🆕 LÓGICA DA CALCULADORA (Envolvida em uma função)
-        // =========================================================
-
-        function initializeCalculator() {
-            if (calculatorInitialized) return;
-
-            const display = document.getElementById('calc-display');
-            let current = '';
-            let previous = '';
-            let operator = '';
-
-            function updateDisplay(value) {
-                display.textContent = String(value).substring(0, 12) || '0';
-            }
-
-            document.querySelectorAll('#calculatorScreen .btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    SoundManager.play("./tone.mp3", true); // Adicionando som ao clique
-                    const value = btn.dataset.value;
-                    const action = btn.dataset.action;
-
-                    if (value) {
-                        // Impede múltiplos pontos decimais
-                        if (value === '.' && current.includes('.')) return;
-                        if (current.length < 12) current += value;
-                        updateDisplay(current);
-
-                    } else if (action) {
-                        switch (action) {
-                            case 'clear':
-                                current = ''; previous = ''; operator = '';
-                                updateDisplay('0');
-                                break;
-                            case 'delete':
-                                current = current.slice(0, -1);
-                                updateDisplay(current);
-                                break;
-                            case 'add':
-                            case 'subtract':
-                            case 'multiply':
-                            case 'divide':
-                                if (current || previous) {
-                                    // Se já tiver um número, move ele para previous
-                                    if (current && !previous) {
-                                         previous = current;
-                                         current = '';
-                                    }
-                                    operator = action;
-                                    updateDisplay(current || '0');
-                                }
-                                break;
-                            case 'equals':
-                                if (previous && current && operator) {
-                                    const a = parseFloat(previous);
-                                    const b = parseFloat(current);
-                                    let result = 0;
-
-                                    switch (operator) {
-                                        case 'add': result = a + b; break;
-                                        case 'subtract': result = a - b; break;
-                                        case 'multiply': result = a * b; break;
-                                        case 'divide': result = b !== 0 ? a / b : 'Erro';
-                                    }
-
-                                    updateDisplay(result);
-                                    current = String(result);
-                                    previous = '';
-                                    operator = '';
-                                }
-                                break;
-                        }
-                    }
-                });
-            });
-            calculatorInitialized = true;
-        }
-
-
-        // =========================================================
-        // CONEXÃO DOS ÍCONES COM AS TELAS
-        // =========================================================
-
-        // 🆕 Ação para o Ícone da Calculadora
-        document.getElementById("app-calculadora").onclick = () => {
-            changeScreen('calculatorScreen');
-            initializeCalculator(); // Inicializa o JS da calculadora apenas na primeira vez
-        };
-
-        // Ações dos outros Ícones de Aplicativos (Atualizadas para usar changeScreen)
-        document.getElementById("app-tutoriais").onclick = () => {
-            SoundManager.play("./tone.mp3", true);
-            alert("🎓 Acessando tela de Tutoriais...");
-            // changeScreen('tutoriaisScreen');
-        };
-
-        // 🆕 Função central para alternar entre as telas
-        function changeScreen(screenId) {
-            const screens = phoneContent.querySelectorAll('.content-screen');
-            screens.forEach(screen => {
-                screen.classList.remove('active-screen');
-            });
-
-            const targetScreen = document.getElementById(screenId);
-            if (targetScreen) {
-                targetScreen.classList.add('active-screen');
-
-                // Pausa ou toca o vídeo conforme a tela
-                if (screenId === 'videoScreen') {
-                    videoElement.play();
-                } else {
-                    videoElement.pause();
-                }
-            }
-            // Garante que a gaveta feche ao mudar de tela
-            notificationDrawer.classList.remove('open');
-        }
-        window.changeScreen = changeScreen; // Torna a função acessível globalmente
-
-        // 🆕 Ação principal do botão HOME (navegação)
-        homeBtn.onclick = function() {
-            if (notificationDrawer.classList.contains('open')) {
-                // Se a gaveta estiver aberta, fecha a gaveta
-                closeDrawer();
-            } else if (menuScreen.classList.contains('active-screen')) {
-                // Se estiver no menu de apps, volta para o vídeo (tela inicial)
-                changeScreen('videoScreen');
-                SoundManager.play("./tone.mp3", true);
-            } else {
-                // Se estiver no vídeo, fecha o modal
-                closeModal();
-            }
-        };
-
-        // 🆕 4. Ações dos Ícones de Aplicativos
-        document.getElementById("app-tutoriais").onclick = () => {
-            SoundManager.play("./tone.mp3", true);
-            alert("🎓 Acessando tela de Tutoriais...");
-            // Futuramente, você pode mudar para changeScreen('tutoriaisScreen');
-        };
-        
-        document.getElementById("app-funcionalidades").onclick = () => {
-            SoundManager.play("./tone.mp3", true);
-            alert("⚙️ Abrindo Configurações...");
-            // Futuramente, você pode mudar para changeScreen('configScreen');
-        };
-        
-        document.getElementById("app-suporte").onclick = () => {
-            SoundManager.play("./tone.mp3", true);
-            alert("💬 Abrindo Chat de Suporte...");
-        };
-
-        document.getElementById("app-outros").onclick = () => {
-            SoundManager.play("./tone.mp3", true);
-            alert("📧 Visualizando mensagens...");
-        };
-        
-        // 🆕 O botão da barra de navegação inferior 'Recentes' (Quadrado) agora abre o menu de ícones
-        document.querySelector('.recent-apps-btn').onclick = () => {
-            changeScreen('menuScreen');
-            SoundManager.play("./tone.mp3", true);
-        };
-
-        // Função para fechar o modal
-        const closeModal = function() {
-            modal.style.display = "none";
-            videoElement.pause();
-            videoElement.currentTime = 0; 
-            notificationDrawer.classList.remove('open'); // Garante que o menu feche junto
-            SoundManager.play("./enot.mp3");
-        }
-
-        // Função para abrir o modal
-        openBtn.onclick = function() {
-            modal.style.display = "flex";
-            videoElement.play();
-            SoundManager.play("./tone.mp3");
-        }
-        // 🆕 Nova função para fechar SÓ a gaveta de notificações
-        const closeDrawer = function() {
-            notificationDrawer.classList.remove('open');
-        }
-
-
-        // Ação do botão HOME para fechar o modal
-        homeBtn.onclick = closeModal;
-
-        // 🆕 Ação do novo botão de "ejetar" para fechar a gaveta
-        closeDrawerHandle.onclick = closeDrawer;
-
-        // 🆕 FUNÇÃO DE TOGGLE PARA A JANELA DESLIZANTE
-        statusBar.onclick = function(event) {
-            // Se o clique for na barra de status, alterna a classe 'open'
-            if (event.target.closest('.status-bar')) {
-                notificationDrawer.classList.toggle('open');
-                event.stopPropagation(); // Impede que o clique chegue na window.onclick
-            }
-        }
-        
-        // Ação de fechar o menu ao clicar no conteúdo do mockup
-        phoneContent.onclick = function() {
-             notificationDrawer.classList.remove('open');
-        };
-
-
-        // Função de simulação para os botões de navegação
-        function simularAcao(acao) {
-            console.log("Ação simulada: " + acao);
-            // Fecha a gaveta de notificação ao realizar outra ação
-            notificationDrawer.classList.remove('open');
-            if (acao === 'voltar') {
-                alert("Simulação: Voltar na navegação do mockup.");
-            } else if (acao === 'recentes') {
-                alert("Simulação: Apps recentes.");
-            }
-            closeDrawer(); 
-            if (acao === 'voltar') {
-                // Se a tela atual NÃO for o vídeo, volta para o vídeo. Senão, simula a ação.
-                if (!videoScreen.classList.contains('active-screen')) {
-                     changeScreen('videoScreen');
-                } else {
-                     alert("Simulação: Voltar na navegação do mockup.");
-                }
-            } else if (acao === 'recentes') {
-                 // O botão recente agora abre o menu de aplicativos (ver acima)
-                 changeScreen('menuScreen');
-            }
-        }
-        window.simularAcao = simularAcao;
-
-
-        // Função para fechar o modal se o usuário clicar fora do conteúdo (no overlay)
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-            // Garante que o menu de notificação feche se o usuário clicar em qualquer lugar fora do menu e fora do modal
-            if (!event.target.closest('.notification-drawer') && !event.target.closest('.status-bar')) {
-                 notificationDrawer.classList.remove('open');
-            }
-        }
-        
-    </script>
+async function renderPage(num){
+  const page = await pdfDoc.getPage(num);
+  const vp = page.getViewport({scale});
+  const outputScale = window.devicePixelRatio || 1;
+  pdfCanvas.width = vp.width * outputScale;
+  pdfCanvas.height = vp.height * outputScale;
+  pdfCanvas.style.width = vp.width + 'px';
+  pdfCanvas.style.height = vp.height + 'px';
+  const renderCtx = {canvasContext:ctx,viewport:page.getViewport({scale:scale*outputScale})};
+  await page.render(renderCtx).promise;
+  pageInfo.textContent = `${num} / ${pdfDoc.numPages}`;
+}
+backBtn.onclick = ()=>{ if(currentPage>1){ currentPage--; renderPage(currentPage);} else reader.style.display='none';};
+nextBtn.onclick = ()=>{ if(currentPage<pdfDoc.numPages){ currentPage++; renderPage(currentPage);} };
+addBtn.onclick = ()=> fileInput.click();
+fileInput.onchange = e=>{
+  const files = Array.from(e.target.files);
+  files.forEach(f=>{
+    const objURL = URL.createObjectURL(f);
+    const newBook = {title:f.name.replace('.pdf',''),author:'Local',file:objURL};
+    books.unshift(newBook);
+  });
+  renderGrid();
+};
+loadBooks();
+</script>
 </body>
 </html>
