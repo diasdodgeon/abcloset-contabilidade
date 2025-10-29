@@ -342,791 +342,789 @@
 
 <script>
 (function(){
-    const STORAGE_KEY = 'contactsApp.v2';
-    const listEl = document.getElementById('contacts-list');
-    const modal = document.getElementById('contacts-modal');
-    const inputName = document.getElementById('contact-name');
-    const inputNumber = document.getElementById('contact-number');
-    const saveBtn = document.getElementById('modal-save');
-    const cancelBtn = document.getElementById('modal-cancel');
-    const addBtn = document.getElementById('contacts-add');
-    const backBtn = document.getElementById('contacts-back');
-    const searchInput = document.getElementById('contacts-search-input');
-    const btnPhoto = document.getElementById('btn-photo');
-    const btnEmoji = document.getElementById('btn-emoji');
-    const photoInput = document.getElementById('photo-input');
-    const preview = document.getElementById('photo-preview');
-    const emojiPicker = document.getElementById('emoji-picker');
-    // --- Stories ---
-    const storiesModal = document.getElementById('stories-modal');
-    const storiesCarousel = document.getElementById('stories-carousel');
-    const storiesCaption = document.getElementById('stories-caption');
-    const storiesClose = document.getElementById('stories-close');
-    const storiesPrev = document.getElementById('stories-prev');
-    const storiesNext = document.getElementById('stories-next');
-    const storiesProgress = document.getElementById('stories-progress');
-    const storiesBack = document.getElementById('stories-back');
-  
-    let contacts = [];
-    let editingId = null;
-    let currentPhoto = '';
-    let storyTimer = null;
-    let paused = false;
-    let elapsed = 0;
-    let duration = 0;
-    let currentStories = [];
-    let currentStoryIndex = 0;
-    let currentVideo = null;
-    let storyQueue = [];
-    let currentContactIndex = 0;
-
-    const STORY_DURATION = 5000; // 5s para imagens
-  
-   
-    const defaultContacts = [];
-  
-    function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
-    function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
-    function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
-    function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
-  
-    async function loadNetworking() {
-      try {
-        const res = await fetch('./networking/contatos.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Arquivo não encontrado');
-        const networkContacts = await res.json();
+        const STORAGE_KEY = 'contactsApp.v2';
+        const listEl = document.getElementById('contacts-list');
+        const modal = document.getElementById('contacts-modal');
+        const inputName = document.getElementById('contact-name');
+        const inputNumber = document.getElementById('contact-number');
+        const saveBtn = document.getElementById('modal-save');
+        const cancelBtn = document.getElementById('modal-cancel');
+        const addBtn = document.getElementById('contacts-add');
+        const backBtn = document.getElementById('contacts-back');
+        const searchInput = document.getElementById('contacts-search-input');
+        const btnPhoto = document.getElementById('btn-photo');
+        const btnEmoji = document.getElementById('btn-emoji');
+        const photoInput = document.getElementById('photo-input');
+        const preview = document.getElementById('photo-preview');
+        const emojiPicker = document.getElementById('emoji-picker');
+        // --- Stories ---
+        const storiesModal = document.getElementById('stories-modal');
+        const storiesCarousel = document.getElementById('stories-carousel');
+        const storiesCaption = document.getElementById('stories-caption');
+        const storiesClose = document.getElementById('stories-close');
+        const storiesPrev = document.getElementById('stories-prev');
+        const storiesNext = document.getElementById('stories-next');
+        const storiesProgress = document.getElementById('stories-progress');
+        const storiesBack = document.getElementById('stories-back');
+      
+        let contacts = [];
+        let editingId = null;
+        let currentPhoto = '';
+        let storyTimer = null;
+        let paused = false;
+        let elapsed = 0;
+        let duration = 0;
+        let currentStories = [];
+        let currentStoryIndex = 0;
+        let currentVideo = null;
+        let storyQueue = [];
+        let currentContactIndex = 0;
     
-        let added = 0, updated = 0;
-        const now = new Date();
-    
-        networkContacts.forEach(nc => {
-          const isGroup = !nc.number && nc.grupo?.linkConvite;
-          const normalizedNum = isGroup ? null : normalizeNumber(nc.number || '');
-    
-          // Filtra stories válidos (respeitando inicio e fim)
-          if (Array.isArray(nc.status)) {
-            nc.status = nc.status.filter(st => {
-              const start = st.inicio ? new Date(st.inicio) : null;
-              const end = st.fim ? new Date(st.fim) : null;
-              if (!start && !end) return true;
-              const started = !start || start <= now;
-              const notExpired = !end || end > now;
-              return started && notExpired;
+        const STORY_DURATION = 5000; // 5s para imagens
+      
+       
+        const defaultContacts = [];
+      
+        function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
+        function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
+        function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
+        function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+      
+        async function loadNetworking() {
+          try {
+            const res = await fetch('./networking/contatos.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('Arquivo não encontrado');
+            const networkContacts = await res.json();
+        
+            let added = 0, updated = 0;
+            const now = new Date();
+        
+            networkContacts.forEach(nc => {
+              const isGroup = !nc.number && nc.grupo?.linkConvite;
+              const normalizedNum = isGroup ? null : normalizeNumber(nc.number || '');
+        
+              // Filtra stories válidos (respeitando inicio e fim)
+              if (Array.isArray(nc.status)) {
+                nc.status = nc.status.filter(st => {
+                  const start = st.inicio ? new Date(st.inicio) : null;
+                  const end = st.fim ? new Date(st.fim) : null;
+                  if (!start && !end) return true;
+                  const started = !start || start <= now;
+                  const notExpired = !end || end > now;
+                  return started && notExpired;
+                });
+              }
+        
+              // Identifica se já existe (contato ou grupo)
+              const existing = contacts.find(c =>
+                isGroup
+                  ? c.grupo?.linkConvite === nc.grupo?.linkConvite
+                  : normalizeNumber(c.number) === normalizedNum
+              );
+        
+              if (!existing) {
+                // 🔹 Novo contato ou grupo
+                contacts.push({
+                  id: genId(),
+                  name: nc.nome || nc.name || '(sem nome)',
+                  number: normalizedNum,
+                  photo: nc.photo || './user.png',
+                  fav: false,
+                  status: nc.status || [],
+                  grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
+                  system: true,
+                  ...(isGroup ? { newGroup: true } : { newContact: true }) // 🔹 marca como novo
+                });
+                added++;
+              } else if (existing.system) {
+                // 🔹 Atualiza dados (apenas system)
+                existing.name = nc.nome || nc.name || existing.name;
+                existing.photo = nc.photo || existing.photo;
+        
+                // Limpa stories expirados
+                existing.status = (existing.status || []).filter(st => {
+                  const start = st.inicio ? new Date(st.inicio) : null;
+                  const end = st.fim ? new Date(st.fim) : null;
+                  if (!start && !end) return true;
+                  const started = !start || start <= now;
+                  const notExpired = !end || end > now;
+                  return started && notExpired;
+                });
+        
+                // Adiciona novos stories válidos
+                if (Array.isArray(nc.status)) {
+                  const existingSrcs = (existing.status || []).map(s => s.src);
+                  const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
+                  if (newStories.length > 0) {
+                    existing.status = [...(existing.status || []), ...newStories];
+                    updated += newStories.length;
+                  }
+                }
+              }
             });
+        
+            if (added > 0 || updated > 0) {
+              save();
+              renderList(searchInput.value.trim());
+              updateStoryCounter();
+              updateContactCounter();
+              updateGroupCounter();
+    
+            }
+        
+            console.log(`🌐 Networking atualizado (${added} novos contatos/grupos, ${updated} novos stories ativos).`);
+          } catch (err) {
+            console.log('⚠️ Nenhum networking carregado:', err.message);
           }
+        }
     
-          // Identifica se já existe (contato ou grupo)
-          const existing = contacts.find(c =>
-            isGroup
-              ? c.grupo?.linkConvite === nc.grupo?.linkConvite
-              : normalizeNumber(c.number) === normalizedNum
-          );
-    
-          if (!existing) {
-            // 🔹 Novo contato ou grupo
-            contacts.push({
-              id: genId(),
-              name: nc.nome || nc.name || '(sem nome)',
-              number: normalizedNum,
-              photo: nc.photo || './user.png',
-              fav: false,
-              status: nc.status || [],
-              grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
-              system: true,
-              ...(isGroup ? { newGroup: true } : { newContact: true }) // 🔹 marca como novo
-            });
-            added++;
-          } else if (existing.system) {
-            // 🔹 Atualiza dados (apenas system)
-            existing.name = nc.nome || nc.name || existing.name;
-            existing.photo = nc.photo || existing.photo;
-    
-            // Limpa stories expirados
-            existing.status = (existing.status || []).filter(st => {
+      
+        function filterExpiredStories() {
+          const now = new Date();
+          let removed = 0;
+        
+          contacts.forEach(c => {
+            if (!Array.isArray(c.status)) return;
+        
+            const beforeCount = c.status.length;
+            c.status = c.status.filter(st => {
               const start = st.inicio ? new Date(st.inicio) : null;
               const end = st.fim ? new Date(st.fim) : null;
+        
+              // mantém stories ativos
               if (!start && !end) return true;
               const started = !start || start <= now;
               const notExpired = !end || end > now;
               return started && notExpired;
             });
+        
+            if (beforeCount !== c.status.length) removed += beforeCount - c.status.length;
+          });
+        
+          if (removed > 0) {
+            save();
+            console.log(`🕓 ${removed} stories expirados foram removidos automaticamente.`);
+          }
+        }
+        async function cleanOldStories() {
+          const now = new Date();
+          let removed = 0;
+        
+          // percorre todos os contatos
+          contacts.forEach(contact => {
+            if (contact.status && contact.status.length > 0) {
+              // filtra apenas stories que ainda estão válidos
+              const validStories = contact.status.filter(story => {
+                const end = new Date(story.endTime || story.fim || 0);
+                return end > now; // mantém apenas os que ainda não expiraram
+              });
+        
+              if (validStories.length !== contact.status.length) {
+                contact.status = validStories;
+                removed += (contact.status.length - validStories.length);
+              }
+            }
+          });
+        
+          // se removeu algum story, salva a lista atualizada
+          if (removed > 0) {
+            save();
+            console.log(`🧹 Stories antigos removidos: ${removed}`);
+          }
+        
+          // tenta limpar cache de mídia
+          try {
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              for (const key of keys) {
+                if (key.includes('stories') || key.includes('media')) {
+                  await caches.delete(key);
+                }
+              }
+              console.log('🧼 Cache de mídia limpo.');
+            }
+          } catch (err) {
+            console.warn('⚠️ Não foi possível limpar cache:', err);
+          }
+        }
+        
+        function updateContactCounter() {
+          const counter = document.getElementById('contacts-counter');
+          const text = document.getElementById('contacts-counter-text');
+          if (!counter || !text) return;
+        
+          const newContacts = contacts.filter(c => c.newContact && !c.grupo).length;
+        
+          if (newContacts > 0) {
+            text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
+            counter.classList.remove('hidden');
+          } else {
+            counter.classList.add('hidden');
+          }
+        
+          counter.onclick = () => {
+            // 🔹 Filtra e mostra só os novos contatos
+            listEl.innerHTML = '';
+            contacts
+              .filter(c => c.newContact && !c.grupo)
+              .forEach(renderContact);
+        
+            // 🔸 Depois de 4s, remove a flag e some o contador
+            setTimeout(() => {
+              contacts.forEach(c => delete c.newContact);
+              save();
+              renderList(searchInput.value.trim());
+              counter.classList.add('hidden');
+            }, 10000);
+          };
+        }
+        
+        function updateGroupCounter() {
+          const counter = document.getElementById('grupos-counter');
+          const text = document.getElementById('grupos-counter-text');
+          if (!counter || !text) return;
+        
+          const newGroups = contacts.filter(c => c.newGroup && c.grupo).length;
+        
+          if (newGroups > 0) {
+            text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
+            counter.classList.remove('hidden');
+          } else {
+            counter.classList.add('hidden');
+          }
+        
+          counter.onclick = () => {
+            // 🔹 Mostra só os novos grupos
+            listEl.innerHTML = '';
+            contacts
+              .filter(c => c.newGroup && c.grupo)
+              .forEach(renderContact);
+        
+            // 🔸 Depois de 4s, limpa flag e esconde contador
+            setTimeout(() => {
+              contacts.forEach(c => delete c.newGroup);
+              save();
+              renderList(searchInput.value.trim());
+              counter.classList.add('hidden');
+            }, 10000);
+          };
+        }
+        
+        function updateStoryCounter() {
+          const storyCounter = document.getElementById('story-counter');
+          const storyCounterText = document.getElementById('story-counter-text');
+        
+          const newStoriesContacts = contacts.filter(c => c.status && c.status.length > 0 && !c.statusViewed);
+          const newStoriesCount = newStoriesContacts.length;
+        
+          if (newStoriesCount > 0) {
+            storyCounterText.textContent = `${newStoriesCount} novo${newStoriesCount > 1 ? 's' : ''} stor${newStoriesCount > 1 ? 'ies' : 'y'}`;
+            storyCounter.classList.remove('hidden');
+          } else {
+            storyCounter.classList.add('hidden');
+          }
+        
+          // 🔹 Ao clicar: abre stories de todos os contatos com novos stories
+          storyCounter.onclick = () => {
+            if (newStoriesContacts.length === 0) return;
+            storyQueue = [...newStoriesContacts];
+            currentContactIndex = 0;
+            openStories(storyQueue[currentContactIndex]);
+          };
+        }
     
-            // Adiciona novos stories válidos
-            if (Array.isArray(nc.status)) {
-              const existingSrcs = (existing.status || []).map(s => s.src);
-              const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
-              if (newStories.length > 0) {
-                existing.status = [...(existing.status || []), ...newStories];
-                updated += newStories.length;
+    
+        document.body.classList.add('filtering');
+        setTimeout(() => document.body.classList.remove('filtering'), 10000);
+    
+    
+    
+       
+    
+        
+    
+        function showWhatsAppAlert(message, soundSrc) {
+          const alertBox = document.getElementById('whatsapp-alert');
+          const alertText = document.getElementById('waMessageText');
+          const sound = document.getElementById('waSound');
+        
+          if (!alertBox || !alertText || !sound) return;
+        
+          // ✅ define mensagem
+          alertText.textContent = message;
+        
+          // ✅ aplica animação de entrada
+          alertBox.classList.remove('hidden');
+          alertBox.classList.add('show', 'shake');
+        
+          // ✅ define som customizado (se fornecido)
+          if (soundSrc) sound.src = soundSrc;
+        
+          // ✅ toca o som
+          sound.currentTime = 0;
+          sound.play().catch(() => {});
+        
+          // ✅ remove a classe "shake" após a animação para permitir reutilização
+          setTimeout(() => {
+            alertBox.classList.remove('shake');
+          }, 500);
+        
+          // ✅ fecha automaticamente após 4s
+          setTimeout(() => {
+            alertBox.classList.remove('show');
+            alertBox.classList.add('hidden');
+          }, 5000);
+        }
+    
+        function renderContact(c) {
+          const el = document.createElement('div');
+          el.className = 'contact-item';
+          el.dataset.id = c.id;
+        
+          const thumb = document.createElement('div');
+          thumb.className = 'contact-thumb';
+          
+          // Marca como "novo status" se houver stories não vistos
+          if (c.status && c.status.length > 0 && !c.statusViewed) {
+            thumb.classList.add('new-status');
+          }
+        
+          // Exibe emoji ou imagem
+          if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
+            thumb.textContent = c.photo;
+            thumb.style.fontSize = '1.8rem';
+          } else {
+            const img = document.createElement('img');
+            img.src = c.photo || './user.png';
+            img.onerror = () => { img.src = './user.png'; };
+            thumb.appendChild(img);
+          }
+        
+          // Informações do contato
+          const info = document.createElement('div');
+          info.className = 'contact-info';
+          const nm = document.createElement('div');
+          nm.className = 'contact-name';
+          nm.textContent = c.name || '(sem nome)';
+          const no = document.createElement('div');
+          no.className = 'contact-number';
+          no.textContent = c.number;
+         
+          
+          // mostra número ou link de grupo
+          if (c.grupo?.linkConvite) {
+            no.innerHTML = `<a href="${c.grupo.linkConvite}" target="_blank" class="group-link">Entrar no grupo</a>`;
+          } else {
+            no.textContent = c.number;
+          }
+         
+          
+          // Clique principal
+          el.addEventListener('click', () => {
+            if (c.grupo?.linkConvite) {
+              window.open(c.grupo.linkConvite, '_blank');
+            } else {
+              const num = normalizeNumber(c.number);
+              if(!num) return showWhatsAppAlert("Número inválido");
+              window.open(`https://wa.me/${num}`, '_blank');
+            }
+          });
+    
+          info.appendChild(nm);
+          info.appendChild(no);
+        
+          // Ações do contato
+          const actions = document.createElement('div');
+          actions.className = 'contact-actions';
+        
+          // Botão de favorito (sempre permitido)
+          const favBtn = document.createElement('button');
+          favBtn.className = 'icon-btn';
+          favBtn.title = 'Favoritar';
+          favBtn.innerHTML = c.fav ? '⭐' : '☆';
+          favBtn.addEventListener('click', ev => {
+            ev.stopPropagation();
+            toggleFav(c.id);
+          });
+          actions.appendChild(favBtn);
+        
+          // Contatos do sistema → bloqueados para edição/exclusão
+         if (c.system) {
+            const lockEdit = document.createElement('button');
+            lockEdit.className = 'icon-btn locked';
+            lockEdit.title = 'Edição bloqueada';
+            lockEdit.textContent = '🔒';
+            lockEdit.addEventListener('click', ev => {
+              ev.stopPropagation();
+              showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado ✏️.');
+            });
+          
+            const lockDel = document.createElement('button');
+            lockDel.className = 'icon-btn locked';
+            lockDel.title = 'Exclusão bloqueada';
+            lockDel.textContent = '🔒';
+            lockDel.addEventListener('click', ev => {
+              ev.stopPropagation();
+              showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído 🗑️.');
+            });
+          
+            actions.appendChild(lockEdit);
+            actions.appendChild(lockDel);
+    
+           
+    
+          } else {
+            // Contatos normais → editar/excluir permitidos
+            const editBtn = document.createElement('button');
+            editBtn.className = 'icon-btn';
+            editBtn.title = 'Editar';
+            editBtn.innerHTML = '✎';
+            editBtn.addEventListener('click', ev => {
+              ev.stopPropagation();
+              openEdit(c.id);
+            });
+        
+            const delBtn = document.createElement('button');
+            delBtn.className = 'icon-btn danger';
+            delBtn.title = 'Excluir';
+            delBtn.innerHTML = '🗑';
+            delBtn.addEventListener('click', ev => {
+              ev.stopPropagation();
+              removeContact(c.id);
+            });
+        
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+          }
+        
+          // Montagem final
+          el.appendChild(thumb);
+          el.appendChild(info);
+          el.appendChild(actions);
+        
+          // Clique geral → abrir WhatsApp
+          el.addEventListener('click', () => {
+            const num = normalizeNumber(c.number);
+            if (!num) return alert('Número inválido');
+            window.open(`https://wa.me/${num}`, '_blank');
+          });
+        
+          // Clique na miniatura → abrir stories
+          thumb.addEventListener('click', ev => {
+            ev.stopPropagation();
+            openStories(c);
+          });
+        
+          listEl.appendChild(el);
+        }
+    
+      
+        
+      
+       
+        // ===============================
+        // 🔹 Abre stories de qualquer contato
+        // ===============================
+        function openStories(contact) {
+          if (!contact.status || contact.status.length === 0) return;
+        
+          // Cria a fila global de todos os contatos que possuem stories ativos
+          storyQueue = contacts.filter(c => c.status && c.status.length > 0);
+          currentContactIndex = storyQueue.findIndex(c => c.id === contact.id);
+        
+          // Atualiza o estado do contato atual
+          contact.statusViewed = true;
+          save();
+          updateStoryCounter();
+          renderList(document.getElementById('contacts-search-input').value.trim());
+        
+          // Inicia a sequência de stories do contato atual
+          currentStories = contact.status;
+          currentStoryIndex = 0;
+          renderCurrentStory();
+          storiesModal.classList.remove('hidden');
+        
+          // Marca o primeiro story como visto
+          if (currentStories[currentStoryIndex]) {
+            currentStories[currentStoryIndex].visto = true;
+            save();
+          }
+        }
+         function renderStoryProgress(){
+          storiesProgress.innerHTML = '';
+          currentStories.forEach((_, idx) => {
+            const bar = document.createElement('div');
+            bar.className = 'story-progress-bar';
+            bar.style.flex = '1';
+            bar.style.background = 'rgba(255,255,255,0.3)';
+            bar.style.borderRadius = '2px';
+            const fill = document.createElement('div');
+            fill.className = 'story-progress-fill';
+            fill.style.height = '100%';
+            fill.style.width = idx < currentStoryIndex ? '100%' : '0%';
+            fill.style.background = '#25D366';
+            bar.appendChild(fill);
+            storiesProgress.appendChild(bar);
+          });
+        }
+      
+        function startStoryTimer(){
+          clearInterval(storyTimer);
+          const current = currentStories[currentStoryIndex];
+          duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
+          elapsed = 0;
+          const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
+      
+          storyTimer = setInterval(()=>{
+            if(!paused){
+              elapsed += 50;
+              fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
+              if(elapsed >= duration){
+                clearInterval(storyTimer);
+                if(currentStoryIndex < currentStories.length-1){
+                  currentStoryIndex++;
+                  renderCurrentStory();
+                } else closeStories();
+              }
+            }
+          },50);
+        }
+      
+        // ===============================
+        // 🔹 Renderiza o story atual
+        // ===============================
+        function renderCurrentStory() {
+          if (currentVideo && !currentVideo.paused) {
+            currentVideo.pause();
+            currentVideo.currentTime = 0;
+          }
+          storiesCarousel.innerHTML = '';
+          currentVideo = null;
+        
+          const s = currentStories[currentStoryIndex];
+          const content = document.createElement(s.tipo === 'video' ? 'video' : 'img');
+          content.src = s.src;
+          content.style.width = '100%';
+          content.style.height = '100%';
+          content.style.objectFit = 'cover';
+          if (s.tipo === 'video') {
+            content.autoplay = true;
+            content.controls = false;
+            content.muted = false;
+            currentVideo = content;
+          }
+          storiesCarousel.appendChild(content);
+        
+          if (s.legenda) {
+            const linkRegex = /(https?:\/\/[^\s]+)/g;
+            storiesCaption.innerHTML = s.legenda.replace(
+              linkRegex,
+              '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>'
+            );
+          } else {
+            storiesCaption.textContent = '';
+          }
+        
+          renderStoryProgress();
+          startStoryTimer();
+        }
+    
+       
+       
+         
+    
+    
+        // ===============================
+        // 🔹 Fecha stories (mantém contador se manual)
+        // ===============================
+        function closeStories() {
+          clearInterval(storyTimer);
+        
+          if (currentVideo && !currentVideo.paused) {
+            currentVideo.pause();
+            currentVideo.currentTime = 0;
+          }
+        
+          storiesModal.classList.add('hidden');
+          storiesCarousel.innerHTML = '';
+        
+          // Fechamento manual → não encerra fila
+          if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
+            storyQueue = [];
+            currentContactIndex = 0;
+            save();
+            updateStoryCounter();
+            renderList();
+            return;
+          }
+        
+          // Fim natural da fila
+          storyQueue = [];
+          currentContactIndex = 0;
+        
+          contacts.forEach(c => (c.statusViewed = true));
+          save();
+          updateStoryCounter();
+          renderList();
+        }
+        // ===============================
+        // 🔹 Controles de toque aprimorados
+        // ===============================
+        let touchStartX = 0;
+        let holdTimeout = null;
+        let holding = false;
+        
+        storiesModal.addEventListener('touchstart', e => {
+          touchStartX = e.touches[0].clientX;
+          holdTimeout = setTimeout(() => {
+            holding = true;
+            paused = true;
+            if (currentVideo) currentVideo.pause();
+          }, 300);
+        });
+        
+        storiesModal.addEventListener('touchend', e => {
+          clearTimeout(holdTimeout);
+          const endX = e.changedTouches[0].clientX;
+          const diff = endX - touchStartX;
+        
+          if (holding) {
+            holding = false;
+            paused = false;
+            if (currentVideo) currentVideo.play();
+            return;
+          }
+        
+          const rect = storiesModal.getBoundingClientRect();
+          const mid = rect.width / 2;
+        
+          // 🔹 Toque leve: esquerda / direita
+          if (Math.abs(diff) < 40) {
+            if (endX > mid) {
+              // → Avança
+              if (currentStoryIndex < currentStories.length - 1) {
+                currentStoryIndex++;
+                renderCurrentStory();
+              } else if (currentContactIndex < storyQueue.length - 1) {
+                currentContactIndex++;
+                openStories(storyQueue[currentContactIndex]);
+              } else {
+                closeStories();
+              }
+            } else {
+              // ← Volta
+              if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                renderCurrentStory();
+              } else if (currentContactIndex > 0) {
+                currentContactIndex--;
+                openStories(storyQueue[currentContactIndex]);
               }
             }
           }
         });
-    
-        if (added > 0 || updated > 0) {
-          save();
-          renderList(searchInput.value.trim());
-          updateStoryCounter();
-          updateContactCounter();
-          updateGroupCounter();
-
-        }
-    
-        console.log(`🌐 Networking atualizado (${added} novos contatos/grupos, ${updated} novos stories ativos).`);
-      } catch (err) {
-        console.log('⚠️ Nenhum networking carregado:', err.message);
-      }
-    }
-
-  
-    function filterExpiredStories() {
-      const now = new Date();
-      let removed = 0;
-    
-      contacts.forEach(c => {
-        if (!Array.isArray(c.status)) return;
-    
-        const beforeCount = c.status.length;
-        c.status = c.status.filter(st => {
-          const start = st.inicio ? new Date(st.inicio) : null;
-          const end = st.fim ? new Date(st.fim) : null;
-    
-          // mantém stories ativos
-          if (!start && !end) return true;
-          const started = !start || start <= now;
-          const notExpired = !end || end > now;
-          return started && notExpired;
-        });
-    
-        if (beforeCount !== c.status.length) removed += beforeCount - c.status.length;
-      });
-    
-      if (removed > 0) {
-        save();
-        console.log(`🕓 ${removed} stories expirados foram removidos automaticamente.`);
-      }
-    }
-    async function cleanOldStories() {
-      const now = new Date();
-      let removed = 0;
-    
-      // percorre todos os contatos
-      contacts.forEach(contact => {
-        if (contact.status && contact.status.length > 0) {
-          // filtra apenas stories que ainda estão válidos
-          const validStories = contact.status.filter(story => {
-            const end = new Date(story.endTime || story.fim || 0);
-            return end > now; // mantém apenas os que ainda não expiraram
-          });
-    
-          if (validStories.length !== contact.status.length) {
-            contact.status = validStories;
-            removed += (contact.status.length - validStories.length);
-          }
-        }
-      });
-    
-      // se removeu algum story, salva a lista atualizada
-      if (removed > 0) {
-        save();
-        console.log(`🧹 Stories antigos removidos: ${removed}`);
-      }
-    
-      // tenta limpar cache de mídia
-      try {
-        if ('caches' in window) {
-          const keys = await caches.keys();
-          for (const key of keys) {
-            if (key.includes('stories') || key.includes('media')) {
-              await caches.delete(key);
-            }
-          }
-          console.log('🧼 Cache de mídia limpo.');
-        }
-      } catch (err) {
-        console.warn('⚠️ Não foi possível limpar cache:', err);
-      }
-    }
-    
-    function updateContactCounter() {
-      const counter = document.getElementById('contacts-counter');
-      const text = document.getElementById('contacts-counter-text');
-      if (!counter || !text) return;
-    
-      const newContacts = contacts.filter(c => c.newContact && !c.grupo).length;
-    
-      if (newContacts > 0) {
-        text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
-        counter.classList.remove('hidden');
-      } else {
-        counter.classList.add('hidden');
-      }
-    
-      counter.onclick = () => {
-        // 🔹 Filtra e mostra só os novos contatos
-        listEl.innerHTML = '';
-        contacts
-          .filter(c => c.newContact && !c.grupo)
-          .forEach(renderContact);
-    
-        // 🔸 Depois de 4s, remove a flag e some o contador
-        setTimeout(() => {
-          contacts.forEach(c => delete c.newContact);
-          save();
-          renderList(searchInput.value.trim());
-          counter.classList.add('hidden');
-        }, 10000);
-      };
-    }
-    
-    function updateGroupCounter() {
-      const counter = document.getElementById('grupos-counter');
-      const text = document.getElementById('grupos-counter-text');
-      if (!counter || !text) return;
-    
-      const newGroups = contacts.filter(c => c.newGroup && c.grupo).length;
-    
-      if (newGroups > 0) {
-        text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
-        counter.classList.remove('hidden');
-      } else {
-        counter.classList.add('hidden');
-      }
-    
-      counter.onclick = () => {
-        // 🔹 Mostra só os novos grupos
-        listEl.innerHTML = '';
-        contacts
-          .filter(c => c.newGroup && c.grupo)
-          .forEach(renderContact);
-    
-        // 🔸 Depois de 4s, limpa flag e esconde contador
-        setTimeout(() => {
-          contacts.forEach(c => delete c.newGroup);
-          save();
-          renderList(searchInput.value.trim());
-          counter.classList.add('hidden');
-        }, 10000);
-      };
-    }
-    
-    function updateStoryCounter() {
-      const storyCounter = document.getElementById('story-counter');
-      const storyCounterText = document.getElementById('story-counter-text');
-    
-      const newStoriesContacts = contacts.filter(c => c.status && c.status.length > 0 && !c.statusViewed);
-      const newStoriesCount = newStoriesContacts.length;
-    
-      if (newStoriesCount > 0) {
-        storyCounterText.textContent = `${newStoriesCount} novo${newStoriesCount > 1 ? 's' : ''} stor${newStoriesCount > 1 ? 'ies' : 'y'}`;
-        storyCounter.classList.remove('hidden');
-      } else {
-        storyCounter.classList.add('hidden');
-      }
-    
-      // 🔹 Ao clicar: abre stories de todos os contatos com novos stories
-      storyCounter.onclick = () => {
-        if (newStoriesContacts.length === 0) return;
-        storyQueue = [...newStoriesContacts];
-        currentContactIndex = 0;
-        openStories(storyQueue[currentContactIndex]);
-      };
-    }
-
-
-    document.body.classList.add('filtering');
-    setTimeout(() => document.body.classList.remove('filtering'), 10000);
-
-
-
-   
-
-    
-
-    function showWhatsAppAlert(message, soundSrc) {
-      const alertBox = document.getElementById('whatsapp-alert');
-      const alertText = document.getElementById('waMessageText');
-      const sound = document.getElementById('waSound');
-    
-      if (!alertBox || !alertText || !sound) return;
-    
-      // ✅ define mensagem
-      alertText.textContent = message;
-    
-      // ✅ aplica animação de entrada
-      alertBox.classList.remove('hidden');
-      alertBox.classList.add('show', 'shake');
-    
-      // ✅ define som customizado (se fornecido)
-      if (soundSrc) sound.src = soundSrc;
-    
-      // ✅ toca o som
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    
-      // ✅ remove a classe "shake" após a animação para permitir reutilização
-      setTimeout(() => {
-        alertBox.classList.remove('shake');
-      }, 500);
-    
-      // ✅ fecha automaticamente após 4s
-      setTimeout(() => {
-        alertBox.classList.remove('show');
-        alertBox.classList.add('hidden');
-      }, 5000);
-    }
-
-    function renderContact(c) {
-      const el = document.createElement('div');
-      el.className = 'contact-item';
-      el.dataset.id = c.id;
-    
-      const thumb = document.createElement('div');
-      thumb.className = 'contact-thumb';
+        
+        storiesBack.onclick = closeStories;
+        window.openStories = openStories;
       
-      // Marca como "novo status" se houver stories não vistos
-      if (c.status && c.status.length > 0 && !c.statusViewed) {
-        thumb.classList.add('new-status');
-      }
-    
-      // Exibe emoji ou imagem
-      if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
-        thumb.textContent = c.photo;
-        thumb.style.fontSize = '1.8rem';
-      } else {
-        const img = document.createElement('img');
-        img.src = c.photo || './user.png';
-        img.onerror = () => { img.src = './user.png'; };
-        thumb.appendChild(img);
-      }
-    
-      // Informações do contato
-      const info = document.createElement('div');
-      info.className = 'contact-info';
-      const nm = document.createElement('div');
-      nm.className = 'contact-name';
-      nm.textContent = c.name || '(sem nome)';
-      const no = document.createElement('div');
-      no.className = 'contact-number';
-      no.textContent = c.number;
-     
       
-      // mostra número ou link de grupo
-      if (c.grupo?.linkConvite) {
-        no.innerHTML = `<a href="${c.grupo.linkConvite}" target="_blank" class="group-link">Entrar no grupo</a>`;
-      } else {
-        no.textContent = c.number;
-      }
-     
+        
       
-      // Clique principal
-      el.addEventListener('click', () => {
-        if (c.grupo?.linkConvite) {
-          window.open(c.grupo.linkConvite, '_blank');
-        } else {
-          const num = normalizeNumber(c.number);
-          if(!num) return showWhatsAppAlert("Número inválido");
-          window.open(`https://wa.me/${num}`, '_blank');
+         // --- Lista de contatos ---
+        function renderList(f=''){
+          listEl.innerHTML='';
+          contacts
+            .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+            .forEach(renderContact);
         }
-      });
-
-      info.appendChild(nm);
-      info.appendChild(no);
-    
-      // Ações do contato
-      const actions = document.createElement('div');
-      actions.className = 'contact-actions';
-    
-      // Botão de favorito (sempre permitido)
-      const favBtn = document.createElement('button');
-      favBtn.className = 'icon-btn';
-      favBtn.title = 'Favoritar';
-      favBtn.innerHTML = c.fav ? '⭐' : '☆';
-      favBtn.addEventListener('click', ev => {
-        ev.stopPropagation();
-        toggleFav(c.id);
-      });
-      actions.appendChild(favBtn);
-    
-      // Contatos do sistema → bloqueados para edição/exclusão
-     if (c.system) {
-        const lockEdit = document.createElement('button');
-        lockEdit.className = 'icon-btn locked';
-        lockEdit.title = 'Edição bloqueada';
-        lockEdit.textContent = '🔒';
-        lockEdit.addEventListener('click', ev => {
-          ev.stopPropagation();
-          showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado ✏️.');
-        });
       
-        const lockDel = document.createElement('button');
-        lockDel.className = 'icon-btn locked';
-        lockDel.title = 'Exclusão bloqueada';
-        lockDel.textContent = '🔒';
-        lockDel.addEventListener('click', ev => {
-          ev.stopPropagation();
-          showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído 🗑️.');
-        });
-      
-        actions.appendChild(lockEdit);
-        actions.appendChild(lockDel);
-
-       
-
-      } else {
-        // Contatos normais → editar/excluir permitidos
-        const editBtn = document.createElement('button');
-        editBtn.className = 'icon-btn';
-        editBtn.title = 'Editar';
-        editBtn.innerHTML = '✎';
-        editBtn.addEventListener('click', ev => {
-          ev.stopPropagation();
-          openEdit(c.id);
-        });
-    
-        const delBtn = document.createElement('button');
-        delBtn.className = 'icon-btn danger';
-        delBtn.title = 'Excluir';
-        delBtn.innerHTML = '🗑';
-        delBtn.addEventListener('click', ev => {
-          ev.stopPropagation();
-          removeContact(c.id);
-        });
-    
-        actions.appendChild(editBtn);
-        actions.appendChild(delBtn);
-      }
-    
-      // Montagem final
-      el.appendChild(thumb);
-      el.appendChild(info);
-      el.appendChild(actions);
-    
-      // Clique geral → abrir WhatsApp
-      el.addEventListener('click', () => {
-        const num = normalizeNumber(c.number);
-        if (!num) return alert('Número inválido');
-        window.open(`https://wa.me/${num}`, '_blank');
-      });
-    
-      // Clique na miniatura → abrir stories
-      thumb.addEventListener('click', ev => {
-        ev.stopPropagation();
-        openStories(c);
-      });
-    
-      listEl.appendChild(el);
-    }
-
-  
-    
-  
-   
-    // ===============================
-    // 🔹 Abre stories de qualquer contato
-    // ===============================
-    function openStories(contact) {
-      if (!contact.status || contact.status.length === 0) return;
-    
-      // Cria a fila global de todos os contatos que possuem stories ativos
-      storyQueue = contacts.filter(c => c.status && c.status.length > 0);
-      currentContactIndex = storyQueue.findIndex(c => c.id === contact.id);
-    
-      // Atualiza o estado do contato atual
-      contact.statusViewed = true;
-      save();
-      updateStoryCounter();
-      renderList(document.getElementById('contacts-search-input').value.trim());
-    
-      // Inicia a sequência de stories do contato atual
-      currentStories = contact.status;
-      currentStoryIndex = 0;
-      renderCurrentStory();
-      storiesModal.classList.remove('hidden');
-    
-      // Marca o primeiro story como visto
-      if (currentStories[currentStoryIndex]) {
-        currentStories[currentStoryIndex].visto = true;
-        save();
-      }
-    }
-     function renderStoryProgress(){
-      storiesProgress.innerHTML = '';
-      currentStories.forEach((_, idx) => {
-        const bar = document.createElement('div');
-        bar.className = 'story-progress-bar';
-        bar.style.flex = '1';
-        bar.style.background = 'rgba(255,255,255,0.3)';
-        bar.style.borderRadius = '2px';
-        const fill = document.createElement('div');
-        fill.className = 'story-progress-fill';
-        fill.style.height = '100%';
-        fill.style.width = idx < currentStoryIndex ? '100%' : '0%';
-        fill.style.background = '#25D366';
-        bar.appendChild(fill);
-        storiesProgress.appendChild(bar);
-      });
-    }
-  
-    function startStoryTimer(){
-      clearInterval(storyTimer);
-      const current = currentStories[currentStoryIndex];
-      duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
-      elapsed = 0;
-      const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
-  
-      storyTimer = setInterval(()=>{
-        if(!paused){
-          elapsed += 50;
-          fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
-          if(elapsed >= duration){
-            clearInterval(storyTimer);
-            if(currentStoryIndex < currentStories.length-1){
-              currentStoryIndex++;
-              renderCurrentStory();
-            } else closeStories();
-          }
+        // --- Modal adicionar / editar ---
+        function openAdd() {
+          editingId = null;
+          inputName.value = '';
+          inputNumber.value = '';
+          currentPhoto = './user.png';
+          preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          emojiPicker.style.display = 'none';
+          modal.classList.remove('hidden');
         }
-      },50);
-    }
-  
-    // ===============================
-    // 🔹 Renderiza o story atual
-    // ===============================
-    function renderCurrentStory() {
-      if (currentVideo && !currentVideo.paused) {
-        currentVideo.pause();
-        currentVideo.currentTime = 0;
-      }
-      storiesCarousel.innerHTML = '';
-      currentVideo = null;
-    
-      const s = currentStories[currentStoryIndex];
-      const content = document.createElement(s.tipo === 'video' ? 'video' : 'img');
-      content.src = s.src;
-      content.style.width = '100%';
-      content.style.height = '100%';
-      content.style.objectFit = 'cover';
-      if (s.tipo === 'video') {
-        content.autoplay = true;
-        content.controls = false;
-        content.muted = false;
-        currentVideo = content;
-      }
-      storiesCarousel.appendChild(content);
-    
-      if (s.legenda) {
-        const linkRegex = /(https?:\/\/[^\s]+)/g;
-        storiesCaption.innerHTML = s.legenda.replace(
-          linkRegex,
-          '<a href="$1" target="_blank" style="color:#25d366;text-decoration:none;">$1</a>'
-        );
-      } else {
-        storiesCaption.textContent = '';
-      }
-    
-      renderStoryProgress();
-      startStoryTimer();
-    }
-
-      renderStoryProgress();
-      startStoryTimer();
-    }
-  
-   
-    // ===============================
-    // 🔹 Fecha stories (mantém contador se manual)
-    // ===============================
-    function closeStories() {
-      clearInterval(storyTimer);
-    
-      if (currentVideo && !currentVideo.paused) {
-        currentVideo.pause();
-        currentVideo.currentTime = 0;
-      }
-    
-      storiesModal.classList.add('hidden');
-      storiesCarousel.innerHTML = '';
-    
-      // Fechamento manual → não encerra fila
-      if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
-        storyQueue = [];
-        currentContactIndex = 0;
-        save();
-        updateStoryCounter();
-        renderList();
-        return;
-      }
-    
-      // Fim natural da fila
-      storyQueue = [];
-      currentContactIndex = 0;
-    
-      contacts.forEach(c => (c.statusViewed = true));
-      save();
-      updateStoryCounter();
-      renderList();
-    }
-
-
-
-    // ===============================
-    // 🔹 Controles de toque aprimorados
-    // ===============================
-    let touchStartX = 0;
-    let holdTimeout = null;
-    let holding = false;
-    
-    storiesModal.addEventListener('touchstart', e => {
-      touchStartX = e.touches[0].clientX;
-      holdTimeout = setTimeout(() => {
-        holding = true;
-        paused = true;
-        if (currentVideo) currentVideo.pause();
-      }, 300);
-    });
-    
-    storiesModal.addEventListener('touchend', e => {
-      clearTimeout(holdTimeout);
-      const endX = e.changedTouches[0].clientX;
-      const diff = endX - touchStartX;
-    
-      if (holding) {
-        holding = false;
-        paused = false;
-        if (currentVideo) currentVideo.play();
-        return;
-      }
-    
-      const rect = storiesModal.getBoundingClientRect();
-      const mid = rect.width / 2;
-    
-      // 🔹 Toque leve: esquerda / direita
-      if (Math.abs(diff) < 40) {
-        if (endX > mid) {
-          // → Avança
-          if (currentStoryIndex < currentStories.length - 1) {
-            currentStoryIndex++;
-            renderCurrentStory();
-          } else if (currentContactIndex < storyQueue.length - 1) {
-            currentContactIndex++;
-            openStories(storyQueue[currentContactIndex]);
+      
+        function openEdit(id) {
+          const c = contacts.find(x => x.id === id);
+          if(!c) return;
+          editingId = id;
+          inputName.value = c.name || '';
+          inputNumber.value = c.number || '';
+          currentPhoto = c.photo || './user.png';
+          if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
+            preview.textContent = currentPhoto; preview.style.background='#fff';
           } else {
-            closeStories();
+            preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
           }
-        } else {
-          // ← Volta
-          if (currentStoryIndex > 0) {
-            currentStoryIndex--;
-            renderCurrentStory();
-          } else if (currentContactIndex > 0) {
-            currentContactIndex--;
-            openStories(storyQueue[currentContactIndex]);
-          }
+          emojiPicker.style.display='none';
+          modal.classList.remove('hidden');
         }
-      }
-    });
+      
+        function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
+        function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
+        function saveFromModal(){ 
+          const name=inputName.value.trim();
+          const number=normalizeNumber(inputNumber.value.trim());
+          if(!number) return alert('Número inválido');
+          const photo=currentPhoto||'./user.png';
+          if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
+          else contacts.unshift({id:genId(),name,number,photo,fav:false});
+          save(); renderList(searchInput.value.trim()); closeModal();
+        }
+        function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
+      
+        function handleFile(ev){
+          const file=ev.target.files[0];
+          if(!file) return;
+          const reader=new FileReader();
+          reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
+          reader.readAsDataURL(file);
+        }
+      
+        btnPhoto.onclick=()=>photoInput.click();
+        photoInput.onchange=handleFile;
+        btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
+        emojiPicker.querySelectorAll('span').forEach(sp=>{
+          sp.addEventListener('click',()=>{
+            currentPhoto=sp.textContent;
+            preview.textContent=currentPhoto;
+            preview.style.background='#fff';
+            emojiPicker.style.display='none';
+          });
+        });
+      
+        addBtn.onclick=openAdd;
+        cancelBtn.onclick=closeModal;
+        saveBtn.onclick=saveFromModal;
+        searchInput.oninput=()=>renderList(searchInput.value);
+        backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
+      
+        // --- Inicialização ---
+        load();
+        renderList();
+      
+        loadNetworking();         // carrega contatos e stories da rede
+        filterExpiredStories(); // remove stories vencidos automaticamente da lista
+        
+        updateStoryCounter();
+        updateContactCounter();
+        updateGroupCounter();
     
-    storiesBack.onclick = closeStories;
-    window.openStories = openStories;
-  
-  
-    
-  
-     // --- Lista de contatos ---
-    function renderList(f=''){
-      listEl.innerHTML='';
-      contacts
-        .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
-        .forEach(renderContact);
-    }
-  
-    // --- Modal adicionar / editar ---
-    function openAdd() {
-      editingId = null;
-      inputName.value = '';
-      inputNumber.value = '';
-      currentPhoto = './user.png';
-      preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-      emojiPicker.style.display = 'none';
-      modal.classList.remove('hidden');
-    }
-  
-    function openEdit(id) {
-      const c = contacts.find(x => x.id === id);
-      if(!c) return;
-      editingId = id;
-      inputName.value = c.name || '';
-      inputNumber.value = c.number || '';
-      currentPhoto = c.photo || './user.png';
-      if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
-        preview.textContent = currentPhoto; preview.style.background='#fff';
-      } else {
-        preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-      }
-      emojiPicker.style.display='none';
-      modal.classList.remove('hidden');
-    }
-  
-    function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
-    function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
-    function saveFromModal(){ 
-      const name=inputName.value.trim();
-      const number=normalizeNumber(inputNumber.value.trim());
-      if(!number) return alert('Número inválido');
-      const photo=currentPhoto||'./user.png';
-      if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
-      else contacts.unshift({id:genId(),name,number,photo,fav:false});
-      save(); renderList(searchInput.value.trim()); closeModal();
-    }
-    function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
-  
-    function handleFile(ev){
-      const file=ev.target.files[0];
-      if(!file) return;
-      const reader=new FileReader();
-      reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
-      reader.readAsDataURL(file);
-    }
-  
-    btnPhoto.onclick=()=>photoInput.click();
-    photoInput.onchange=handleFile;
-    btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
-    emojiPicker.querySelectorAll('span').forEach(sp=>{
-      sp.addEventListener('click',()=>{
-        currentPhoto=sp.textContent;
-        preview.textContent=currentPhoto;
-        preview.style.background='#fff';
-        emojiPicker.style.display='none';
-      });
-    });
-  
-    addBtn.onclick=openAdd;
-    cancelBtn.onclick=closeModal;
-    saveBtn.onclick=saveFromModal;
-    searchInput.oninput=()=>renderList(searchInput.value);
-    backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
-  
-    // --- Inicialização ---
-    load();
-    renderList();
-  
-    loadNetworking();         // carrega contatos e stories da rede
-    filterExpiredStories(); // remove stories vencidos automaticamente da lista
-    
-    updateStoryCounter();
-    updateContactCounter();
-    updateGroupCounter();
-
-    cleanOldStories();     //remove stories vencidos automaticamente do cache
-
+        cleanOldStories();     //remove stories vencidos automaticamente do cache
 })();
+
 </script>
 
 
 
 </body>
 </html>
+
 
 
 
