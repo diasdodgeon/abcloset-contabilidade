@@ -266,7 +266,7 @@
       <!-- Cabeçalho do Story -->
       <div id="story-header-container" style="
         position:absolute;
-        top:20px;
+        top:25px;
         left:10px;
         right:10px;
         display:flex;
@@ -1035,7 +1035,41 @@
         // 🔹 Fecha stories (mantém contador se manual)
         // ===============================
         function closeStories() {
-         
+          clearInterval(storyTimer);
+        
+          // Pausar e resetar o vídeo atual, se existir
+          if (currentVideo && !currentVideo.paused) {
+            currentVideo.pause();
+            currentVideo.currentTime = 0;
+          }
+        
+          // Esconder o modal
+          storiesModal.classList.add('hidden');
+        
+          // Limpa o conteúdo do carrossel (garante que áudio/vídeo parem)
+          storiesCarousel.innerHTML = '';
+        
+          // 🔹 Se o fechamento for manual (usuário clicou no botão ou saiu da tela),
+          // interrompe a fila e mantém o contador visível
+          if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
+            // o usuário fechou manualmente, então pausamos a fila
+            storyQueue = [];
+            currentContactIndex = 0;
+            save();
+            updateStoryCounter();
+            renderList();
+            return; // encerra aqui
+          }
+        
+          // 🔸 Se a fila chegou ao fim naturalmente (todas as stories vistas)
+          storyQueue = [];
+          currentContactIndex = 0;
+        
+          // Marca todos como vistos e atualiza contador
+          contacts.forEach(c => (c.statusViewed = true));
+          save();
+          updateStoryCounter();
+          renderList();
         }
         // ===============================
         // 🔹 Controles de toque aprimorados (com exceção da legenda)
@@ -1203,6 +1237,7 @@
 
 </body>
 </html>
+
 
 
 
