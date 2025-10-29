@@ -893,6 +893,29 @@
           // Inicia a sequência de stories do contato atual
           currentStories = contact.status;
           currentStoryIndex = 0;
+          // Atualiza foto e nome no topo do modal
+          const photoEl = document.getElementById('story-user-photo');
+          const nameEl = document.getElementById('story-user-name');
+          
+          if (photoEl && nameEl) {
+            photoEl.innerHTML = '';
+          
+            if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(contact.photo)) {
+              photoEl.textContent = contact.photo;
+              photoEl.style.fontSize = '1.6rem';
+            } else {
+              const img = document.createElement('img');
+              img.src = contact.photo || './user.png';
+              img.style.width = '100%';
+              img.style.height = '100%';
+              img.style.objectFit = 'cover';
+              img.onerror = () => { img.src = './user.png'; };
+              photoEl.appendChild(img);
+            }
+          
+            nameEl.textContent = contact.name || '(sem nome)';
+          }
+
           renderCurrentStory();
           storiesModal.classList.remove('hidden');
         
@@ -990,60 +1013,7 @@
         // 🔹 Fecha stories (mantém contador se manual)
         // ===============================
         function closeStories() {
-          clearInterval(storyTimer);
-        
-          if (currentVideo && !currentVideo.paused) {
-            currentVideo.pause();
-            currentVideo.currentTime = 0;
-          }
-        
-          storiesModal.classList.add('hidden');
-          // Atualiza foto e nome no topo do modal
-          const photoEl = document.getElementById('story-user-photo');
-          const nameEl = document.getElementById('story-user-name');
-          
-          if (photoEl && nameEl) {
-            // Limpa conteúdo anterior
-            photoEl.innerHTML = '';
-          
-            // Define imagem ou emoji
-            if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(contact.photo)) {
-              photoEl.textContent = contact.photo;
-              photoEl.style.fontSize = '1.6rem';
-            } else {
-              const img = document.createElement('img');
-              img.src = contact.photo || './user.png';
-              img.style.width = '100%';
-              img.style.height = '100%';
-              img.style.objectFit = 'cover';
-              img.onerror = () => { img.src = './user.png'; };
-              photoEl.appendChild(img);
-            }
-          
-              // Define nome
-              nameEl.textContent = contact.name || '(sem nome)';
-            }
-
-          storiesCarousel.innerHTML = '';
-        
-          // Fechamento manual → não encerra fila
-          if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
-            storyQueue = [];
-            currentContactIndex = 0;
-            save();
-            updateStoryCounter();
-            renderList();
-            return;
-          }
-        
-          // Fim natural da fila
-          storyQueue = [];
-          currentContactIndex = 0;
-        
-          contacts.forEach(c => (c.statusViewed = true));
-          save();
-          updateStoryCounter();
-          renderList();
+         
         }
         // ===============================
         // 🔹 Controles de toque aprimorados (com exceção da legenda)
@@ -1209,6 +1179,7 @@
 
 </body>
 </html>
+
 
 
 
