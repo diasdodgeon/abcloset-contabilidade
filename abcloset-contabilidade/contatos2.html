@@ -222,6 +222,19 @@
     font-weight: 600;
     color: #fff;
   }
+  #story-header-container {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  
+  #story-user-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  #story-user-name {
+    color: #fff;
+  }
 
 </style>
 <!-- Modal estilo WhatsApp -->
@@ -250,36 +263,45 @@
       <!-- Barra de progresso -->
       <div id="stories-progress"
            style="display:flex;gap:4px;position:absolute;top:16px;left:16px;right:16px;height:4px;z-index:10;"></div>
-      <!-- Identificação do contato -->
-      <div id="story-header" style="
+      <!-- Cabeçalho do Story -->
+      <div id="story-header-container" style="
         position:absolute;
-        top:28px;
-        left:16px;
+        top:20px;
+        left:10px;
+        right:10px;
         display:flex;
         align-items:center;
         gap:10px;
         z-index:10;
         color:white;
       ">
+        <button id="stories-back" style="
+          background:none;
+          border:none;
+          color:white;
+          font-size:1.6rem;
+          cursor:pointer;
+          padding:4px 8px;
+        ">←</button>
+      
         <div id="story-user-photo" style="
           width:40px;
           height:40px;
           border-radius:50%;
           overflow:hidden;
           border:2px solid #25D366;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          background:rgba(255,255,255,0.08);
-        ">
-        </div>
-        <div id="story-user-name" style="font-size:1rem;font-weight:600;"></div>
+          flex-shrink:0;
+        "></div>
+      
+        <div id="story-user-name" style="
+          font-size:1rem;
+          font-weight:600;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        "></div>
       </div>
 
-      <!-- Botão de voltar -->
-      <button id="stories-back"
-              style="position:absolute;top:28px;left:16px;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;z-index:10;">←</button>
-  
       <!-- Área dos stories -->
       <div id="stories-carousel"
            style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
@@ -1158,6 +1180,8 @@
         saveBtn.onclick=saveFromModal;
         searchInput.oninput=()=>renderList(searchInput.value);
         backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
+        document.getElementById('stories-back').onclick = closeStories;
+
       
         // --- Inicialização ---
         load();
@@ -1179,6 +1203,7 @@
 
 </body>
 </html>
+
 
 
 
