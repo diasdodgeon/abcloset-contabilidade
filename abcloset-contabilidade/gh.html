@@ -11,7 +11,7 @@
 .mobile-menu-container {
   display: flex;
   width: 100%;
-  height: 88vh;
+  height: 90vh;
   background-color: #f4f4f9;
   font-family: sans-serif;
 }
@@ -871,7 +871,8 @@ input::-webkit-inner-spin-button {
         transition: opacity 0.3s ease-in-out;
         pointer-events: none;
         background-color: #fff; /* Fundo padrão para o menu */
-        
+
+
         padding: 0;
         box-sizing: border-box;
     }
@@ -885,16 +886,45 @@ input::-webkit-inner-spin-button {
 
     /* 🆕 SEÇÃO DO MENU DE APPS */
     #menuScreen {
-  
+        position: relative;
         display: flex;
         flex-direction: column;
-        padding: 20px 10px;
-        /* Garantir que o background preencha*/
+        padding: 0px;
+        /* Garantir que o background preencha 
         background-size: cover;
         background-position: center fixed;
-        background-repeat: no-repeat;
+        background-repeat: no-repeat;*/
+        overflow: hidden !important;
+        
+    }
+    /* O fundo fica fixo e cobre tudo */
+    .wallpaper-fixed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: 1; /* Fica atrás */
+        pointer-events: none; /* Não interfere nos cliques dos apps */
     }
 
+    /* O container de apps fica por cima e permite o scroll */
+    .apps-scroll-container {
+        position: relative;
+        z-index: 2; /* Fica na frente */
+        width: 100%;
+        height: 100%;
+        overflow-y: auto; /* Apenas os ícones rolam */
+        padding: 20px 10px;
+    }
+
+    /* Opcional: Deixar o fundo dos apps levemente transparente 
+       para o wallpaper aparecer melhor */
+    .apps-grid {
+        background: transparent;
+    }
     /* --- tema de celular, com apps --- */
     .phone-menu {
         display: flex;
@@ -903,6 +933,7 @@ input::-webkit-inner-spin-button {
         gap: 18px; /* Espaço entre os ícones */
         width: 100%;
         background-color: transparent; /* Certifica que a área onde estão os ícones é transparente */
+
     }
     
     .app-icon {
@@ -1389,7 +1420,7 @@ input::-webkit-inner-spin-button {
                 
                 <div class="phone-screen">
                     
-                    <div class="status-bar" id="statusBar">
+                    <div class="status-bar" id="statusBar" onclick="toggleNotificationDrawer()">
                         <div class="time" id="currentTime">10:47</div>
                         <div class="icons">
                             ⏰📬⚙️📆
@@ -1410,7 +1441,7 @@ input::-webkit-inner-spin-button {
                             </div>
 
                             <div class="drawer-handle-container">
-                                <button id="closeDrawerHandle" class="close-drawer-handle">⏏︎</button>
+                                <button id="closeDrawerHandle" class="close-drawer-handle" onclick="closeDrawer()">⏏︎</button>
                             </div>
                     </div>
                     <div class="phone-content" id="phoneContent">
@@ -1495,8 +1526,9 @@ input::-webkit-inner-spin-button {
                               </div>
                             </div>
 
-                        <div id="menuScreen" class="content-screen">
-                            <div class="phone-menu">
+                        <div id="menuScreen" class="content-screen"class="screen">
+                          <div class="apps-scroll-container">
+                            <div class="phone-menu"class="apps-grid">
                                 <div class="app-icon" id="app-tutoriais">
                                     🎓
                                     <div class="app-label">Tutoriais</div>
@@ -1569,11 +1601,17 @@ input::-webkit-inner-spin-button {
                                     🗃️
                                     <div class="app-label">Config.</div>
                                 </div>
-                                
-                              
-                                
+                                <div class="app-icon" id="app-suporte">
+                                    💡
+                                    <div class="app-label">Suporte</div>
+                                </div>
+                                <div class="app-icon" id="app-outros">
+                                    💸
+                                    <div class="app-label">Mensagens</div>
+                                </div>
                             </div>
                             </div>
+                          </div>
                     </div>
                     
                     <div class="nav-bar">
@@ -1610,8 +1648,18 @@ input::-webkit-inner-spin-button {
 </main>
 </div>
 <script type="text/javascript">
-  
-
+  function toggleNotificationDrawer() {
+    const drawer = document.getElementById("notificationDrawer");
+    if (drawer) {
+        drawer.classList.toggle("open");
+        // Opcional: Vibração ao abrir (estilo celular real)
+        if (navigator.vibrate) navigator.vibrate(20);
+    }
+}
+// 🆕 Nova função para fechar SÓ a gaveta de notificações
+  function closeDrawer() {
+            notificationDrawer.classList.remove('open');
+        }
   function inicializarFolgasPadrao() {
     const hoje = new Date();
     const anoAtual = hoje.getFullYear();
@@ -2560,15 +2608,18 @@ function salvarConfiguracoes() {
         // =========================================================
 
         function applyWallpaper(url, container) {
-            // ... (Sua lógica existente para aplicar e salvar) ...
-            menuScreen.style.backgroundImage = `url('${url}')`;
-            localStorage.setItem('selectedWallpaper', url);
+          const wallLayer = document.getElementById('menu-wallpaper-layer');
+          if (wallLayer) {
+              wallLayer.style.backgroundImage = `url('${url}')`;
+          }
+          
+          localStorage.setItem('selectedWallpaper', url);
 
-            document.querySelectorAll('#wallpaperScreen .wallpaper-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            container.classList.add('selected');
-        }
+          document.querySelectorAll('#wallpaperScreen .wallpaper-option').forEach(opt => {
+              opt.classList.remove('selected');
+          });
+          container.classList.add('selected');
+      }
 
         // Função para inicializar o App de Wallpaper com o carregamento dinâmico
         async function initializeWallpaperApp() {
@@ -2593,11 +2644,18 @@ function salvarConfiguracoes() {
                 wallpaperGallery.innerHTML = '';
                 
                 // 3. Aplica o wallpaper inicial ao menu
-                menuScreen.style.backgroundImage = `url('${initialUrl}')`;
-                menuScreen.style.backgroundSize = 'cover';
-                menuScreen.style.backgroundPosition = 'center';
-                menuScreen.style.backgroundRepeat = 'no-repeat';
-
+               // menuScreen.style.backgroundImage = `url('${initialUrl}')`;
+                //menuScreen.style.backgroundSize = 'cover';
+               // menuScreen.style.backgroundPosition = 'center';
+               // menuScreen.style.backgroundRepeat = 'no-repeat';
+                // 3. Aplica o wallpaper inicial à CAMADA FIXA
+                const wallLayer = document.getElementById('menu-wallpaper-layer');
+                if (wallLayer) {
+                    wallLayer.style.backgroundImage = `url('${initialUrl}')`;
+                    wallLayer.style.backgroundSize = 'cover';
+                    wallLayer.style.backgroundPosition = 'center';
+                    wallLayer.style.backgroundRepeat = 'no-repeat';
+                }
 
                 // 4. Cria os elementos da galeria
                 imageNames.forEach(name => {
@@ -2750,9 +2808,9 @@ function salvarConfiguracoes() {
             SoundManager.play("./tone.mp3");
         }
         // 🆕 Nova função para fechar SÓ a gaveta de notificações
-        const closeDrawer = function() {
-            notificationDrawer.classList.remove('open');
-        }
+        //const closeDrawer = function() {
+         //   notificationDrawer.classList.remove('open');
+        //}
 
 
         // Ação do botão HOME para fechar o modal
@@ -2823,8 +2881,6 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
-
-
 
 
 
