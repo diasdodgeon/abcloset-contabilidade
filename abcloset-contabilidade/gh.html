@@ -871,6 +871,10 @@ input::-webkit-inner-spin-button {
         transition: opacity 0.3s ease-in-out;
         pointer-events: none;
         background-color: #fff; /* Fundo padrão para o menu */
+         /* Garantir que o background preencha */
+        background-size: cover;
+        background-position: center fixed;
+        background-repeat: no-repeat;
         padding: 0;
         box-sizing: border-box;
     }
@@ -888,10 +892,10 @@ input::-webkit-inner-spin-button {
         display: flex;
         flex-direction: column;
         padding: 20px 10px;
-        /* Garantir que o background preencha */
+        /* Garantir que o background preencha
         background-size: cover;
         background-position: center fixed;
-        background-repeat: no-repeat;
+        background-repeat: no-repeat;*/
     }
 
     /* --- tema de celular, com apps --- */
@@ -2833,6 +2837,7 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
+
 
 
 
