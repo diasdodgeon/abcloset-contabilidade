@@ -1,24 +1,690 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal Mockup Celular Avançado</title>
+  <title>menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 </head>
 <body>
-<style>
+  <style type="text/css">
+    
+    /* Container Principal ocupando a tela toda */
+.mobile-menu-container {
+  display: flex;
+  width: 100%;
+  height: 90vh;
+  background-color: #f4f4f9;
+  font-family: sans-serif;
+}
+
+/* Menu Lateral (Abas) */
+.side-tabs {
+  width: 20%;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-button {
+  padding: 20px 5px;
+  border: none;
+  background: none;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: 0.3s;
+  border-left: 4px solid transparent;
+}
+
+/* Aba Ativa: Destaque visual */
+.tab-button.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  border-left: 4px solid #4f46e5;
+  font-weight: bold;
+}
+
+/* Área da Janela à Direita */
+.tab-content-area {
+  width: 70%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Esconder as janelas por padrão */
+.tab-window {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Mostrar a janela ativa */
+.tab-window.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Estilo para grupos de input */
+.setting-group {
+  margin-bottom: 15px;
+}
+
+.setting-group label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box; /* Garante que o padding não quebre a largura */
+}
+
+/* Itens com Switch (Toggle) */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Switch Estilizado */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px; width: 16px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #4f46e5; }
+input:checked + .slider:before { transform: translateX(18px); }
+
+/* Botões de Ação */
+.action-card {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.action-card.danger {
+  color: #dc3545;
+  border-color: #f8d7da;
+}
+
+.save-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+/* Instrução de texto */
+.instruction-text {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+
+.title { padding: 15px; text-align: center; }
+.title h2 { margin: 0; font-size: 18px; }
+
+.main-button { padding: 20px; display: flex; justify-content: center; }
+.main-button button { 
+  background: #4f46e5; color: white; border: none; 
+  padding: 10px 20px; border-radius: 5px; width: 100%;
+}
+
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none; /* Evita selecionar texto ao segurar */
+  transition: 0.2s;
+}
+
+/* Estado: Folga (Clique rápido) */
+.day-off {
+  background-color: #ff4d4d !important;
+  color: white;
+}
+
+/* Estado: Meio Expediente (Clique longo) */
+.day-half {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%) !important;
+  color: white;
+}
+.weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 5px;
+}
+/* Estiliza o "Dom" no cabeçalho da semana */
+.weekdays-grid div:nth-child(7n+1) {
+  color: #ef4444; /* Vermelho para destacar que é domingo */
+  font-weight: bold;
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+/* Melhorando a visualização no Mockup */
+#preview-schedule-list {
+  max-height: 150px;
+  overflow-y: auto;
+  border-top: 1px dashed #ddd;
+  margin-top: 10px;
+}
+
+/* feriados e setas */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.nav-btn {
+  background: #eee;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Destaque para Feriados */
+.calendar-day.is-holiday {
+  border: 2px solid #ff9800; /* Borda laranja para feriado */
+  position: relative;
+}
+
+.calendar-day.is-holiday::after {
+  content: '🚩'; /* Pequeno indicador de Holiday/Feriado */
+  position: absolute;
+  top: -0.3px;
+  right: 13px;
+  font-size: 8px;
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.holiday-info-box {
+  margin-top: 15px;
+  padding: 10px;
+  background: #fff8e1; /* Um tom leve de amarelo/laranja para combinar com o destaque */
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  font-size: 12px;
+  color: #555;
+}
+
+.holiday-item {
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 2px;
+}
+
+.holiday-item:last-child {
+  border-bottom: none;
+}
+
+.holiday-item strong {
+  color: #e65100;
+} 
+
+.work-config-container {
+  margin-top: 20px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.calculation-panel {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #eef2ff;
+  border-radius: 8px;
+  border-left: 4px solid #4f46e5;
+  font-size: 13px;
+  color: #3730a3;
+  line-height: 1.6;
+}
+
+.calculation-panel b {
+  color: #4f46e5;
+}
+
+/* Container Principal */
+.form-group {
+  max-width: 400px;
+  margin: 20px 0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Rótulo e Pergunta */
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #6366f1; /* Um roxo/azul moderno */
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.form-group h3 {
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+/* O Contador */
+.counter-container {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 5px;
+  width: fit-content;
+  transition: border-color 0.3s ease;
+}
+
+.counter-container:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* Botões - e + */
+.counter-container button {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter-container button:hover {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.counter-container button:active {
+  transform: scale(0.95);
+}
+
+/* O Input Numérico */
+.counter-container input {
+  width: 70px;
+  border: none;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  background: transparent;
+  outline: none;
+  pointer-events: none; /* Impede digitação direta, usa-se apenas os botões */
+}
+
+/* Remove as setinhas padrão do navegador */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.actions-container {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+}
+
+#btn-salvar-horarios {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+
+#btn-salvar-horarios:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+#btn-salvar-horarios:active {
+  transform: translateY(0);
+}
+
+.save-feedback {
+  display: none;
+  color: #059669;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  font-weight: 500;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+    
+
+:root {
+  --cor-principal-app: #4f46e5; /* Cor padrão inicial */
+  --cor-texto-calendario: #1f2937;
+  --cor-fundo-folga: #fee2e2;
+  --cor-texto-folga: #ef4444;
+}
+
+.calendar-preview-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Aplicando a cor customizável no cabeçalho */
+#calendar-month-preview {
+  color: var(--cor-principal-app);
+  font-weight: bold;
+}
+
+/* Estilo dos dias */
+.calendar-day-preview {
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--cor-texto-calendario);
+}
+
+/* Dia de Folga (Espelhado da aba Horários) */
+.day-off-preview {
+  background-color: var(--cor-fundo-folga);
+  color: var(--cor-texto-folga);
+  font-weight: bold;
+  text-decoration: line-through;
+}
+
+/* Meio Período (Espelhado) */
+.day-half-preview {
+  border: 2px solid var(--cor-principal-app);
+  color: var(--cor-principal-app);
+}
+
+/* No seu CSS */
+.preview-mode {
+  --cor-tema: #4f46e5; /* Valor padrão */
+}
+
+/* Onde você quer que a cor mude no mockup, use a variável */
+.preview-mode #calendar-month-preview {
+  color: var(--cor-tema);
+}
+
+.preview-mode .calendar-day.selected {
+  background-color: var(--cor-tema);
+}
+/* No preview, vamos confiar nas classes injetadas pelo JS */
+#calendar-preview .calendar-day.day-off {
+  background-color: #fee2e2 !important; /* Vermelho claro */
+  color: #ef4444 !important;
+  text-decoration: line-through;
+}
+
+#calendar-preview .calendar-day.day-half {
+  border: 2px solid #4f46e5 !important; /* Cor do tema */
+  color: #4f46e5 !important;
+}
+
+#calendar-preview .calendar-day.is-holiday {
+  background-color: #fef9c3; /* Amarelo para feriados */
+  border-bottom: 2px solid #facc15;
+}
+/* Garante que o feedback visual funcione bem em blocos grandes */
+.calendar-section.editable-element:hover {
+  outline: 2px dashed #4f46e5;
+  outline-offset: 4px; /* Cria um respiro entre o calendário e o tracejado */
+  border-radius: 12px;
+  background-color: rgba(79, 70, 229, 0.02); /* Um fundo ainda mais sutil */
+}
+.time-slot-btn {
+  border: 1px solid var(--primary-color);
+  background: white;
+  color: var(--primary-color);
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.time-slot-btn.selected {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Destaque do dia selecionado no clique simples */
+.calendar-day.selected-preview {
+    background-color: var(--primary-color, #4f46e5) !important;
+    color: white !important;
+    border-radius: 8px;
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* A Janela de Informações dentro do Grid */
+.info-drawer {
+    grid-column: 1 / 8; /* Ocupa a largura total de 7 dias */
+    background: #f9fafb;
+    border-top: 1px solid #eee;
+    padding: 15px;
+    margin-top: 5px;
+    animation: expandDrawer 0.3s ease-out;
+    border-radius: 0 0 15px 15px;
+}
+
+@keyframes expandDrawer {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 300px; }
+}
+
+.info-drawer h4 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
+.info-drawer p { margin: 5px 0; font-size: 13px; color: #666; }
+/* Aplicando as variáveis aos elementos */
+.calendar-wrapper.preview-mode { background-color: var(--bg-calendar); }
+
+.preview-mode .calendar-day.day-off {
+  background-color: var(--bg-off) !important;
+  color: var(--color-off) !important;
+}
+
+.preview-mode .calendar-day.day-half {
+  background: var(--bg-half) !important;
+  border: 2px solid var(--color-half) !important;
+}
+
+/* Gradiente para Meio-Período (Tema Verde) */
+.modern-dark .day-half {
+    background: linear-gradient(135deg, #ecfdf5 50%, #f3f4f6 50%) !important;
+    border: 1px dashed #10b981 !important;
+    color: #059669 !important;
+}
+
+/* Gradiente para Meio-Período (Tema Vermelho) */
+.classic-red .day-half {
+    background: linear-gradient(135deg, #fee2e2 50%, #ffffff 50%) !important;
+    border: 1px dashed #ef4444 !important;
+    color: #dc2626 !important;
+}
+
+/* Garante que o calendário não dispare o editor sozinho ao renderizar */
+.calendar-day {
+    user-select: none; /* Impede seleção de texto ao segurar */
+    -webkit-tap-highlight-color: transparent;
+}
+/* Remove a borda azul clássica de foco */
+.calendar-day, .editable-element {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent; /* Remove o flash cinza no mobile */
+}
+
+/* Estilização Visual dos Dias (Sem depender de scripts extras) */
+.modern-dark .day-half {
+    background: linear-gradient(135deg, #ecfdf5 50%, #f3f4f6 50%) !important;
+    border: 1px dashed #10b981 !important;
+    color: #059669 !important;
+}
+
+.classic-red .day-half {
+    background: linear-gradient(135deg, #fee2e2 50%, #ffffff 50%) !important;
+    border: 1px dashed #ef4444 !important;
+    color: #dc2626 !important;
+}
+
+/* Destaque do dia selecionado (Preview) */
+.calendar-day.selected-preview {
+    border: 2px solid #4f46e5 !important;
+    transform: scale(1.05);
+    z-index: 2;
+}
+/* Botão X discreto para o modal de agendamento no mockup */
+.close-modal-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-modal-btn:hover {
+  color: #333;
+}
+
+.banner {
+  height: 120px;
+  background-color: #ddd;
+  background-image: url('https://via.placeholder.com/400x120?text=Seu+Banner+Aqui'); /* Imagem Padrão [cite: 348, 632] */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
     /* Estilos do Modal (Overlay) */
     .modal-mockup {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
+        display: flex !important;       /* Sempre visível */
+        position: relative;
+        z-index: 1;
+        left: -30px;
         top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.5);
-        backdrop-filter: blur(5px);
+
+        width: 122%;
+        height: auto;
+        /*overflow: auto;*/
+        background-color: transparent;  /* Remove o fundo escuro/borrado */
+        backdrop-filter: none;
         align-items: center;
         justify-content: center;
     }
@@ -60,7 +726,7 @@
     .phone-screen {
         background-color: white;
         width: 100%;
-        height: 680px;
+        height: 555px;
         border-radius: 30px;
         padding: 0;
         box-sizing: border-box;
@@ -74,6 +740,7 @@
     .status-bar {
         height: 30px;
         background-color: black;
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -84,7 +751,7 @@
         font-weight: bold;
         border-radius: 30px 30px 0 0;
         z-index: 3; /* Sempre visível e clicável */
-        position: relative;
+        
         cursor: pointer; /* Indica que é clicável */
         border-bottom: 0px solid #eee;
     }
@@ -204,12 +871,15 @@
         transition: opacity 0.3s ease-in-out;
         pointer-events: none;
         background-color: #fff; /* Fundo padrão para o menu */
+
+
         padding: 0;
         box-sizing: border-box;
     }
 
     .content-screen.active-screen {
         opacity: 1;
+
         pointer-events: auto; /* Permite interação apenas na tela ativa */
         position: relative; /* Ajuste para o scrollbar aparecer corretamente */
     }
@@ -222,8 +892,9 @@
         padding: 20px 10px;
         /* Garantir que o background preencha */
         background-size: cover;
-        background-position: center;
+        background-position: center fixed;
         background-repeat: no-repeat;
+        
     }
 
     /* --- tema de celular, com apps --- */
@@ -231,9 +902,10 @@
         display: flex;
         flex-wrap: wrap; /* Permite quebrar linha se houver muitos ícones */
         justify-content: start; /* Alinha os ícones à esquerda */
-        gap: 5px; /* Espaço entre os ícones */
+        gap: 18px; /* Espaço entre os ícones */
         width: 100%;
         background-color: transparent; /* Certifica que a área onde estão os ícones é transparente */
+
     }
     
     .app-icon {
@@ -559,10 +1231,159 @@
         60% { transform: scale(1.2); opacity:1; }
         100% { transform: scale(1); opacity:1; }
     }
-</style>
-    <button id="btn-ajuda" class="btn-ajuda">🙋</button>
 
-    <div id="phoneModal" class="modal-mockup">
+</style>
+<div class="mobile-menu-container">
+  <nav class="side-tabs">
+    <button class="tab-button active" onclick="openTab(event, 'perfil')">Perfil</button>
+    <button class="tab-button" onclick="openTab(event, 'notificacoes')">Avisos</button>
+    <button class="tab-button" onclick="openTab(event, 'seguranca')">Senha</button>
+    <button class="tab-button" onclick="openTab(event, 'ajuda')">Ajuda</button>
+    <button class="tab-button" onclick="openTab(event, 'horarios')">Horários</button>
+    <button class="tab-button" onclick="openTab(event, 'aparencia')">Estilo</button>
+  </nav>
+
+  <main class="tab-content-area">
+  
+  <div id="perfil" class="tab-window active">
+    <h3>Meu Perfil</h3>
+    <div class="setting-group">
+      <label>Nome de Exibição</label>
+      <input type="text" placeholder="Seu nome..." class="input-field">
+    </div>
+    <div class="setting-group">
+      <label>Bio</label>
+      <textarea class="input-field" rows="3"></textarea>
+    </div>
+    <button class="save-btn">Salvar Alterações</button>
+  </div>
+
+  <div id="notificacoes" class="tab-window">
+    <h3>Avisos</h3>
+    <div class="setting-item">
+      <span>Notificações Push</span>
+      <label class="switch">
+        <input type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting-item">
+      <span>Alertas por E-mail</span>
+      <label class="switch">
+        <input type="checkbox">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div id="seguranca" class="tab-window">
+    <h3>Segurança</h3>
+    <button class="action-card">Alterar Senha</button>
+    <button class="action-card">Ativar 2FA (Dois Fatores)</button>
+    <button class="action-card danger">Encerrar todas as sessões</button>
+  </div>
+  <div id="ajuda" class="tab-window">
+    <h3>Segurança</h3>
+    <button class="action-card">Alterar Senha</button>
+    <button class="action-card">Ativar 2FA (Dois Fatores)</button>
+    <button class="action-card danger">Encerrar todas as sessões</button>
+  </div>
+  <div id="horarios" class="tab-window">
+    <div class="form-group">
+      <label>Marque no calendário, seus dias de Folga, e Meio Expediente: </label>
+    </div>
+    <p class="instruction-text">Click simples: Folga <br> Click e Segura: Meio Expediente</p>
+     
+    
+    <div class="calendar-wrapper">
+      <div class="calendar-header">
+        <button class="nav-btn" onclick="changeMonth(-1)">&#10094;</button>
+        <h3 id="calendar-month-name">Mês Atual</h3>
+        <button class="nav-btn" onclick="changeMonth(1)">&#10095;</button>
+      </div>
+      <div class="weekdays-grid">
+        <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sab</div>
+      </div>
+      <div class="calendar-grid" id="calendar-admin">
+        <div class="calendar-day" onmousedown="startPressAdmin(event, 1)" onmouseup="endPressAdmin(event, 1)" ontouchstart="startPress(event, 1)" ontouchend="endPress(event, 1)">1</div>
+        <div class="calendar-day" onmousedown="startPressAdmin(event, 2)" onmouseup="endPressAdmin(event, 2)">2</div>
+        <div class="calendar-day" onmousedown="startPressAdmin(event, 3)" onmouseup="endPressAdmin(event, 3)">3</div>
+      </div>
+    </div>
+    <div id="holiday-list-container" class="holiday-info-box">
+    </div>
+    <div class="work-config-container">
+  <div class="setting-group">
+    <div class="form-group">
+      <label>Defina, seus horarios de funcionamento: </label>
+    </div>
+    <label><strong>*Obrigatório</strong> - Horário de abertura</label>
+    <input type="time" id="time-open" class="input-field" value="07:00" onchange="calculateWorkMinutes()">
+  </div>
+
+  <div class="setting-group">
+    <label><strong>Opcional</strong> - Duração do intervalo (almoço)</label>
+    <input type="time" id="time-break" class="input-field" value="01:00" onchange="calculateWorkMinutes()">
+  </div>
+
+  <div class="setting-group">
+    <label><strong>*Obrigatório</strong> - Horário de encerramento</label>
+    <input type="time" id="time-close" class="input-field" value="17:00" onchange="calculateWorkMinutes()">
+  </div>
+
+  <div id="work-summary" class="calculation-panel">
+      Carregando cálculos...
+  </div>
+
+  <div class="form-group">
+    <label>Quantidade de vagas diárias: </label>
+    <h3>Quantos clientes voçê pode atender, por dia?</h3>
+    <div class="counter-container">
+      <button type="button" onclick="changeSlots(-1)">-</button>
+      <input type="number" id="vagas-diarias" value="10" readonly>
+      <button type="button" onclick="changeSlots(1)">+</button>
+    </div>
+  </div>
+
+   
+      
+  <div class="form-group checkbox-group">
+    <label for="check-agendamento">Definir horários de agendamento?</label>
+    <input type="checkbox" id="check-agendamento" onchange="toggleScheduling()" <label>Se marcada esta opçâo ativa o agendamento diário por horários, ex:07:00, 07:40, 08:20...<br> Se não, o atendimento será realizado por ordem de chegada.</label>
+    
+  </div>
+  
+  <div id="painel-agendamento" style="display: none; margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+    <small style="color: #666; display: block; margin-bottom: 5px;">
+      Tempo de cada atendimento, é igual ao tempo total de atendimento, dividido pela quantidade de vagas.
+    </small>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <strong>Tempo de cada atendimento:</strong>
+      <span id="timer-vaga" style="font-family: monospace; font-size: 1.2rem; color: #2ecc71;">00:30</span>
+    </div>
+  </div>
+    <div class="actions-container">
+      <button type="button" id="btn-salvar-horarios" onclick="salvarConfiguracoes()">
+        Salvar Configurações
+      </button>
+      <div id="save-feedback" class="save-feedback">Configurações salvas com sucesso!</div>
+    </div>
+  </div>
+ 
+</div>
+
+
+  <div id="aparencia" class="tab-window">
+    <h3>Bem vindo a aba de Estilo</h3>
+    <p class="instruction-text">
+      É assim que seus clientes verão sua página de agendamento. 
+      Para editar, explore os APPs no menu deste celular virtual.
+    </p>
+
+    <div >
+      <div >
+        
+        <div id="phoneModal" class="modal-mockup">
         
         <div class="modal-content">
             
@@ -571,7 +1392,7 @@
                 
                 <div class="phone-screen">
                     
-                    <div class="status-bar" id="statusBar">
+                    <div class="status-bar" id="statusBar" onclick="toggleNotificationDrawer()">
                         <div class="time" id="currentTime">10:47</div>
                         <div class="icons">
                             ⏰📬⚙️📆
@@ -592,7 +1413,7 @@
                             </div>
 
                             <div class="drawer-handle-container">
-                                <button id="closeDrawerHandle" class="close-drawer-handle">⏏︎</button>
+                                <button id="closeDrawerHandle" class="close-drawer-handle" onclick="closeDrawer()">⏏︎</button>
                             </div>
                     </div>
                     <div class="phone-content" id="phoneContent">
@@ -639,13 +1460,43 @@
                             </div>
                         </div>
                         </div>
-                        <div id="videoScreen" class="content-screen active-screen">
+                            <div id="videoScreen" class="content-screen active-screen">
+                              <div id="video" width="100%" height="100%" controls >
+                                
+                                <div class="editable-element banner" 
+                                     >
+                                  Clique para alterar o Banner
+                                </div>
 
-                            <video id="video" width="100%" height="100%" controls>
-                                <source src="bemVindo.mp4" type="video/mp4">
-                                Seu navegador não suporta o elemento de vídeo.
-                            </video>
-                        </div>
+                                <div class="editable-element title" 
+                                     >
+                                  <h2 id="mockup-title-text">Título da sua Página</h2>
+                                </div>
+                         
+
+
+                                <div id="calendar-wrapper-mockup" 
+                                   class="calendar-wrapper preview-mode" 
+                                   >
+
+                                <div class="calendar-header">
+                                  <button class="nav-btn" style="opacity: 0.5; cursor: default;">&#10094;</button>
+                                  <h3 id="calendar-month-preview">Mês Atual</h3> 
+                                  <button class="nav-btn" style="opacity: 0.5; cursor: default;">&#10095;</button>
+                                </div>
+                                
+                                <div class="weekdays-grid">
+                                  <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sab</div>
+                                </div>
+                                
+                                <div class="calendar-grid" id="calendar-preview">
+                                  </div>
+
+                                <div id="holiday-list-preview" class="holiday-info-box" style="display: none;">
+                                </div>
+                              </div> 
+                              </div>
+                            </div>
 
                         <div id="menuScreen" class="content-screen">
                             <div class="phone-menu">
@@ -755,8 +1606,680 @@
         </div>
     </div>
 
-    <script>
+
         
+        
+      </div>
+    </div>
+
+    
+  </div>
+
+</main>
+</div>
+<script type="text/javascript">
+  function toggleNotificationDrawer() {
+    const drawer = document.getElementById("notificationDrawer");
+    if (drawer) {
+        drawer.classList.toggle("open");
+        // Opcional: Vibração ao abrir (estilo celular real)
+        if (navigator.vibrate) navigator.vibrate(20);
+    }
+}
+// 🆕 Nova função para fechar SÓ a gaveta de notificações
+  function closeDrawer() {
+            notificationDrawer.classList.remove('open');
+        }
+  function inicializarFolgasPadrao() {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+
+    // Vamos percorrer o mês atual e os próximos 2 meses
+    for (let m = 0; m <= 2; m++) {
+        const dataBusca = new Date(anoAtual, mesAtual + m, 1);
+        const diasNoMes = new Date(anoAtual, mesAtual + m + 1, 0).getDate();
+        const mesParaChave = dataBusca.getMonth() + 1;
+        const anoParaChave = dataBusca.getFullYear();
+
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const dataTemp = new Date(anoParaChave, mesParaChave - 1, dia);
+            const dateKey = `${anoParaChave}-${mesParaChave}-${dia}`;
+
+            // Se for Domingo (0) e NÃO houver nenhuma marcação manual ainda
+            if (dataTemp.getDay() === 0 && !scheduleData[dateKey]) {
+                scheduleData[dateKey] = 'Folga';
+            }
+        }
+    }
+    console.log("✅ Domingos pré-configurados como folga.");
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+      inicializarFolgasPadrao(); // Preenche o objeto scheduleData primeiro
+      generateCalendar();        // Depois renderiza visualmente
+      calculateWorkMinutes();    // E calcula os tempos
+  });
+
+  
+  
+
+  // Objeto Global para guardar os dados e serem usados na aba 'Aparência'
+  let configuracaoUsuario = {
+      
+      minutosDisponiveis: 0, // Esse valor vem do seu cálculo anterior de trabalho
+      vagas: 10,
+      usarAgendamento: false,
+      tempoPorVaga: 30
+  };
+  
+  function changeSlots(val) {
+    const input = document.getElementById('vagas-diarias');
+    let novoValor = parseInt(input.value) + val;
+  
+    if (novoValor >= 1) { // Mínimo de 1 vaga
+      input.value = novoValor;
+      // Dispara o cálculo novamente
+      calcularTempoVaga();
+    }
+  }
+  
+  function toggleScheduling() {
+    const checkbox = document.getElementById('check-agendamento');
+    const painel = document.getElementById('painel-agendamento');
+    
+    // Guarda a preferência do usuário
+    scheduleData.config.usarAgendamento = checkbox.checked;
+    
+    // Mostra ou esconde o painel
+    painel.style.display = checkbox.checked ? 'block' : 'none';
+    
+    if (checkbox.checked) {
+      calcularTempoVaga();
+    }
+  }
+  
+  // A fórmula mágica
+  function calcularTempoVaga() {
+  // Busca os minutos que sua função calculateWorkMinutes salvou
+  const minutosDisponiveis = scheduleData.config.availableMinutes || 0;
+  
+  // Busca a quantidade de vagas do input
+  const inputVagas = document.getElementById('vagas-diarias');
+  const qtdVagas = parseInt(inputVagas.value) || 1;
+
+  if (minutosDisponiveis > 0) {
+    // Cálculo: Minutos / Vagas
+    const tempoPorVaga = Math.floor(minutosDisponiveis / qtdVagas);
+    
+    // Salva o resultado no objeto global para a aba "Aparência"
+    scheduleData.config.tempoPorVaga = tempoPorVaga;
+    scheduleData.config.vagas = qtdVagas;
+
+    // Formata para exibição (00:00)
+    const h = Math.floor(tempoPorVaga / 60);
+    const m = tempoPorVaga % 60;
+    const display = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+
+    // Atualiza o timer na tela
+    const timerElement = document.getElementById('timer-vaga');
+    if (timerElement) timerElement.innerText = display;
+  }
+ }
+
+
+
+
+  // VARIÁVEIS GLOBAIS
+  let pressTimer;
+  let isLongPress = false;
+  const scheduleData = {}; 
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+  
+  // GERAR CALENDÁRIO REAL
+  // VARIÁVEIS DE CONTROLE DE DATA
+  let viewDate = new Date(); // Data que o usuário está vendo no momento
+  const realDate = new Date(); // Data de "hoje" (para travar o limite)
+  
+  // CADASTRO DE FERIADOS (Exemplo: 2026)
+  const holidays = {
+    "2026-1-1": "Ano Novo",
+    "2026-3-3": "teste",
+    "2026-4-3": "Sexta-feira Santa",
+    "2026-4-21": "Tiradentes",
+    "2026-5-1": "Dia do Trabalho",
+    "2026-9-7": "Independência",
+    "2026-10-12": "Nossa Sra Aparecida",
+    "2026-11-2": "Finados",
+    "2026-11-15": "Proclamação da República",
+    "2026-12-25": "Natal"
+  };
+  
+    
+
+    function generateCalendar() {
+    const viewMonth = viewDate.getMonth();
+    const viewYear = viewDate.getFullYear();
+    
+    const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const calendarGrid = document.getElementById('calendar-admin');
+    const monthTitle = document.getElementById('calendar-month-name');
+
+    if (!calendarGrid) return;
+
+    monthTitle.innerText = `${monthNames[viewMonth]} ${viewYear}`;
+    calendarGrid.innerHTML = "";
+
+    updateNavButtons();
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.classList.add('calendar-day', 'empty');
+      calendarGrid.appendChild(emptyDiv);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayElement = document.createElement('div');
+      dayElement.classList.add('calendar-day');
+      dayElement.innerText = day;
+      
+      const dateKey = `${viewYear}-${viewMonth + 1}-${day}`;
+      
+      // --- NOVO: Lógica para marcar Domingos automaticamente ---
+      const dataObjeto = new Date(viewYear, viewMonth, day);
+      const diaDaSemana = dataObjeto.getDay(); // 0 = Domingo
+
+      // Se for domingo e ainda NÃO houver nada salvo no scheduleData para este dia
+      if (diaDaSemana === 0 && !scheduleData[dateKey]) {
+        scheduleData[dateKey] = 'Folga'; // Pré-define como folga
+      }
+      // ---------------------------------------------------------
+
+      // 1. Verificar se é feriado
+      if (holidays[dateKey]) {
+        dayElement.classList.add('is-holiday');
+        dayElement.title = holidays[dateKey];
+      }
+
+      // 2. Restaurar estado (Agora inclui os domingos pré-marcados)
+      if (scheduleData[dateKey] === 'Folga') dayElement.classList.add('day-off');
+      if (scheduleData[dateKey] === 'Meio-Período') dayElement.classList.add('day-half');
+
+      // ATRIBUI OS EVENTOS DE CLIQUE
+      dayElement.onmousedown = () => startPressAdmin(day);
+      dayElement.onmouseup = () => endPressAdmin(day);
+      
+      // Mobile
+      dayElement.ontouchstart = () => startPressAdmin(day);
+      dayElement.ontouchend = () => endPressAdmin(day);
+
+      // Dentro do loop de dias da generatePreviewCalendar
+      if (scheduleData[dateKey] !== 'Folga') {
+          dayElement.onclick = (e) => {
+              // Só abre se não for um clique longo de edição
+              if (!e.target.dataset.isLongPress) {
+                  abrirJanelaAgendamento(day, dateKey);
+              }
+              delete e.target.dataset.isLongPress;
+          };
+      }
+
+
+
+      // 3. Eventos
+      dayElement.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(e, dateKey); }, {passive: false});
+      dayElement.addEventListener('touchend', (e) => { e.preventDefault(); endPress(e, dateKey); }, {passive: false});
+      dayElement.addEventListener('mousedown', (e) => startPress(e, dateKey));
+      dayElement.addEventListener('mouseup', (e) => endPress(e, dateKey));
+
+      calendarGrid.appendChild(dayElement);
+    }
+
+    // NOVA FUNÇÃO: Renderiza o texto dos feriados abaixo do mês
+    function renderHolidaysText() {
+      const listContainer = document.getElementById('holiday-list-container');
+      const viewMonth = viewDate.getMonth() + 1; // +1 porque JS conta meses de 0 a 11
+      const viewYear = viewDate.getFullYear();
+      
+      if (!listContainer) return;
+    
+      listContainer.innerHTML = ""; // Limpa a lista atual
+      let hasHolidays = false;
+    
+      // Percorrer o objeto de feriados
+      for (const [dateKey, name] of Object.entries(holidays)) {
+        const [year, month, day] = dateKey.split('-').map(Number);
+    
+        // Verifica se o feriado pertence ao ano e mês que estamos vendo
+        if (year === viewYear && month === viewMonth) {
+          hasHolidays = true;
+          const item = document.createElement('div');
+          item.classList.add('holiday-item');
+          item.innerHTML = `<strong>${dateKey}:</strong> ${name}`;
+          listContainer.appendChild(item);
+        }
+      }
+    
+      // Se não houver feriados no mês, podemos esconder a caixa ou mostrar uma mensagem
+      if (!hasHolidays) {
+        listContainer.style.display = 'none';
+      } else {
+        listContainer.style.display = 'block';
+      }
+    }
+    renderHolidaysText();
+  }
+  
+
+
+
+
+  // MUDAR DE MÊS
+  function changeMonth(direction) {
+    // Altera o mês da viewDate
+    viewDate.setMonth(viewDate.getMonth() + direction);
+    generateCalendar();
+  }
+  
+  // TRAVAR NAVEGAÇÃO
+  function updateNavButtons() {
+    const btns = document.querySelectorAll('.nav-btn');
+    const diff = (viewDate.getFullYear() - realDate.getFullYear()) * 12 + (viewDate.getMonth() - realDate.getMonth());
+  
+    // Desativa "Voltar" se estiver no mês atual
+    btns[0].disabled = (diff <= 0);
+    // Desativa "Avançar" se estiver 2 meses à frente
+    btns[1].disabled = (diff >= 2);
+  }
+  
+
+
+
+
+  function handleDaySelection(dateKey, type, element) {
+    if (!element) return;
+  
+    if (type === 'half') {
+      element.classList.toggle('day-half');
+      element.classList.remove('day-off');
+      scheduleData[dateKey] = element.classList.contains('day-half') ? 'Meio-Período' : null;
+    } else {
+      element.classList.toggle('day-off');
+      element.classList.remove('day-half');
+      scheduleData[dateKey] = element.classList.contains('day-off') ? 'Folga' : null;
+    }
+    renderMockupSchedule();
+  }
+  
+  // SINCRONIZAÇÃO COM O MOCKUP
+  function renderMockupSchedule() {
+    const mockupContainer = document.getElementById('preview-schedule-list');
+    if (!mockupContainer) return;
+  
+    mockupContainer.innerHTML = "";
+    let hasData = false;
+  
+    const sortedKeys = Object.keys(scheduleData).sort();
+  
+    for (const date of sortedKeys) {
+      const status = scheduleData[date];
+      if (status) {
+        hasData = true;
+        const item = document.createElement('div');
+        item.style.fontSize = "10px";
+        item.style.padding = "4px";
+        item.style.borderBottom = "1px solid #eee";
+        const dayLabel = date.split('-')[2];
+        item.innerHTML = `Dia ${dayLabel}: <strong>${status}</strong>`;
+        mockupContainer.appendChild(item);
+      }
+    }
+  
+    if (!hasData) {
+      mockupContainer.innerHTML = '<span style="font-size: 9px; color: #999; padding: 5px;">Nenhuma alteração nos horários.</span>';
+    }
+  }
+  
+    //let pressTimer;
+    const LONG_PRESS_DURATION = 500; // ms
+
+    function setupInteractions(element, type, dateKey = null) {
+        element.onmousedown = (e) => startPress(e, type, dateKey);
+        element.onmouseup = (e) => endPress(e, type, dateKey);
+        // Suporte para Mobile
+        element.ontouchstart = (e) => startPress(e, type, dateKey);
+        element.ontouchend = (e) => endPress(e, type, dateKey);
+    }
+
+    function startPress(e, type, dateKey) {
+        e.target.dataset.longPress = "false";
+        pressTimer = setTimeout(() => {
+            e.target.dataset.longPress = "true";
+            //openEditor(type); // Ativa edição (Banner, Título ou Cores do Calendário)
+        }, LONG_PRESS_DURATION);
+    }
+
+    function endPress(e, type, dateKey) {
+        clearTimeout(pressTimer);
+        // Se não foi clique longo e é um dia do calendário, abre o agendamento
+        if (e.target.dataset.longPress === "false" && type === 'agendamento') {
+            abrirJanelaInformacoes(e.target, dateKey);
+        }
+    }
+
+    
+
+
+
+
+
+
+
+
+  // --- JANELA DE AGENDAMENTO COM VAGAS DINÂMICAS ---
+  function abrirJanelaInformacoes(target, dateKey) {
+      document.querySelectorAll('.selected-preview').forEach(d => d.classList.remove('selected-preview'));
+      const drawerExistente = document.querySelector('.info-drawer');
+      if (drawerExistente) drawerExistente.remove();
+
+      target.classList.add('selected-preview');
+
+      const grid = target.parentNode;
+      const todosOsDias = Array.from(grid.children);
+      const indiceClicado = todosOsDias.indexOf(target);
+      let indiceFimDaSemana = (Math.floor(indiceClicado / 7) * 7) + 6;
+      if (indiceFimDaSemana >= todosOsDias.length) indiceFimDaSemana = todosOsDias.length - 1;
+
+      const drawer = document.createElement('div');
+      drawer.className = 'info-drawer';
+      
+      // LÓGICA DE VAGAS:
+      const config = scheduleData.config || { vagas: 20 };
+      const statusDia = scheduleData[dateKey]; // Verifica se é Meio-Período
+      
+      // Se for Meio-Período, divide as vagas por 2
+      let vagasExibidas = config.vagas;
+      let labelExtra = "";
+
+      if (statusDia === 'Meio-Período') {
+          vagasExibidas = Math.floor(config.vagas / 2);
+          labelExtra = "<span style='color: orange; display: block; font-size: 11px;'>(Horário Reduzido)</span>";
+      }
+
+      drawer.innerHTML = `
+          <div class="drawer-content">
+              <button class="close-modal-btn" onclick="closeBooking()">✕</button>
+              <h4>📅 Detalhes: Dia ${dateKey.split('-')[2]}</h4>
+              <p>✨ <strong>${vagasExibidas} vagas</strong> disponíveis ${labelExtra}</p>
+              <p>🕒 Horário: ${config.open || '08:00'} às ${config.close || '18:00'}</p>
+              <button class="save-btn" style="width:100%; margin-top:10px;">Agendar Agora</button>
+          </div>
+      `;
+
+      todosOsDias[indiceFimDaSemana].after(drawer);
+      setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+  }
+
+  function generatePreviewCalendar() {
+  const viewMonth = viewDate.getMonth();
+  const viewYear = viewDate.getFullYear();
+  
+  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  
+  const grid = document.getElementById('calendar-preview');
+  const title = document.getElementById('calendar-month-preview');
+  const listContainer = document.getElementById('holiday-list-preview');
+
+  if (!grid || !title) return;
+
+  title.innerText = `${monthNames[viewMonth]} ${viewYear}`;
+  grid.innerHTML = ""; // Limpa o calendário antes de gerar
+
+  // 1. Gerar espaços vazios
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    const emptyDiv = document.createElement('div');
+    emptyDiv.classList.add('calendar-day', 'empty');
+    grid.appendChild(emptyDiv);
+  }
+
+  let temFeriadoNoMes = false;
+
+  // 2. GERAR DIAS (Loop Único e Unificado)
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayElement = document.createElement('div');
+    dayElement.classList.add('calendar-day');
+    dayElement.innerText = day;
+    
+    const dateKey = `${viewYear}-${viewMonth + 1}-${day}`;
+    
+    // --- Lógica de Interação ---
+    // Vincula o clique simples (agendar) e o clique longo (editar cores)
+    setupInteractions(dayElement, 'agendamento', dateKey);
+
+    // --- Lógica de Estilização (Cores) ---
+    // Verifica Feriados
+    if (holidays[dateKey]) {
+      dayElement.classList.add('is-holiday');
+      temFeriadoNoMes = true;
+    }
+
+    // Verifica Folgas e Meio-Período salvos no scheduleData
+    if (scheduleData[dateKey] === 'Folga') {
+      dayElement.classList.add('day-off');
+    } //else if (scheduleData[dateKey] === 'Meio-Período') {
+      //dayElement.classList.add('day-half');
+    //}
+
+    // Adiciona o dia ao grid (Usando a variável correta: grid)
+    grid.appendChild(dayElement);
+  }
+
+  // 3. Exibição da lista de feriados abaixo do grid
+  if (listContainer) {
+    listContainer.innerHTML = "";
+    if (temFeriadoNoMes) {
+      let htmlFeriados = "";
+      for (const [dateKey, name] of Object.entries(holidays)) {
+        const [y, m, d] = dateKey.split('-').map(Number);
+        if (y === viewYear && m === (viewMonth + 1)) {
+          htmlFeriados += `<div class="holiday-item"><strong>${dateKey}:</strong> ${name}</div>`;
+        }
+      }
+      listContainer.innerHTML = htmlFeriados;
+      listContainer.style.display = 'block';
+    } else {
+      listContainer.style.display = 'none';
+    }
+  }
+}
+    
+
+  
+
+
+  
+
+  // NAVEGAÇÃO DE ABAS
+  function openTab(evt, tabId) {
+    const windows = document.getElementsByClassName("tab-window");
+    for (let i = 0; i < windows.length; i++) windows[i].classList.remove("active");
+  
+    const buttons = document.getElementsByClassName("tab-button");
+    for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+  
+    document.getElementById(tabId).classList.add("active");
+    evt.currentTarget.classList.add("active");
+
+    generatePreviewCalendar()
+
+  }
+  
+
+  
+  
+  function openTab(evt, tabId) {
+  // 1. Esconder todas as janelas de conteúdo
+  const windows = document.getElementsByClassName("tab-window");
+  for (let i = 0; i < windows.length; i++) {
+    windows[i].classList.remove("active");
+  }
+
+  // 2. Remover a classe "active" de todos os botões
+  const buttons = document.getElementsByClassName("tab-button");
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].classList.remove("active");
+  }
+
+  // 3. Mostrar a janela atual e adicionar classe ativa ao botão clicado
+  document.getElementById(tabId).classList.add("active");
+  evt.currentTarget.classList.add("active");
+}
+  
+
+// Função auxiliar: Transforma "07:30" em 450 (minutos)
+function timeToMinutes(timeString) {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return (hours * 60) + minutes;
+}
+
+
+  let adminTimer;
+  let isAdminLongPress = false;
+
+  // Função para o início do clique no calendário de ADMIN
+  function startPressAdmin(day) {
+    isAdminLongPress = false;
+    adminTimer = setTimeout(() => {
+      isAdminLongPress = true;
+      toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
+    }, 600);
+  }
+
+  // Função para o fim do clique no calendário de ADMIN
+  function endPressAdmin(day) {
+    clearTimeout(adminTimer);
+    if (!isAdminLongPress) {
+      toggleDayStatus(day, 'Folga'); // Se for clique rápido, vira Folga
+    }
+  }
+
+  // Função que altera o status no objeto scheduleData
+  function toggleDayStatus(day, statusDesejado) {
+    const viewMonth = viewDate.getMonth();
+    const viewYear = viewDate.getFullYear();
+    const dateKey = `${viewYear}-${viewMonth + 1}-${day}`;
+
+    if (scheduleData[dateKey] === statusDesejado) {
+      delete scheduleData[dateKey]; // Se já era o status, remove (fica dia normal)
+    } else {
+      scheduleData[dateKey] = statusDesejado;
+    }
+
+    generateCalendar();           // Atualiza o calendário de Admin
+    generatePreviewCalendar(); // Atualiza o Mockup instantaneamente
+  } 
+
+  
+function calculateWorkMinutes() {
+  const openTime = document.getElementById('time-open').value;
+  const breakTime = document.getElementById('time-break').value;
+  const closeTime = document.getElementById('time-close').value;
+  const summaryDiv = document.getElementById('work-summary');
+ 
+  // 1. Converter tudo para minutos
+  const minOpen = timeToMinutes(openTime);
+  const minClose = timeToMinutes(closeTime);
+  const minBreak = timeToMinutes(breakTime);
+
+  // 2. Cálculo Total Bruto
+  let totalGross = minClose - minOpen;
+
+  // Validação simples: encerramento deve ser após a abertura
+  if (totalGross <= 0) {
+    summaryDiv.innerHTML = "⚠️ <b>Erro:</b> O horário de encerramento deve ser após a abertura.";
+    summaryDiv.style.borderColor = "#dc3545";
+    return;
+  }
+
+  // 3. Cálculo Líquido (Subtraindo intervalo)
+  const totalNet = totalGross - minBreak;
+
+   
+  // 4. Exibir para o usuário (e deixar pronto para o sistema)
+  summaryDiv.style.borderColor = "#4f46e5";
+  summaryDiv.innerHTML = `
+    🕒 <b>Expediente Total:</b> ${Math.floor(totalGross/60)}h (${totalGross} minutos)<br>
+    🍽️ <b>Intervalo:</b> ${minBreak} minutos<br>
+    ⏳ <b>Tempo total de atendimento:</b> <b>${totalNet} minutos</b>
+   
+  `;
+  
+
+  // Salvar no nosso objeto global para usar no Mockup depois
+  scheduleData.config = {
+    open: openTime,
+    close: closeTime,
+    break: breakTime,
+    availableMinutes: totalNet,
+    vagas: scheduleData.config?.vagas || 20, // Mantém o que já tinha ou inicia com 20
+    usarAgendamento: scheduleData.config?.usarAgendamento || false
+  };
+  
+  // Opcional: Atualizar algo no mockup se desejar
+  console.log("Minutos disponíveis atualizados:", totalNet);
+
+  // --- LINHA NOVA: Sempre que calcular o tempo de trabalho, recalcula o tempo por vaga ---
+  calcularTempoVaga();
+ 
+}
+function salvarConfiguracoes() {
+  // 1. Forçar uma última atualização dos cálculos antes de salvar
+  calculateWorkMinutes(); 
+  calcularTempoVaga();
+
+
+  // 2. Capturar os estados dos elementos de interface
+  const isAgendamentoAtivo = document.getElementById('check-agendamento').checked;
+  const qtdVagas = parseInt(document.getElementById('vagas-diarias').value);
+  
+  // 3. Consolidar no Objeto Global
+  // Note que 'availableMinutes' e 'tempoPorVaga' já foram inseridos pelas funções de cálculo
+  scheduleData.config = {
+    ...scheduleData.config, // Mantém o que já foi calculado (open, close, availableMinutes)
+    vagas: qtdVagas,
+    usarAgendamento: isAgendamentoAtivo,
+    // O tempoPorVaga é crucial para gerar a grade de horários depois
+    tempoPorVaga: scheduleData.config.tempoPorVaga,
+    // Aqui garantimos que salvamos todo o objeto de datas (inclusive folgas automáticas)
+    mapaDeDatas: { ...scheduleData }, 
+    vagas: parseInt(document.getElementById('vagas-diarias').value),
+    usarAgendamento: document.getElementById('check-agendamento').checked 
+  };
+
+  // 4. Feedback visual para o usuário
+  const feedback = document.getElementById('save-feedback');
+  const btn = document.getElementById('btn-salvar-horarios');
+  
+  feedback.style.display = 'block';
+  btn.style.backgroundColor = '#059669'; // Muda para verde temporariamente
+  btn.innerHTML = '<span>✅</span> Salvo!';
+
+  console.log("Dados prontos para o Mockup:", scheduleData.config);
+
+  // Reverter o botão após 2 segundos
+  setTimeout(() => {
+    feedback.style.display = 'none';
+    btn.style.backgroundColor = '#4f46e5';
+    btn.innerHTML = 'Salvar Configurações';
+  }, 2500);
+  generatePreviewCalendar()
+}
+  
         // Elementos do DOM
         const modal = document.getElementById("phoneModal");
         const openBtn = document.getElementById("btn-ajuda");
@@ -1180,6 +2703,8 @@
             }
             // Garante que a gaveta feche ao mudar de tela
             notificationDrawer.classList.remove('open');
+            // 3. Opcional: Vibração ao trocar de tela
+            if (navigator.vibrate) navigator.vibrate(30);
         }
         window.changeScreen = changeScreen; // Torna a função acessível globalmente
 
@@ -1243,9 +2768,9 @@
             SoundManager.play("./tone.mp3");
         }
         // 🆕 Nova função para fechar SÓ a gaveta de notificações
-        const closeDrawer = function() {
-            notificationDrawer.classList.remove('open');
-        }
+        //const closeDrawer = function() {
+         //   notificationDrawer.classList.remove('open');
+        //}
 
 
         // Ação do botão HOME para fechar o modal
@@ -1305,11 +2830,46 @@
                  notificationDrawer.classList.remove('open');
             }
         }
-        
-    </script>
-</body>
 
+
+    
+
+  
+// INICIALIZAÇÃO
+window.onload = generateCalendar;
+window.onload = generatePreviewCalendar;
+</script>
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
