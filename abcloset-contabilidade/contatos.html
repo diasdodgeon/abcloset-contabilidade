@@ -460,6 +460,15 @@
 
 <script>
 (function(){
+        // =========================================================================
+        // COMANDO DE LIMPEZA DE CACHE (DURANTE DESENVOLVIMENTO)
+        // Descomente a linha abaixo para limpar os contatos salvos toda vez que atualizar a página.
+        // =========================================================================
+        // localStorage.clear(); // <--- LIMPA TUDO (CUIDADO)
+        localStorage.removeItem('wa_contacts_cache'); // <--- LIMPA APENAS OS CONTATOS
+        // =========================================================================
+
+  
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
         const chatBack = document.getElementById('chat-back');
@@ -859,10 +868,10 @@
                 openInternalChat(c);
             } else if (c.grupo?.linkConvite) {
                 window.open(c.grupo.linkConvite, '_blank');
-            } else {
-                const num = normalizeNumber(c.number);
-                if(!num) return showWhatsAppAlert("Número inválido");
-                window.open(`https://wa.me/${num}`, '_blank');
+            } //else {
+                //const num = normalizeNumber(c.number);
+               // if(!num) return showWhatsAppAlert("Número inválido");
+               // window.open(`https://wa.me/${num}`, '_blank');
             }
         });
     
@@ -1347,6 +1356,7 @@
 
 </body>
 </html>
+
 
 
 
