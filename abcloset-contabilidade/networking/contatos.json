@@ -1,5 +1,11 @@
 [
   {
+    "nome": "Suporte Oficial",
+    "photo": "./logo.png",
+    "internalChat": true,
+    "status": []
+  },
+  {
     "name": "Ariane B",
     "number": "5585944355181",
     "photo": "./networking/ariane.png",
@@ -183,6 +189,7 @@
 
 
 ]
+
 
 
 
