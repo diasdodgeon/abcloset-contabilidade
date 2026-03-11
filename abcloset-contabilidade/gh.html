@@ -1527,7 +1527,7 @@ input::-webkit-inner-spin-button {
                             </div>
 
                         <div id="menuScreen" class="content-screen"class="screen">
-                          <div class="apps-scroll-container">
+                          <div class="apps-scroll-container" id="menu-wallpaper-layer" class="wallpaper-fixed">
                             <div class="phone-menu"class="apps-grid">
                                 <div class="app-icon" id="app-tutoriais">
                                     🎓
@@ -2637,6 +2637,7 @@ function salvarConfiguracoes() {
 
                 // 2. Define o papel de parede padrão (o primeiro da lista)
                 const DEFAULT_WALLPAPER_URL = `wallpapers/${imageNames[0]}`;
+                const wallLayer = document.getElementById('menu-wallpaper-layer'); // Nova linha
                 const savedUrl = localStorage.getItem('selectedWallpaper');
                 const initialUrl = savedUrl || DEFAULT_WALLPAPER_URL;
 
@@ -2644,13 +2645,22 @@ function salvarConfiguracoes() {
                 wallpaperGallery.innerHTML = '';
                 
                 // 3. Aplica o wallpaper inicial ao menu
-                const wallLayer = document.getElementById('menu-wallpaper-layer');
-                    wallLayer.style.backgroundImage = `url('${initialUrl}')`;
-                    wallLayer.style.backgroundSize = 'cover';
-                    wallLayer.style.backgroundPosition = 'center';
-                    wallLayer.style.backgroundRepeat = 'no-repeat';
+               // menuScreen.style.backgroundImage = `url('${initialUrl}')`;
                
-                
+                 if (wallLayer) {
+                      wallLayer.style.backgroundImage = `url('${initialUrl}')`;
+                      wallLayer.style.backgroundSize = 'cover';
+                      wallLayer.style.backgroundPosition = 'center';
+                  }
+
+                //const wallLayer = document.getElementById('menu-wallpaper-layer');
+                //if (wallLayer) {
+                 //   wallLayer.style.backgroundImage = `url('${initialUrl}')`;
+                 //   wallLayer.style.backgroundSize = 'cover';
+                //    wallLayer.style.backgroundPosition = 'center';
+                //    wallLayer.style.backgroundRepeat = 'no-repeat';
+                //}
+
                 // 4. Cria os elementos da galeria
                 imageNames.forEach(name => {
                     // A URL completa é: 'wallpapers/' + nome_do_arquivo
@@ -2875,12 +2885,6 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
 
