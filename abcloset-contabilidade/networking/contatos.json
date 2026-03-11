@@ -3,7 +3,7 @@
     "nome": "Suporte Admin",
     "photo": "./logo.png",
     "internalChat": true,
-    "status": []
+    "status": [],
     "system": true
   },
   {
@@ -35,6 +35,7 @@
 
 
 ]
+
 
 
 
