@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contatos - WhatsApp Mockup</title>
+</head>
+<body>
+<style>
+  .contacts-app{
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    background: linear-gradient(#0b8450, #075f3a );
+    color:#fff; padding:10px; box-sizing:border-box;
+    border-radius:16px; overflow:hidden;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+  .contacts-header{display:flex;align-items:center;justify-content:center;position:relative;padding:8px 4px;}
+  .contacts-header h2{margin:0;font-size:1.05rem;}
+  .back-btn{position:absolute;left:6px;background:transparent;border:none;color:white;font-size:2rem;cursor:pointer;}
+  .add-btn{position:absolute;right:6px;background:rgba(255,255,255,0.12);border:none;color:white;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:1.05rem;}
+  .contacts-search{padding:8px 4px;}
+  #contacts-search-input{width:100%;padding:8px 10px;border-radius:10px;border:none;outline:none;box-sizing:border-box;font-size:0.95rem;}
+  .contacts-list{flex:1;overflow:auto;padding:6px;display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+  .contact-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,0.06);padding:8px;border-radius:12px;cursor:pointer;transition:transform .12s;}
+  .contact-item:hover{transform:translateY(-2px);}
+  .contact-thumb{width:56px;height:56px;min-width:56px;border-radius:12px;z-index: 1;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);color:#fff;font-weight:700;}
+  .contact-thumb img{width:100%;height:100%;object-fit:cover;display:block;z-index: 1;}
+  .contact-thumb {
+    width:56px;
+    height:56px;
+    min-width:56px;
+    border-radius:50%; /* círculo */
+    z-index: 1;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    font-weight:700;
+    border: 2px solid transparent; /* borda padrão */
+    transition: border 0.3s ease;
+  }
+  
+  .contact-thumb.new-status {
+    border: 2px solid #25D366; /* verde WhatsApp */
+    animation: pulse 1.2s infinite alternate;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .contact-info{flex:1;display:flex;flex-direction:column;}
+  .contact-name{font-size:1rem;font-weight:600;}
+  .contact-number{font-size:0.82rem;opacity:0.9;}
+  .contact-actions{display:flex;gap:8px;align-items:center;margin-left:8px;}
+  .icon-btn{background:transparent;border:none;color:rgba(255,255,255,0.95);cursor:pointer;font-size:1.05rem;padding:6px;border-radius:8px;}
+  .icon-btn.danger{color:rgba(255,200,200,0.95);}
+  .contacts-modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index: 9999;}
+  .contacts-modal.hidden{display:none;}
+  .contacts-modal-card{width:86%;max-width:420px;background:white;color:#111;border-radius:12px;padding:14px;box-sizing:border-box;}
+  .contacts-modal-card h3{margin-top:0;}
+  .contacts-modal-card label{display:block;font-size:0.85rem;margin:8px 0;}
+  .contacts-modal-card input{width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
+  .btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;}
+  .btn.primary{background:#0b8450;color:white;}
+  .photo-preview{display:flex;justify-content:center;align-items:center;margin:8px auto;width:80px;height:80px;border-radius:50%;background:#f0f0f0;overflow:hidden;font-size:4rem;}
+  .emoji-picker{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;justify-content:center;}
+  .emoji-picker span{cursor:pointer;font-size:1.5rem;transition:transform .1s;}
+  .emoji-picker span:hover{transform:scale(1.2);}
+
+  .story-item { min-width:100%; transition:transform 0.3s ease; display:flex; justify-content:center; align-items:center; }
+  .story-item img, .story-item video { width:100%; height:auto; max-height:600px; border-radius:12px; object-fit:cover; }
+  #stories-modal {
+    backdrop-filter: blur(6px);
+    transition: opacity 0.2s ease;
+  }
+  #stories-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .story-progress-bar {
+    flex:1;
+    background: rgba(255,255,255,0.3);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  
+  .story-progress-fill {
+    width:0%;
+    height:100%;
+    background:#25D366;
+    transition: width 0.1s linear;
+  }
+  .locked {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  /* 🔔 Modal estilo WhatsApp */
+
+  .whatsapp-alert {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    width: 100%;
+    background: #2a2f32; /* cinza fosco */
+    color: white;
+    border-radius: 12px; /* 🔘 bordas arredondadas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 14px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: transform 0.3s ease, opacity 0.3s ease, top 0.3s ease;
+    opacity: 0;
+    z-index: 9999;
+  }
+  
+  /* Quando o modal está visível */
+  .whatsapp-alert.show {
+    top: 0;
+    opacity: 1;
+    border-radius: 0 0 16px 16px; /* bordas só na parte de baixo, estilo mensagem deslizando */
+  }
+  
+  .wa-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .wa-header img {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+  }
+  
+  .wa-header span {
+    color: #25d366; /* verde WhatsApp */
+    font-weight: 600;
+  }
+  
+  .wa-message-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #fff;
+    padding-left: 30px;
+  }
+
+  .story-counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1px 0;
+    background-color: #25D366; /* verde WhatsApp */
+    color: white;
+    font-size: 14px;
+    font-weight: 485;
+    border-radius: 20px;
+    padding: 3px 8px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .story-counter.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .story-counter:not(.hidden) {
+    opacity: 1;
+  }
+
+  .group-link {
+  color: #25D366;
+  text-decoration: none;
+  font-weight: 500;
+  }
+  .group-link:hover {
+    text-decoration: underline;
+  }
+  body.filtering {
+    filter: brightness(1.1);
+    transition: filter 0.3s ease;
+  }
+  #stories-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 18px 20px;
+    min-height: 60px;
+    background: rgba(0,0,0,0.45);
+    color: white;
+    font-size: 1rem;
+    z-index: 10;
+  }
+  #story-header {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  
+  #story-user-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  #story-user-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  #story-header-container {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  
+  #story-user-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  #story-user-name {
+    color: #fff;
+  }
+  /* --- Tela de Chat Interno --- */
+.chat-screen {
+  position: absolute; inset: 0; background: #e5ddd5; /* Cor de fundo padrão WA */
+  display: flex; flex-direction: column; z-index: 10000;
+}
+.chat-header {
+  background: #075e54; color: white; padding: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 15px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.msg {
+  max-width: 80%; padding: 8px 12px; border-radius: 8px;
+  font-size: 0.95rem; position: relative; line-height: 1.4;
+}
+.msg-admin { align-self: flex-start; background: white; color: #000; }
+.msg-user { align-self: flex-end; background: #dcf8c6; color: #000; }
+
+.chat-input-area {
+  background: #f0f0f0; padding: 10px; display: flex; gap: 8px;
+}
+.chat-input-area input {
+  flex: 1; border: none; padding: 10px; border-radius: 20px; outline: none;
+}
+.send-btn {
+  background: #075e54; color: white; border: none;
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+}
+.hidden { display: none !important; }
+</style>
+<!-- Modal estilo WhatsApp -->
+<div id="whatsapp-alert" class="whatsapp-alert hidden">
+  <div class="wa-header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+    <span>WhatsApp</span>
+  </div>
+  <div class="wa-message" id="waMessageText">Mensagem</div>
+</div>
+
+<!-- Som da notificação -->
+<audio id="waSound" src="./whatsapp.mp3" preload="auto"></audio>
+
+
+<div id="contacts-app" class="contacts-app">
+  
+  <div class="contacts-header">
+    <button id="contacts-back" class="back-btn">←</button>
+    <h2>Contatos</h2>
+    <button id="contacts-add" class="add-btn">＋</button>
+  </div>
+  <!-- Stories Modal -->
+  <div id="stories-modal" class="contacts-modal hidden" style="position:fixed;inset:0;background:black;z-index:9999;">
+    <div id="stories-container" style="position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+      <!-- Barra de progresso -->
+      <div id="stories-progress"
+           style="display:flex;gap:4px;position:absolute;top:16px;left:16px;right:16px;height:4px;z-index:10;"></div>
+      <!-- Cabeçalho do Story -->
+      <div id="story-header-container" style="
+        position:absolute;
+        top:25px;
+        left:10px;
+        right:10px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        z-index:10;
+        color:white;
+      ">
+        <button id="stories-back" style="
+          background:none;
+          border:none;
+          color:white;
+          font-size:2rem;
+          cursor:pointer;
+          padding:4px 8px;
+        ">←</button>
+      
+        <div id="story-user-photo" style="
+          width:40px;
+          height:40px;
+          border-radius:50%;
+          overflow:hidden;
+          border:2px solid #25D366;
+          flex-shrink:0;
+        "></div>
+      
+        <div id="story-user-name" style="
+          font-size:1rem;
+          font-weight:600;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        "></div>
+      </div>
+
+      <!-- Área dos stories -->
+      <div id="stories-carousel"
+           style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
+  
+      <!-- Legenda -->
+      <div id="stories-caption"
+           style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:rgba(0,0,0,0.45);color:white;font-size:1rem;z-index:10;"></div>
+    </div>
+  </div>
+
+  <div class="contacts-search">
+    <input id="contacts-search-input" type="search" placeholder="Procurar..."/>
+  </div>
+  
+  <!-- 🔹 Contadores de novos itens -->
+  <div id="counters-wrapper" style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:3px;
+    margin:1px 0;
+    flex-wrap:wrap;
+  ">
+    <div id="story-counter" class="story-counter hidden">
+      <span id="story-counter-text"></span>
+    </div>
+
+    <div id="contacts-counter" class="story-counter hidden">
+      <span id="contacts-counter-text"></span>
+    </div>
+  
+    <div id="grupos-counter" class="story-counter hidden">
+      <span id="grupos-counter-text"></span>
+    </div>
+  
+    
+  </div>
+
+
+
+  <div id="contacts-list" class="contacts-list"></div>
+
+  <!-- Modal -->
+  <div id="contacts-modal" class="contacts-modal hidden">
+    
+    <div class="contacts-modal-card">
+      <h3 id="modal-title">Adicionar Contato</h3>
+
+      <label>Nome
+        <input id="contact-name" type="text" placeholder="Ex: João Silva"/>
+      </label>
+      <label>Número (ex: 5585995598888)
+        <input id="contact-number" type="text" placeholder="Código do país + DDD + número"/>
+      </label>
+
+      <div class="photo-preview" id="photo-preview">👤</div>
+
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;">
+        <button id="btn-photo" class="btn">📷 Foto</button>
+        <button id="btn-emoji" class="btn">😎 Emoji</button>
+        <input type="file" id="photo-input" accept="image/*" capture="user" style="display:none;">
+      </div>
+
+      <div id="emoji-picker" class="emoji-picker" style="display:none;">
+        <span>😎</span>
+        <span>😀</span>
+        <span>😁</span>
+        <span>❤️</span>
+        <span>💩</span>
+        <span>😅</span>
+        <span>🐱</span>
+        <span>🤢</span>
+        <span>🤮</span>
+        <span>😻</span>
+        <span>🧐</span>
+        <span>😠</span>
+        <span>😡</span>
+        <span>🧒</span>
+        <span>👦</span>
+        <span>👧</span>
+        <span>🧑</span>
+        <span>👱</span>
+        <span>👨</span>
+        <span>🧔</span>
+        <span>👨‍🦰</span>
+        <span>👨‍🦱</span>
+        <span>👨‍🦳</span>
+        <span>👨‍🦲</span>
+        <span>👩</span>
+        <span>👩‍🦰</span>
+        <span>👩‍🦱</span>
+        <span>👩‍🦳</span>
+        <span>👧</span>
+        <span>🧓</span>
+        <span>👴</span>
+        <span>👵</span>
+       
+      </div>
+    
+      <div class="modal-actions">
+        <button id="modal-save" class="btn primary">Salvar</button>
+        <button id="modal-cancel" class="btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  
+
+</div>
+<div id="chat-screen" class="chat-screen hidden">
+  <div class="chat-header">
+    <button id="chat-back" class="back-btn" style="position:static">←</button>
+    <div id="chat-user-photo" class="contact-thumb" style="width:35px; height:35px; min-width:35px"></div>
+    <span id="chat-user-name" style="font-weight:600">Admin</span>
+  </div>
+  
+  <div id="chat-messages" class="chat-messages">
+    </div>
+
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Mensagem">
+    <button id="chat-send" class="send-btn">➤</button>
+  </div>
+</div>
+
+<!-- ... código HTML e CSS permanece igual até <script> ... -->
+
+<script>
+(function(){
+        const STORAGE_KEY = 'contactsApp.v2';
+        const listEl = document.getElementById('contacts-list');
+        const modal = document.getElementById('contacts-modal');
+        const inputName = document.getElementById('contact-name');
+        const inputNumber = document.getElementById('contact-number');
+        const saveBtn = document.getElementById('modal-save');
+        const cancelBtn = document.getElementById('modal-cancel');
+        const addBtn = document.getElementById('contacts-add');
+        const backBtn = document.getElementById('contacts-back');
+        const searchInput = document.getElementById('contacts-search-input');
+        const btnPhoto = document.getElementById('btn-photo');
+        const btnEmoji = document.getElementById('btn-emoji');
+        const photoInput = document.getElementById('photo-input');
+        const preview = document.getElementById('photo-preview');
+        const emojiPicker = document.getElementById('emoji-picker');
+        // --- Stories ---
+        const storiesModal = document.getElementById('stories-modal');
+        const storiesCarousel = document.getElementById('stories-carousel');
+        const storiesCaption = document.getElementById('stories-caption');
+        const storiesClose = document.getElementById('stories-close');
+        const storiesPrev = document.getElementById('stories-prev');
+        const storiesNext = document.getElementById('stories-next');
+        const storiesProgress = document.getElementById('stories-progress');
+        const storiesBack = document.getElementById('stories-back');
+      
+        let contacts = [];
+        let editingId = null;
+        let currentPhoto = '';
+        let storyTimer = null;
+        let paused = false;
+        let elapsed = 0;
+        let duration = 0;
+        let currentStories = [];
+        let currentStoryIndex = 0;
+        let currentVideo = null;
+        let storyQueue = [];
+        let currentContactIndex = 0;
+    
+        const STORY_DURATION = 5000; // 5s para imagens
+      
+       
+        const defaultContacts = [];
+      
+        function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
+        function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
+        function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
+        function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+      
+        async function loadNetworking() {
+          try {
+            const res = await fetch('./networking/contatos.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('Arquivo não encontrado');
+            const networkContacts = await res.json();
+        
+            let added = 0, updated = 0;
+            const now = new Date();
+        
+            networkContacts.forEach(nc => {
+              const isGroup = !nc.number && nc.grupo?.linkConvite;
+              const normalizedNum = isGroup ? null : normalizeNumber(nc.number || '');
+        
+              // Filtra stories válidos (respeitando inicio e fim)
+              if (Array.isArray(nc.status)) {
+                nc.status = nc.status.filter(st => {
+                  const start = st.inicio ? new Date(st.inicio) : null;
+                  const end = st.fim ? new Date(st.fim) : null;
+                  if (!start && !end) return true;
+                  const started = !start || start <= now;
+                  const notExpired = !end || end > now;
+                  return started && notExpired;
+                });
+              }
+        
+              // Identifica se já existe (contato ou grupo)
+              const existing = contacts.find(c =>
+                isGroup
+                  ? c.grupo?.linkConvite === nc.grupo?.linkConvite
+                  : normalizeNumber(c.number) === normalizedNum
+              );
+        
+              if (!existing) {
+                // 🔹 Novo contato ou grupo
+                contacts.push({
+                  id: genId(),
+                  name: nc.nome || nc.name || '(sem nome)',
+                  number: normalizedNum,
+                  photo: nc.photo || './user.png',
+                  fav: false,
+                  status: nc.status || [],
+                  grupo: isGroup ? { linkConvite: nc.grupo.linkConvite } : null,
+                  system: true,
+                  ...(isGroup ? { newGroup: true } : { newContact: true }) // 🔹 marca como novo
+                });
+                added++;
+              } else if (existing.system) {
+                // 🔹 Atualiza dados (apenas system)
+                existing.name = nc.nome || nc.name || existing.name;
+                existing.photo = nc.photo || existing.photo;
+        
+                // Limpa stories expirados
+                existing.status = (existing.status || []).filter(st => {
+                  const start = st.inicio ? new Date(st.inicio) : null;
+                  const end = st.fim ? new Date(st.fim) : null;
+                  if (!start && !end) return true;
+                  const started = !start || start <= now;
+                  const notExpired = !end || end > now;
+                  return started && notExpired;
+                });
+        
+                // Adiciona novos stories válidos
+                if (Array.isArray(nc.status)) {
+                  const existingSrcs = (existing.status || []).map(s => s.src);
+                  const newStories = nc.status.filter(s => !existingSrcs.includes(s.src));
+                  if (newStories.length > 0) {
+                    existing.status = [...(existing.status || []), ...newStories];
+                    updated += newStories.length;
+                  }
+                }
+              }
+            });
+        
+            if (added > 0 || updated > 0) {
+              save();
+              renderList(searchInput.value.trim());
+              updateStoryCounter();
+              updateContactCounter();
+              updateGroupCounter();
+    
+            }
+        
+            console.log(`🌐 Networking atualizado (${added} novos contatos/grupos, ${updated} novos stories ativos).`);
+          } catch (err) {
+            console.log('⚠️ Nenhum networking carregado:', err.message);
+          }
+        }
+    
+      
+        function filterExpiredStories() {
+          const now = new Date();
+          let removed = 0;
+        
+          contacts.forEach(c => {
+            if (!Array.isArray(c.status)) return;
+        
+            const beforeCount = c.status.length;
+            c.status = c.status.filter(st => {
+              const start = st.inicio ? new Date(st.inicio) : null;
+              const end = st.fim ? new Date(st.fim) : null;
+        
+              // mantém stories ativos
+              if (!start && !end) return true;
+              const started = !start || start <= now;
+              const notExpired = !end || end > now;
+              return started && notExpired;
+            });
+        
+            if (beforeCount !== c.status.length) removed += beforeCount - c.status.length;
+          });
+        
+          if (removed > 0) {
+            save();
+            console.log(`🕓 ${removed} stories expirados foram removidos automaticamente.`);
+          }
+        }
+        async function cleanOldStories() {
+          const now = new Date();
+          let removed = 0;
+        
+          // percorre todos os contatos
+          contacts.forEach(contact => {
+            if (contact.status && contact.status.length > 0) {
+              // filtra apenas stories que ainda estão válidos
+              const validStories = contact.status.filter(story => {
+                const end = new Date(story.endTime || story.fim || 0);
+                return end > now; // mantém apenas os que ainda não expiraram
+              });
+        
+              if (validStories.length !== contact.status.length) {
+                contact.status = validStories;
+                removed += (contact.status.length - validStories.length);
+              }
+            }
+          });
+        
+          // se removeu algum story, salva a lista atualizada
+          if (removed > 0) {
+            save();
+            console.log(`🧹 Stories antigos removidos: ${removed}`);
+          }
+        
+          // tenta limpar cache de mídia
+          try {
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              for (const key of keys) {
+                if (key.includes('stories') || key.includes('media')) {
+                  await caches.delete(key);
+                }
+              }
+              console.log('🧼 Cache de mídia limpo.');
+            }
+          } catch (err) {
+            console.warn('⚠️ Não foi possível limpar cache:', err);
+          }
+        }
+        
+        function updateContactCounter() {
+          const counter = document.getElementById('contacts-counter');
+          const text = document.getElementById('contacts-counter-text');
+          if (!counter || !text) return;
+        
+          const newContacts = contacts.filter(c => c.newContact && !c.grupo).length;
+        
+          if (newContacts > 0) {
+            text.textContent = `${newContacts} novo${newContacts > 1 ? 's' : ''} contato${newContacts > 1 ? 's' : ''}`;
+            counter.classList.remove('hidden');
+          } else {
+            counter.classList.add('hidden');
+          }
+        
+          counter.onclick = () => {
+            // 🔹 Filtra e mostra só os novos contatos
+            listEl.innerHTML = '';
+            contacts
+              .filter(c => c.newContact && !c.grupo)
+              .forEach(renderContact);
+        
+            // 🔸 Depois de 4s, remove a flag e some o contador
+            setTimeout(() => {
+              contacts.forEach(c => delete c.newContact);
+              save();
+              renderList(searchInput.value.trim());
+              counter.classList.add('hidden');
+            }, 10000);
+          };
+        }
+        
+        function updateGroupCounter() {
+          const counter = document.getElementById('grupos-counter');
+          const text = document.getElementById('grupos-counter-text');
+          if (!counter || !text) return;
+        
+          const newGroups = contacts.filter(c => c.newGroup && c.grupo).length;
+        
+          if (newGroups > 0) {
+            text.textContent = `${newGroups} novo${newGroups > 1 ? 's' : ''} grupo${newGroups > 1 ? 's' : ''}`;
+            counter.classList.remove('hidden');
+          } else {
+            counter.classList.add('hidden');
+          }
+        
+          counter.onclick = () => {
+            // 🔹 Mostra só os novos grupos
+            listEl.innerHTML = '';
+            contacts
+              .filter(c => c.newGroup && c.grupo)
+              .forEach(renderContact);
+        
+            // 🔸 Depois de 4s, limpa flag e esconde contador
+            setTimeout(() => {
+              contacts.forEach(c => delete c.newGroup);
+              save();
+              renderList(searchInput.value.trim());
+              counter.classList.add('hidden');
+            }, 10000);
+          };
+        }
+        
+        function updateStoryCounter() {
+          const storyCounter = document.getElementById('story-counter');
+          const storyCounterText = document.getElementById('story-counter-text');
+        
+          const newStoriesContacts = contacts.filter(c => c.status && c.status.length > 0 && !c.statusViewed);
+          const newStoriesCount = newStoriesContacts.length;
+        
+          if (newStoriesCount > 0) {
+            storyCounterText.textContent = `${newStoriesCount} novo${newStoriesCount > 1 ? 's' : ''} stor${newStoriesCount > 1 ? 'ies' : 'y'}`;
+            storyCounter.classList.remove('hidden');
+          } else {
+            storyCounter.classList.add('hidden');
+          }
+        
+          // 🔹 Ao clicar: abre stories de todos os contatos com novos stories
+          storyCounter.onclick = () => {
+            if (newStoriesContacts.length === 0) return;
+            storyQueue = [...newStoriesContacts];
+            currentContactIndex = 0;
+            openStories(storyQueue[currentContactIndex]);
+          };
+        }
+    
+    
+        document.body.classList.add('filtering');
+        setTimeout(() => document.body.classList.remove('filtering'), 10000);
+    
+    
+    
+       
+    
+        
+    
+        function showWhatsAppAlert(message, soundSrc) {
+          const alertBox = document.getElementById('whatsapp-alert');
+          const alertText = document.getElementById('waMessageText');
+          const sound = document.getElementById('waSound');
+        
+          if (!alertBox || !alertText || !sound) return;
+        
+          // ✅ define mensagem
+          alertText.textContent = message;
+        
+          // ✅ aplica animação de entrada
+          alertBox.classList.remove('hidden');
+          alertBox.classList.add('show', 'shake');
+        
+          // ✅ define som customizado (se fornecido)
+          if (soundSrc) sound.src = soundSrc;
+        
+          // ✅ toca o som
+          sound.currentTime = 0;
+          sound.play().catch(() => {});
+        
+          // ✅ remove a classe "shake" após a animação para permitir reutilização
+          setTimeout(() => {
+            alertBox.classList.remove('shake');
+          }, 500);
+        
+          // ✅ fecha automaticamente após 4s
+          setTimeout(() => {
+            alertBox.classList.remove('show');
+            alertBox.classList.add('hidden');
+          }, 5000);
+        }
+    
+        function renderContact(c) {
+          const el = document.createElement('div');
+          el.className = 'contact-item';
+          el.dataset.id = c.id;
+        
+          const thumb = document.createElement('div');
+          thumb.className = 'contact-thumb';
+          
+          // Marca como "novo status" se houver stories não vistos
+          if (c.status && c.status.length > 0 && !c.statusViewed) {
+            thumb.classList.add('new-status');
+          }
+        
+          // Exibe emoji ou imagem
+          if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(c.photo)) {
+            thumb.textContent = c.photo;
+            thumb.style.fontSize = '1.8rem';
+          } else {
+            const img = document.createElement('img');
+            img.src = c.photo || './user.png';
+            img.onerror = () => { img.src = './user.png'; };
+            thumb.appendChild(img);
+          }
+        
+          // Informações do contato
+          const info = document.createElement('div');
+          info.className = 'contact-info';
+          const nm = document.createElement('div');
+          nm.className = 'contact-name';
+          nm.textContent = c.name || '(sem nome)';
+          const no = document.createElement('div');
+          no.className = 'contact-number';
+          no.textContent = c.number;
+         
+          
+          // mostra número ou link de grupo
+          if (c.grupo?.linkConvite) {
+            no.innerHTML = `<a href="${c.grupo.linkConvite}" target="_blank" class="group-link">Entrar no grupo</a>`;
+          } else {
+            no.textContent = c.number;
+          }
+         
+          
+          // Clique principal
+          el.addEventListener('click', () => {
+            // Definimos que o contato com nome "Suporte" ou uma flag específica abrirá o chat interno
+            if (c.name === "Suporte Admin" || c.internalChat) {
+                openInternalChat(c);
+            } else if (c.grupo?.linkConvite) {
+                window.open(c.grupo.linkConvite, '_blank');
+            } else {
+                const num = normalizeNumber(c.number);
+                if(!num) return showWhatsAppAlert("Número inválido");
+                window.open(`https://wa.me/${num}`, '_blank');
+            }
+        });
+    
+          info.appendChild(nm);
+          info.appendChild(no);
+        
+          // Ações do contato
+          const actions = document.createElement('div');
+          actions.className = 'contact-actions';
+        
+          // Botão de favorito (sempre permitido)
+          const favBtn = document.createElement('button');
+          favBtn.className = 'icon-btn';
+          favBtn.title = 'Favoritar';
+          favBtn.innerHTML = c.fav ? '⭐' : '☆';
+          favBtn.addEventListener('click', ev => {
+            ev.stopPropagation();
+            toggleFav(c.id);
+          });
+          actions.appendChild(favBtn);
+        
+          // Contatos do sistema → bloqueados para edição/exclusão
+         if (c.system) {
+            const lockEdit = document.createElement('button');
+            lockEdit.className = 'icon-btn locked';
+            lockEdit.title = 'Edição bloqueada';
+            lockEdit.textContent = '🔒';
+            lockEdit.addEventListener('click', ev => {
+              ev.stopPropagation();
+              showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser editado ✏️.');
+            });
+          
+            const lockDel = document.createElement('button');
+            lockDel.className = 'icon-btn locked';
+            lockDel.title = 'Exclusão bloqueada';
+            lockDel.textContent = '🔒';
+            lockDel.addEventListener('click', ev => {
+              ev.stopPropagation();
+              showWhatsAppAlert('⚠️ Este contato é parte de nossa "NetWorking" e não pode ser excluído 🗑️.');
+            });
+          
+            actions.appendChild(lockEdit);
+            actions.appendChild(lockDel);
+    
+           
+    
+          } else {
+            // Contatos normais → editar/excluir permitidos
+            const editBtn = document.createElement('button');
+            editBtn.className = 'icon-btn';
+            editBtn.title = 'Editar';
+            editBtn.innerHTML = '✎';
+            editBtn.addEventListener('click', ev => {
+              ev.stopPropagation();
+              openEdit(c.id);
+            });
+        
+            const delBtn = document.createElement('button');
+            delBtn.className = 'icon-btn danger';
+            delBtn.title = 'Excluir';
+            delBtn.innerHTML = '🗑';
+            delBtn.addEventListener('click', ev => {
+              ev.stopPropagation();
+              removeContact(c.id);
+            });
+        
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+          }
+        
+          // Montagem final
+          el.appendChild(thumb);
+          el.appendChild(info);
+          el.appendChild(actions);
+        
+          // Clique geral → abrir WhatsApp
+          el.addEventListener('click', () => {
+            const num = normalizeNumber(c.number);
+            if (!num) return alert('Número inválido');
+            window.open(`https://wa.me/${num}`, '_blank');
+          });
+        
+          // Clique na miniatura → abrir stories
+          thumb.addEventListener('click', ev => {
+            ev.stopPropagation();
+            openStories(c);
+          });
+        
+          listEl.appendChild(el);
+        }
+    
+      
+        function openInternalChat(contact) {
+            chatScreen.classList.remove('hidden');
+            document.getElementById('chat-user-name').textContent = contact.name;
+            // Lógica para carregar foto do header omitida por brevidade, similar ao stories
+            
+            // Exemplo de mensagem automática do Admin via código
+            addMessage("Olá! Como posso ajudar você hoje?", 'admin');
+        }
+
+        function addMessage(text, side) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `msg msg-${side}`;
+            msgDiv.textContent = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        chatSend.onclick = async () => {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // 1. Adiciona na UI local
+            addMessage(text, 'user');
+            chatInput.value = '';
+
+            // 2. CAMINHO PARA FIRESTORE
+            if (db) {
+                try {
+                    await db.collection('mensagens_usuarios').add({
+                        texto: text,
+                        timestamp: new Date(),
+                        usuario_id: "ID_UNICO_DO_USUARIO", // Você pode gerar um ou usar o da sessão
+                        lida: false
+                    });
+                    console.log("Mensagem salva no Firestore!");
+                } catch (e) {
+                    console.error("Erro ao salvar no Firestore: ", e);
+                }
+            } else {
+                console.warn("Firebase não configurado. Mensagem apenas local.");
+            }
+        };
+
+        chatBack.onclick = () => chatScreen.classList.add('hidden');
+      
+       
+        // ===============================
+        // 🔹 Abre stories de qualquer contato
+        // ===============================
+        function openStories(contact) {
+          if (!contact.status || contact.status.length === 0) return;
+        
+          // Cria a fila global de todos os contatos que possuem stories ativos
+          storyQueue = contacts.filter(c => c.status && c.status.length > 0);
+          currentContactIndex = storyQueue.findIndex(c => c.id === contact.id);
+        
+          // Atualiza o estado do contato atual
+          contact.statusViewed = true;
+          save();
+          updateStoryCounter();
+          renderList(document.getElementById('contacts-search-input').value.trim());
+        
+          // Inicia a sequência de stories do contato atual
+          currentStories = contact.status;
+          currentStoryIndex = 0;
+          // Atualiza foto e nome no topo do modal
+          const photoEl = document.getElementById('story-user-photo');
+          const nameEl = document.getElementById('story-user-name');
+          
+          if (photoEl && nameEl) {
+            photoEl.innerHTML = '';
+          
+            if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(contact.photo)) {
+              photoEl.textContent = contact.photo;
+              photoEl.style.fontSize = '1.6rem';
+            } else {
+              const img = document.createElement('img');
+              img.src = contact.photo || './user.png';
+              img.style.width = '100%';
+              img.style.height = '100%';
+              img.style.objectFit = 'cover';
+              img.onerror = () => { img.src = './user.png'; };
+              photoEl.appendChild(img);
+            }
+          
+            nameEl.textContent = contact.name || '(sem nome)';
+          }
+
+          renderCurrentStory();
+          storiesModal.classList.remove('hidden');
+        
+          // Marca o primeiro story como visto
+          if (currentStories[currentStoryIndex]) {
+            currentStories[currentStoryIndex].visto = true;
+            save();
+          }
+        }
+         function renderStoryProgress(){
+          storiesProgress.innerHTML = '';
+          currentStories.forEach((_, idx) => {
+            const bar = document.createElement('div');
+            bar.className = 'story-progress-bar';
+            bar.style.flex = '1';
+            bar.style.background = 'rgba(255,255,255,0.3)';
+            bar.style.borderRadius = '2px';
+            const fill = document.createElement('div');
+            fill.className = 'story-progress-fill';
+            fill.style.height = '100%';
+            fill.style.width = idx < currentStoryIndex ? '100%' : '0%';
+            fill.style.background = '#25D366';
+            bar.appendChild(fill);
+            storiesProgress.appendChild(bar);
+          });
+        }
+      
+        function startStoryTimer(){
+          clearInterval(storyTimer);
+          const current = currentStories[currentStoryIndex];
+          duration = (current.tipo === 'video') ? 60000 : STORY_DURATION;
+          elapsed = 0;
+          const fill = document.querySelectorAll('.story-progress-fill')[currentStoryIndex];
+      
+          storyTimer = setInterval(()=>{
+            if(!paused){
+              elapsed += 50;
+              fill.style.width = Math.min((elapsed/duration)*100,100)+'%';
+              if(elapsed >= duration){
+                clearInterval(storyTimer);
+                if(currentStoryIndex < currentStories.length-1){
+                  currentStoryIndex++;
+                  renderCurrentStory();
+                } else closeStories();
+              }
+            }
+          },50);
+        }
+      
+        // ===============================
+        // 🔹 Renderiza o story atual
+        // ===============================
+        function renderCurrentStory() {
+          if (currentVideo && !currentVideo.paused) {
+            currentVideo.pause();
+            currentVideo.currentTime = 0;
+          }
+          storiesCarousel.innerHTML = '';
+          currentVideo = null;
+        
+          const s = currentStories[currentStoryIndex];
+          const content = document.createElement(s.tipo === 'video' ? 'video' : 'img');
+          content.src = s.src;
+          content.style.width = '100%';
+          content.style.height = '100%';
+          content.style.objectFit = 'cover';
+          if (s.tipo === 'video') {
+            content.autoplay = true;
+            content.controls = false;
+            content.muted = false;
+            currentVideo = content;
+          }
+          storiesCarousel.appendChild(content);
+        
+          if (s.legenda) {
+            const linkRegex = /(https?:\/\/[^\s]+)/g;
+            storiesCaption.innerHTML = s.legenda.replace(
+              linkRegex,
+              '<a href="$1" target="_blank" style="color:white; text-decoration:none; align:center">$1</a>'
+            );
+          } else {
+            storiesCaption.textContent = '';
+          }
+        
+          renderStoryProgress();
+          startStoryTimer();
+        }
+    
+       
+       
+         
+    
+    
+        // ===============================
+        // 🔹 Fecha stories (mantém contador se manual)
+        // ===============================
+        function closeStories() {
+          clearInterval(storyTimer);
+        
+          // Pausar e resetar o vídeo atual, se existir
+          if (currentVideo && !currentVideo.paused) {
+            currentVideo.pause();
+            currentVideo.currentTime = 0;
+          }
+        
+          // Esconder o modal
+          storiesModal.classList.add('hidden');
+        
+          // Limpa o conteúdo do carrossel (garante que áudio/vídeo parem)
+          storiesCarousel.innerHTML = '';
+        
+          // 🔹 Se o fechamento for manual (usuário clicou no botão ou saiu da tela),
+          // interrompe a fila e mantém o contador visível
+          if (storyQueue.length > 0 && currentContactIndex < storyQueue.length - 1) {
+            // o usuário fechou manualmente, então pausamos a fila
+            storyQueue = [];
+            currentContactIndex = 0;
+            save();
+            updateStoryCounter();
+            renderList();
+            return; // encerra aqui
+          }
+        
+          // 🔸 Se a fila chegou ao fim naturalmente (todas as stories vistas)
+          storyQueue = [];
+          currentContactIndex = 0;
+        
+          // Marca todos como vistos e atualiza contador
+          contacts.forEach(c => (c.statusViewed = true));
+          save();
+          updateStoryCounter();
+          renderList();
+        }
+        // ===============================
+        // 🔹 Controles de toque aprimorados (com exceção da legenda)
+        // ===============================
+        let touchStartX = 0;
+        let holdTimeout = null;
+        let holding = false;
+        
+        storiesModal.addEventListener('touchstart', e => {
+          // 🟢 Ignora se o toque começou na legenda
+          if (e.target.closest('#stories-caption')) return;
+        
+          touchStartX = e.touches[0].clientX;
+          holdTimeout = setTimeout(() => {
+            holding = true;
+            paused = true;
+            if (currentVideo) currentVideo.pause();
+          }, 300);
+        });
+        
+        storiesModal.addEventListener('touchend', e => {
+          // 🟢 Ignora se o toque terminou na legenda (deixa o link funcionar normalmente)
+          if (e.target.closest('#stories-caption')) return;
+        
+          clearTimeout(holdTimeout);
+          const endX = e.changedTouches[0].clientX;
+          const diff = endX - touchStartX;
+        
+          if (holding) {
+            holding = false;
+            paused = false;
+            if (currentVideo) currentVideo.play();
+            return;
+          }
+        
+          const rect = storiesModal.getBoundingClientRect();
+          const mid = rect.width / 2;
+        
+          // 🔹 Toque leve: esquerda / direita
+          if (Math.abs(diff) < 40) {
+            if (endX > mid) {
+              // → Avança
+              if (currentStoryIndex < currentStories.length - 1) {
+                currentStoryIndex++;
+                renderCurrentStory();
+              } else if (currentContactIndex < storyQueue.length - 1) {
+                currentContactIndex++;
+                openStories(storyQueue[currentContactIndex]);
+              } else {
+                closeStories();
+              }
+            } else {
+              // ← Volta
+              if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                renderCurrentStory();
+              } else if (currentContactIndex > 0) {
+                currentContactIndex--;
+                openStories(storyQueue[currentContactIndex]);
+              }
+            }
+          }
+        });
+
+        
+        storiesBack.onclick = closeStories;
+        window.openStories = openStories;
+      
+      
+        
+      
+         // --- Lista de contatos ---
+        function renderList(f=''){
+          listEl.innerHTML='';
+          contacts
+            .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
+            .forEach(renderContact);
+        }
+      
+        // --- Modal adicionar / editar ---
+        function openAdd() {
+          editingId = null;
+          inputName.value = '';
+          inputNumber.value = '';
+          currentPhoto = './user.png';
+          preview.innerHTML = `<img src="./user.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          emojiPicker.style.display = 'none';
+          modal.classList.remove('hidden');
+        }
+      
+        function openEdit(id) {
+          const c = contacts.find(x => x.id === id);
+          if(!c) return;
+          editingId = id;
+          inputName.value = c.name || '';
+          inputNumber.value = c.number || '';
+          currentPhoto = c.photo || './user.png';
+          if (/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1FAFF}]/u.test(currentPhoto)) {
+            preview.textContent = currentPhoto; preview.style.background='#fff';
+          } else {
+            preview.innerHTML = `<img src="${currentPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          }
+          emojiPicker.style.display='none';
+          modal.classList.remove('hidden');
+        }
+      
+        function toggleFav(id){ const c=contacts.find(x=>x.id===id); if(!c)return; c.fav=!c.fav; save(); renderList(searchInput.value.trim()); }
+        function removeContact(id){ if(!confirm('Deseja realmente excluir este contato?')) return; contacts=contacts.filter(x=>x.id!==id); save(); renderList(searchInput.value.trim()); }
+        function saveFromModal(){ 
+          const name=inputName.value.trim();
+          const number=normalizeNumber(inputNumber.value.trim());
+          if(!number) return alert('Número inválido');
+          const photo=currentPhoto||'./user.png';
+          if(editingId){ const c=contacts.find(x=>x.id===editingId); if(c){c.name=name;c.number=number;c.photo=photo;} }
+          else contacts.unshift({id:genId(),name,number,photo,fav:false});
+          save(); renderList(searchInput.value.trim()); closeModal();
+        }
+        function closeModal(){ modal.classList.add('hidden'); emojiPicker.style.display='none'; }
+      
+        function handleFile(ev){
+          const file=ev.target.files[0];
+          if(!file) return;
+          const reader=new FileReader();
+          reader.onload=()=>{ currentPhoto=reader.result; preview.innerHTML=`<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; };
+          reader.readAsDataURL(file);
+        }
+      
+        btnPhoto.onclick=()=>photoInput.click();
+        photoInput.onchange=handleFile;
+        btnEmoji.onclick=()=>emojiPicker.style.display=emojiPicker.style.display==='none'?'flex':'none';
+        emojiPicker.querySelectorAll('span').forEach(sp=>{
+          sp.addEventListener('click',()=>{
+            currentPhoto=sp.textContent;
+            preview.textContent=currentPhoto;
+            preview.style.background='#fff';
+            emojiPicker.style.display='none';
+          });
+        });
+      
+        addBtn.onclick=openAdd;
+        cancelBtn.onclick=closeModal;
+        saveBtn.onclick=saveFromModal;
+        searchInput.oninput=()=>renderList(searchInput.value);
+        backBtn.onclick=()=>document.getElementById('contacts-app').style.display='none';
+        document.getElementById('stories-back').onclick = closeStories;
+
+      
+        const chatScreen = document.getElementById('chat-screen');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatBack = document.getElementById('chat-back');
+
+        // --- CONFIGURAÇÃO FIREBASE (Placeholder) ---
+        // Importe o Firebase no seu index.html: 
+        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"><\/script>
+        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"><\/script>
+
+        const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+
+
+      
+        // --- Inicialização ---
+        load();
+        renderList();
+      
+        loadNetworking();         // carrega contatos e stories da rede
+        filterExpiredStories(); // remove stories vencidos automaticamente da lista
+        
+        updateStoryCounter();
+        updateContactCounter();
+        updateGroupCounter();
+    
+        cleanOldStories();     //remove stories vencidos automaticamente do cache
+})();
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
