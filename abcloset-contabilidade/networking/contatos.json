@@ -1,6 +1,6 @@
 [
   {
-    "nome": "Suporte Oficial",
+    "nome": "Suporte Admin",
     "photo": "./logo.png",
     "internalChat": true,
     "status": []
@@ -189,6 +189,7 @@
 
 
 ]
+
 
 
 
