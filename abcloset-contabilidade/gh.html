@@ -2644,22 +2644,13 @@ function salvarConfiguracoes() {
                 wallpaperGallery.innerHTML = '';
                 
                 // 3. Aplica o wallpaper inicial ao menu
-               // menuScreen.style.backgroundImage = `url('${initialUrl}')`;
-                //menuScreen.style.backgroundSize = 'cover';
-               // menuScreen.style.backgroundPosition = 'center';
-               // menuScreen.style.backgroundRepeat = 'no-repeat';
-                // 3. Aplica o wallpaper inicial à CAMADA FIXA
-                //const wallLayer = document.getElementById('menu-wallpaper-layer');
-                //if (wallLayer) {
-                 //   wallLayer.style.backgroundImage = `url('${initialUrl}')`;
-                 //   wallLayer.style.backgroundSize = 'cover';
-                //    wallLayer.style.backgroundPosition = 'center';
-                //    wallLayer.style.backgroundRepeat = 'no-repeat';
-               // }
-                wallLayer.style.backgroundImage = `url('${initialUrl}')`;
-                wallLayer.style.backgroundSize = 'cover';
-                wallLayer.style.backgroundPosition = 'center';
-                wallLayer.style.backgroundRepeat = 'no-repeat';
+                const wallLayer = document.getElementById('menu-wallpaper-layer');
+                    wallLayer.style.backgroundImage = `url('${initialUrl}')`;
+                    wallLayer.style.backgroundSize = 'cover';
+                    wallLayer.style.backgroundPosition = 'center';
+                    wallLayer.style.backgroundRepeat = 'no-repeat';
+               
+                
                 // 4. Cria os elementos da galeria
                 imageNames.forEach(name => {
                     // A URL completa é: 'wallpapers/' + nome_do_arquivo
@@ -2884,6 +2875,7 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
+
 
 
 
