@@ -4,6 +4,7 @@
     "photo": "./logo.png",
     "internalChat": true,
     "status": []
+    "system": true
   },
   {
     "name": "Ariane B",
@@ -34,6 +35,7 @@
 
 
 ]
+
 
 
 
