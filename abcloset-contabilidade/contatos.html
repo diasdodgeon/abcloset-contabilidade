@@ -460,6 +460,21 @@
 
 <script>
 (function(){
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatBack = document.getElementById('chat-back');
+
+        // --- CONFIGURAÇÃO FIREBASE (Placeholder) ---
+        // Importe o Firebase no seu index.html: 
+        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"><\/script>
+        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"><\/script>
+
+        const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+
+
+
+
+
         const STORAGE_KEY = 'contactsApp.v2';
         const listEl = document.getElementById('contacts-list');
         const modal = document.getElementById('contacts-modal');
@@ -1309,19 +1324,9 @@
       
         const chatScreen = document.getElementById('chat-screen');
         const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatSend = document.getElementById('chat-send');
-        const chatBack = document.getElementById('chat-back');
-
-        // --- CONFIGURAÇÃO FIREBASE (Placeholder) ---
-        // Importe o Firebase no seu index.html: 
-        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"><\/script>
-        // <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"><\/script>
-
-        const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+        
 
 
-      
         // --- Inicialização ---
         load();
         renderList();
