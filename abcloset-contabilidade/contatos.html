@@ -942,11 +942,11 @@
           el.appendChild(actions);
         
           // Clique geral → abrir WhatsApp
-          el.addEventListener('click', () => {
-            const num = normalizeNumber(c.number);
-            if (!num) return alert('Número inválido');
-            window.open(`https://wa.me/${num}`, '_blank');
-          });
+          //el.addEventListener('click', () => {
+          //  const num = normalizeNumber(c.number);
+          //  if (!num) return alert('Número inválido');
+          //  window.open(`https://wa.me/${num}`, '_blank');
+         // });
         
           // Clique na miniatura → abrir stories
           thumb.addEventListener('click', ev => {
@@ -1350,6 +1350,7 @@
 
 </body>
 </html>
+
 
 
 
