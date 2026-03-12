@@ -13,10 +13,10 @@ console.log("ChatEngine iniciado")
 
 carregarDados: async function(){
 
-const treino = await fetch("data/treinamentoChat.json")
+const treino = await fetch("./treinamentoChat.json")
 this.dadosTreinamento = await treino.json()
 
-const func = await fetch("data/funcionalidades.json")
+const func = await fetch("./funcionalidades.json")
 this.funcionalidades = await func.json()
 
 },
@@ -152,4 +152,5 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
+
 window.ChatEngine = ChatEngine
