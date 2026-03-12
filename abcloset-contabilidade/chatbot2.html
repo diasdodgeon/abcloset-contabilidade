@@ -119,6 +119,17 @@ Enquanto isso, talvez eu possa ajudar com uma dessas opções:
 `;
 
 }
+
+
+let funcionalidades;
+
+async function carregarFuncionalidades(){
+
+const res = await fetch("./funcionalidades.json");
+funcionalidades = await res.json();
+
+}
+
 let dadosTreinamento;
 let memoria = [];
 
@@ -179,6 +190,66 @@ return melhorIntent;
 
 }
 
+function encontrarFuncionalidade(frase){
+
+frase = frase.toLowerCase();
+
+let palavras = frase.split(" ");
+
+let melhor = null;
+let melhorScore = 0;
+
+for(let nome in funcionalidades){
+
+let func = funcionalidades[nome];
+
+let score = 0;
+
+palavras.forEach(p=>{
+
+if(func.palavras.includes(p)){
+score++;
+}
+
+});
+
+if(score > melhorScore){
+
+melhorScore = score;
+melhor = func;
+
+}
+
+}
+
+if(melhorScore >= 2){
+return melhor;
+}
+
+return null;
+
+}
+
+function responderFuncionalidade(func){
+
+let texto = `Parece que você quer ajuda com:\n\n${func.titulo}\n\n`;
+
+texto += func.descricao + "\n\n";
+
+texto += "Nessa área você pode:\n";
+
+func.acoes.forEach(a=>{
+texto += "• " + a + "\n";
+});
+
+return texto;
+
+}
+
+
+
+
+
 function salvarPerguntaNaoEntendida(pergunta){
 
 let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]");
@@ -202,25 +273,36 @@ console.table(lista);
 
 function responder(frase){
 
-// verificar se o usuário digitou número do menu
-
-if(menuAjuda[frase]){
-
-return menuAjuda[frase];
-
-}
+// tentar intent treinada
 
 const intent = encontrarIntent(frase);
 
-if(!intent){
+if(intent){
 
-salvarPerguntaNaoEntendida(frase);
-console.log(verPerguntasNaoEntendidas())
-return gerarMenuAjuda();
+const resp = dadosTreinamento.respostas.find(r => r.intent === intent);
+
+if(resp) return resp.resposta;
 
 }
 
-const resp = dadosTreinamento.respostas.find(r => r.intent === intent);
+// tentar funcionalidade
+
+const func = encontrarFuncionalidade(frase);
+
+if(func){
+
+return responderFuncionalidade(func);
+
+}
+
+// fallback
+
+salvarPerguntaNaoEntendida(frase);
+console.log(verPerguntasNaoEntendidas());
+
+return gerarMenuAjuda();
+
+
 
 if(resp) return resp.resposta;
 
@@ -265,6 +347,7 @@ memoria.push(resposta);
 }
 
 carregarTreinamento();
+carregarFuncionalidades();
 
 </script>
 
