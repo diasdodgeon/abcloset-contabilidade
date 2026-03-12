@@ -864,18 +864,19 @@
          
           
           // Clique principal
-          el.addEventListener('click', () => {
-            // Definimos que o contato com nome "Suporte" ou uma flag específica abrirá o chat interno
-            if (c.name === "Suporte Admin" || c.internalChat) {
-                openInternalChat(c);
-            } else if (c.grupo?.linkConvite) {
-                window.open(c.grupo.linkConvite, '_blank');
-            } else {
-               const num = normalizeNumber(c.number);
-               if(!num) return showWhatsAppAlert("Número inválido");
-               window.open(`https://wa.me/${num}`, '_blank');
-            }
-        });
+            el.onclick = () => {
+                if (c.internalChat === true) {
+                    openInternalChat(c);
+                } else {
+                    // Trata como link externo se tiver número
+                    if(c.number) {
+                        window.open(`https://wa.me/${c.number.replace(/\D/g,'')}`, '_blank');
+                    } else {
+                        alert("Este contato não possui número nem chat interno.");
+                    }
+                }
+            };
+            contactsListEl.appendChild(el);
     
           info.appendChild(nm);
           info.appendChild(no);
@@ -1358,7 +1359,6 @@
 
 </body>
 </html>
-
 
 
 
