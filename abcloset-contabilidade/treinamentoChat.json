@@ -1,0 +1,75 @@
+{
+"versao":"1.0",
+
+"intents":[
+"saudacao",
+"despedida",
+"como_funciona",
+"criar_conta",
+"criar_agenda",
+"compartilhar_link",
+"ver_agendamentos",
+"cancelar_agendamento",
+"preco",
+"suporte"
+],
+
+"documentos":[
+
+{"frase":"olá","intent":"saudacao"},
+{"frase":"oi","intent":"saudacao"},
+{"frase":"bom dia","intent":"saudacao"},
+{"frase":"boa tarde","intent":"saudacao"},
+
+{"frase":"como funciona","intent":"como_funciona"},
+{"frase":"como funciona o sistema","intent":"como_funciona"},
+{"frase":"para que serve","intent":"como_funciona"},
+
+{"frase":"como criar conta","intent":"criar_conta"},
+{"frase":"quero criar conta","intent":"criar_conta"},
+{"frase":"como faço cadastro","intent":"criar_conta"},
+
+{"frase":"como criar agenda","intent":"criar_agenda"},
+{"frase":"como configurar agenda","intent":"criar_agenda"},
+
+{"frase":"como compartilhar agenda","intent":"compartilhar_link"},
+{"frase":"como enviar link de agendamento","intent":"compartilhar_link"},
+
+{"frase":"como ver agendamentos","intent":"ver_agendamentos"},
+{"frase":"onde vejo meus clientes","intent":"ver_agendamentos"},
+
+{"frase":"cancelar agendamento","intent":"cancelar_agendamento"},
+{"frase":"remover cliente da agenda","intent":"cancelar_agendamento"},
+
+{"frase":"quanto custa","intent":"preco"},
+{"frase":"qual o preço","intent":"preco"},
+{"frase":"tem plano gratuito","intent":"preco"},
+
+{"frase":"preciso de ajuda","intent":"suporte"},
+{"frase":"falar com suporte","intent":"suporte"}
+],
+
+"respostas":[
+
+{"intent":"saudacao","resposta":"Olá! 👋 Sou o assistente da plataforma de agendamentos. Como posso ajudar?"},
+
+{"intent":"despedida","resposta":"Até logo! Se precisar de ajuda é só chamar 😊"},
+
+{"intent":"como_funciona","resposta":"Nossa plataforma permite que você crie uma agenda online e compartilhe um link para que seus clientes agendem horários automaticamente."},
+
+{"intent":"criar_conta","resposta":"Para criar sua conta basta acessar a página de cadastro e preencher seus dados. Em poucos minutos sua agenda estará pronta."},
+
+{"intent":"criar_agenda","resposta":"Depois de criar sua conta, você pode configurar dias e horários de atendimento diretamente no painel de controle."},
+
+{"intent":"compartilhar_link","resposta":"Após configurar sua agenda você receberá um link exclusivo que pode ser enviado para seus clientes."},
+
+{"intent":"ver_agendamentos","resposta":"Todos os agendamentos aparecem organizados no painel da sua agenda dentro do dashboard."},
+
+{"intent":"cancelar_agendamento","resposta":"Você pode cancelar agendamentos diretamente na lista de clientes dentro da agenda."},
+
+{"intent":"preco","resposta":"A plataforma possui planos acessíveis e também uma versão inicial gratuita para começar."},
+
+{"intent":"suporte","resposta":"Se precisar de ajuda nossa equipe de suporte está disponível para orientar você."}
+
+]
+}
