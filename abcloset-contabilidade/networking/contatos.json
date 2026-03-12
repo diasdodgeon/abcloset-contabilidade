@@ -1,8 +1,8 @@
 [
   {
     "nome": "Suporte Admin",
-    "photo": "🛠️",
-    "number": "5585944355181",
+    "photo": "./admin.png",
+    
     "internalChat": true,
     "status": []
     
@@ -36,6 +36,7 @@
 
 
 ]
+
 
 
 
