@@ -1,0 +1,72 @@
+{
+  "agenda": {
+    "titulo": "Agenda de atendimentos",
+    "descricao": "Área onde você configura seus horários disponíveis para clientes.",
+    "acoes": [
+      "definir horários",
+      "bloquear datas",
+      "visualizar clientes"
+    ],
+    "palavras": [
+      "agenda",
+      "horario",
+      "horarios",
+      "agendamento",
+      "marcar",
+      "atendimento"
+    ]
+  },
+
+  "estilo": {
+    "titulo": "Personalização da página",
+    "descricao": "Permite alterar cores, banner, imagem e título da página de agendamento.",
+    "acoes": [
+      "alterar cores",
+      "trocar banner",
+      "mudar título"
+    ],
+    "palavras": [
+      "cor",
+      "cores",
+      "imagem",
+      "banner",
+      "estilo",
+      "aparencia",
+      "pagina"
+    ]
+  },
+
+  "clientes": {
+    "titulo": "Lista de clientes",
+    "descricao": "Mostra todos os clientes que fizeram agendamentos.",
+    "acoes": [
+      "cancelar agendamento",
+      "editar cliente",
+      "ver histórico"
+    ],
+    "palavras": [
+      "cliente",
+      "clientes",
+      "lista",
+      "pessoas",
+      "usuario"
+    ]
+  },
+
+  "compartilhar": {
+    "titulo": "Compartilhar agenda",
+    "descricao": "Gera um link que você pode enviar para seus clientes agendarem.",
+    "acoes": [
+      "copiar link",
+      "enviar whatsapp",
+      "gerar QR code"
+    ],
+    "palavras": [
+      "link",
+      "compartilhar",
+      "enviar",
+      "agenda",
+      "divulgar"
+    ]
+  }
+}
