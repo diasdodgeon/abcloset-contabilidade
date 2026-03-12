@@ -640,6 +640,7 @@
           } catch (err) {
             console.log('⚠️ Nenhum networking carregado:', err.message);
           }
+           await ChatEngine.init()
         }
     
       
@@ -1261,7 +1262,7 @@
           contacts
             .filter(c=>(c.name+c.number).toLowerCase().includes(f.toLowerCase()))
             .forEach(renderContact);
-          await ChatEngine.init();
+         
         }
       
         // --- Modal adicionar / editar ---
@@ -1424,6 +1425,7 @@
 
 </body>
 </html>
+
 
 
 
