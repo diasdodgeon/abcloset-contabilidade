@@ -1005,31 +1005,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        chatSend.onclick = async () => {
-            const text = chatInput.value.trim();
-            if (!text) return;
-
-            // 1. Adiciona na UI local
-            addMessage(text, 'user');
-            chatInput.value = '';
-
-            // 2. CAMINHO PARA FIRESTORE
-            if (db) {
-                try {
-                    await db.collection('mensagens_usuarios').add({
-                        texto: text,
-                        timestamp: new Date(),
-                        usuario_id: "ID_UNICO_DO_USUARIO", // Você pode gerar um ou usar o da sessão
-                        lida: false
-                    });
-                    console.log("Mensagem salva no Firestore!");
-                } catch (e) {
-                    console.error("Erro ao salvar no Firestore: ", e);
-                }
-            } else {
-                console.warn("Firebase não configurado. Mensagem apenas local.");
-            }
-        };
+        
 
         chatBack.onclick = () => chatScreen.classList.add('hidden');
       
@@ -1447,6 +1423,7 @@
 
 </body>
 </html>
+
 
 
 
