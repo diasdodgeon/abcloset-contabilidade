@@ -719,7 +719,7 @@
               save();
               renderList(searchInput.value.trim());
               counter.classList.add('hidden');
-            }, 10000);
+            }, 1000);
           };
         }
         
@@ -750,7 +750,7 @@
               save();
               renderList(searchInput.value.trim());
               counter.classList.add('hidden');
-            }, 10000);
+            }, 1000);
           };
         }
         
@@ -779,7 +779,7 @@
     
     
         document.body.classList.add('filtering');
-        setTimeout(() => document.body.classList.remove('filtering'), 10000);
+        setTimeout(() => document.body.classList.remove('filtering'), 1000);
     
     
     
@@ -817,7 +817,7 @@
           setTimeout(() => {
             alertBox.classList.remove('show');
             alertBox.classList.add('hidden');
-          }, 5000);
+          }, 1000);
         }
     
         function renderContact(c) {
@@ -864,20 +864,19 @@
          
           
           // Clique principal
-            el.onclick = () => {
-                if (c.internalChat === true) {
-                    openInternalChat(c);
-                } else {
-                    // Trata como link externo se tiver número
-                    if(c.number) {
-                        window.open(`https://wa.me/${c.number.replace(/\D/g,'')}`, '_blank');
-                    } else {
-                        alert("Este contato não possui número nem chat interno.");
-                    }
-                }
-            };
-            //contactsListEl.appendChild(el);
-          info.appendChild(el);
+          el.addEventListener('click', () => {
+            // Definimos que o contato com nome "Suporte" ou uma flag específica abrirá o chat interno
+            if (c.name === "Suporte Admin" || c.internalChat) {
+                openInternalChat(c);
+            } else if (c.grupo?.linkConvite) {
+                window.open(c.grupo.linkConvite, '_blank');
+            } else {
+               const num = normalizeNumber(c.number);
+               if(!num) return showWhatsAppAlert("Número inválido");
+               window.open(`https://wa.me/${num}`, '_blank');
+            }
+        });
+    
           info.appendChild(nm);
           info.appendChild(no);
         
