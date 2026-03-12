@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chatbot Inteligente</title>
+    <script src="https://cdn.jsdelivr.net/npm/@nlpjs/basic"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #chat-container { width: 100%; max-width: 400px; border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: #f9f9f9; }
+        #chat-log { height: 300px; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px; padding: 5px; }
+        .msg { margin: 5px 0; padding: 8px; border-radius: 5px; }
+        .bot { background: #e1f5fe; align-self: flex-start; }
+        .user { background: #e8f5e9; text-align: right; }
+        #status { font-size: 12px; color: #888; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <div id="status">Iniciando sistema...</div>
+        <div id="chat-log"></div>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="user-input" placeholder="Digite algo..." style="flex:1; padding: 8px;">
+            <button onclick="enviarMensagem()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const { window: { nlpjs } } = window;
+        let bot;
+        const statusTxt = document.getElementById('status');
+
+        async function inicializarBot() {
+            // Inicialização padrão do container e NLP.js
+            const container = await nlpjs.containerBootstrap();
+            container.use(nlpjs.Nlp);
+            container.use(nlpjs.LangPt);
+            bot = container.get('nlp');
+            bot.settings.autoSave = false;
+            bot.addLanguage('pt');
+
+            try {
+                //Para fazer o bot atualizar automaticamente sempre que se alterar o arquivo JSON, a estratégia é adicionar um campo de versao no JSON. O JavaScript comparará a versão salva no navegador com a versão do arquivo online; se forem diferentes, ele ignora o cache e treina novamente.
+                
+
+                // 1. Busca o arquivo JSON atualizado
+                const response = await fetch('./treinamentoChat.json?nocache=' + Date.now());
+            //const response = await fetch('./treinamentoChat.json');
+                const dadosOnline = await response.json();
+
+                // 2. Verifica a versão salva no navegador
+                const versaoLocal = localStorage.getItem('bot_versao');
+
+                if (versaoLocal === dadosOnline.versao) {
+                    // Versão coincide? Carrega o cérebro instantâneo do localStorage
+                    const modeloSalvo = localStorage.getItem('modelo_bot');
+                    bot.import(modeloSalvo);
+                    statusTxt.innerText = "Status: Pronto (Versão " + dadosOnline.versao + ")";
+                } else {
+                    // Versão mudou ou não existe? Treina do zero com os novos dados
+                    statusTxt.innerText = "Status: Atualizando para v" + dadosOnline.versao + "...";
+                    await treinarComDados(dadosOnline);
+                }
+            } catch (erro) {
+                statusTxt.innerText = "Erro ao conectar com o servidor.";
+                console.error(erro);
+            }
+        }
+
+        async function treinarComDados(dados) {
+            // Alimenta o bot com os novos documentos e respostas do JSON
+            dados.documentos.forEach(d => bot.addDocument('pt', d.frase, d.intent));
+            dados.respostas.forEach(r => bot.addAnswer('pt', r.intent, r.resposta));
+
+            await bot.train();
+
+            // Salva o novo modelo e a nova versão
+            localStorage.setItem('modelo_bot', bot.export());
+            localStorage.setItem('bot_versao', dados.versao);
+            
+            statusTxt.innerText = "Status: Atualizado (v" + dados.versao + ")";
+        }
+
+        
+
+        async function enviarMensagem() {
+            const input = document.getElementById('user-input');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            exibirMensagem('user', texto);
+            input.value = '';
+
+            // O bot processa a frase usando o modelo treinado
+            const resultado = await bot.process('pt', texto);
+            const resposta = resultado.answer || "Ainda estou aprendendo sobre isso. Pode reformular?";
+            
+            setTimeout(() => exibirMensagem('bot', resposta), 500);
+        }
+
+        function exibirMensagem(autor, msg) {
+            const log = document.getElementById('chat-log');
+            log.innerHTML += `<div class="msg ${autor}"><strong>${autor === 'bot' ? 'Bot' : 'Você'}:</strong> ${msg}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        inicializarBot();
+    </script>
+</body>
+</html>
