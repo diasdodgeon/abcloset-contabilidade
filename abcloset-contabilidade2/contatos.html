@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Contatos</title>
+
+<link rel="stylesheet" href="contatos.css">
+</head>
+
+<body>
+
+<!-- ALERTA ESTILO WHATSAPP -->
+<div id="whatsapp-alert" class="whatsapp-alert hidden">
+  <div class="wa-header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+    <span>WhatsApp</span>
+  </div>
+  <div id="waMessageText"></div>
+</div>
+
+<audio id="waSound" src="whatsapp.mp3"></audio>
+
+<!-- APP DE CONTATOS -->
+<div id="contacts-app" class="contacts-app">
+
+<header class="contacts-header">
+<button id="contacts-back" class="back-btn">←</button>
+<h2>Contatos</h2>
+<button id="contacts-add" class="add-btn">＋</button>
+</header>
+
+<div class="contacts-search">
+<input id="contacts-search-input" type="search" placeholder="Procurar contato">
+</div>
+
+<div id="contacts-list" class="contacts-list"></div>
+
+</div>
+
+<!-- MODAL CONTATO -->
+
+<div id="contacts-modal" class="contacts-modal hidden">
+
+<div class="contacts-modal-card">
+
+<h3 id="modal-title">Adicionar Contato</h3>
+
+<label>
+Nome
+<input id="contact-name" type="text">
+</label>
+
+<label>
+Número
+<input id="contact-number" type="text">
+</label>
+
+<div id="photo-preview" class="photo-preview">👤</div>
+
+<div class="modal-actions">
+<button id="modal-save" class="btn primary">Salvar</button>
+<button id="modal-cancel" class="btn">Cancelar</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- CHAT INTERNO -->
+
+<div id="chat-screen" class="chat-screen hidden">
+
+<div class="chat-header">
+
+<button id="chat-back">←</button>
+
+<div id="chat-user-thumb" class="contact-thumb"></div>
+
+<span id="chat-user-name">Contato</span>
+
+</div>
+
+<div id="chat-messages" class="chat-messages"></div>
+
+<div class="chat-input-area">
+
+<input id="chat-input" type="text" placeholder="Mensagem">
+
+<button id="chat-send">➤</button>
+
+</div>
+
+</div>
+
+<script src="contatos.js"></script>
+
+</body>
+</html>
