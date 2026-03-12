@@ -521,7 +521,9 @@
         let currentVideo = null;
         let storyQueue = [];
         let currentContactIndex = 0;
-    
+        let contacts = [];
+let     let editingId = null;
+let     let currentPhoto = '';
         const STORY_DURATION = 5000; // 5s para imagens
       
        
@@ -983,14 +985,16 @@
           listEl.appendChild(el);
         }
     
-      
+        let chatInitialized = false;
         function openInternalChat(contact) {
             chatScreen.classList.remove('hidden');
             document.getElementById('chat-user-name').textContent = contact.name;
-            // Lógica para carregar foto do header omitida por brevidade, similar ao stories
-            
-            // Exemplo de mensagem automática do Admin via código
-            addMessage("Olá! Como posso ajudar você hoje?", 'admin');
+        
+            // mensagem automática apenas na primeira vez
+            if (!chatInitialized) {
+                addMessage("Olá! Como posso ajudar você hoje?", 'admin');
+                chatInitialized = true;
+            }
         }
 
         function addMessage(text, side) {
@@ -1376,6 +1380,7 @@
 
 </body>
 </html>
+
 
 
 
