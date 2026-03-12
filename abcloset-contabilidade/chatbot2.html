@@ -192,6 +192,13 @@ localStorage.setItem("perguntasNaoEntendidas", JSON.stringify(lista));
 
 }
 
+function verPerguntasNaoEntendidas(){
+
+let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]");
+
+console.table(lista);
+
+}
 
 function responder(frase){
 
@@ -200,6 +207,7 @@ const intent = encontrarIntent(frase);
 if(!intent){
 
 salvarPerguntaNaoEntendida(frase);
+console.log(lista)
 
 return gerarMenuAjuda();
 
@@ -216,13 +224,7 @@ return "Ainda não tenho resposta para isso.";
 
 
 
-function verPerguntasNaoEntendidas(){
 
-let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]");
-
-console.table(lista);
-
-}
 
 function enviar(){
 
