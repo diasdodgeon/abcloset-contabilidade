@@ -202,13 +202,20 @@ console.table(lista);
 
 function responder(frase){
 
+// verificar se o usuário digitou número do menu
+
+if(menuAjuda[frase]){
+
+return menuAjuda[frase];
+
+}
+
 const intent = encontrarIntent(frase);
 
 if(!intent){
 
 salvarPerguntaNaoEntendida(frase);
 console.log(verPerguntasNaoEntendidas())
-
 return gerarMenuAjuda();
 
 }
@@ -263,6 +270,3 @@ carregarTreinamento();
 
 </body>
 </html>
-
-
-
