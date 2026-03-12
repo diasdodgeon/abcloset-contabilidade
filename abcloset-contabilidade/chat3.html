@@ -528,7 +528,7 @@
       
        
         const defaultContacts = [];
-      
+        await ChatEngine.init();
         function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
         function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
         function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
@@ -1427,7 +1427,7 @@
 
         }
         // --- Inicialização ---
-        await ChatEngine.init();
+        //await ChatEngine.init();
         load();
         renderList();
         carregarChatCache();       //carrega o historico de messagens
@@ -1447,6 +1447,7 @@
 
 </body>
 </html>
+
 
 
 
