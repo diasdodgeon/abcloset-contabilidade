@@ -179,6 +179,20 @@ return melhorIntent;
 
 }
 
+function salvarPerguntaNaoEntendida(pergunta){
+
+let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]");
+
+lista.push({
+pergunta: pergunta,
+data: new Date().toISOString()
+});
+
+localStorage.setItem("perguntasNaoEntendidas", JSON.stringify(lista));
+
+}
+
+
 function responder(frase){
 
 const intent = encontrarIntent(frase);
@@ -210,19 +224,8 @@ if(resp) return resp.resposta;
 return "Ainda não tenho resposta para isso.";
 
 }
-
-function salvarPerguntaNaoEntendida(pergunta){
-
-let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]");
-
-lista.push({
-pergunta: pergunta,
-data: new Date().toISOString()
-});
-
-localStorage.setItem("perguntasNaoEntendidas", JSON.stringify(lista));
-
 }
+
 
 
 function verPerguntasNaoEntendidas(){
@@ -270,3 +273,4 @@ carregarTreinamento();
 
 </body>
 </html>
+
