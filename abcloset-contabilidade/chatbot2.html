@@ -181,7 +181,11 @@ return melhorIntent;
 
 function responder(frase){
 
-// verificar se o usuário digitou número do menu
+const intent = encontrarIntent(frase);
+
+if(!intent){
+
+salvarPerguntaNaoEntendida(frase);
 
 if(menuAjuda[frase]){
 
@@ -203,10 +207,9 @@ const resp = dadosTreinamento.respostas.find(r => r.intent === intent);
 
 if(resp) return resp.resposta;
 
-
 return "Ainda não tenho resposta para isso.";
-}
 
+}
 
 function salvarPerguntaNaoEntendida(pergunta){
 
