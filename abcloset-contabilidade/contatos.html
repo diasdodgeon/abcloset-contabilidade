@@ -530,7 +530,27 @@
         function genId(){return 'c_'+Math.random().toString(36).slice(2,9);}
         function load(){contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||defaultContacts;}
         function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(contacts));}
-        function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+        //function normalizeNumber(raw){return String(raw||'').replace(/\D/g,'');}
+        function normalizeNumber(number){
+
+          if(!number) return null;
+        
+          // remove tudo que não for número
+          number = number.replace(/\D/g,'');
+        
+          // remove código do Brasil se existir
+          if(number.startsWith('55') && number.length > 11){
+            number = number.substring(2);
+          }
+        
+          // valida tamanho (DDD + número)
+          if(number.length < 10 || number.length > 11){
+            return null;
+          }
+        
+          return number;
+        }
+        
       
         async function loadNetworking() {
           try {
@@ -1356,6 +1376,7 @@
 
 </body>
 </html>
+
 
 
 
