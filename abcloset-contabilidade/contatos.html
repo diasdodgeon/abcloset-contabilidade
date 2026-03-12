@@ -235,37 +235,40 @@
   #story-user-name {
     color: #fff;
   }
-  /* --- Tela de Chat Interno --- */
-.chat-screen {
-  position: absolute; inset: 0; background: #e5ddd5; /* Cor de fundo padrão WA */
-  display: flex; flex-direction: column; z-index: 99000;
-}
-.chat-header {
-  background: #075e54; color: white; padding: 10px;
-  display: flex; align-items: center; gap: 10px;
-}
-.chat-messages {
-  flex: 1; overflow-y: auto; padding: 15px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.msg {
-  max-width: 80%; padding: 8px 12px; border-radius: 8px;
-  font-size: 0.95rem; position: relative; line-height: 1.4;
-}
-.msg-admin { align-self: flex-start; background: white; color: #000; }
-.msg-user { align-self: flex-end; background: #dcf8c6; color: #000; }
-
-.chat-input-area {
-  background: #f0f0f0; padding: 10px; display: flex; gap: 8px;
-}
-.chat-input-area input {
-  flex: 1; border: none; padding: 10px; border-radius: 20px; outline: none;
-}
-.send-btn {
-  background: #075e54; color: white; border: none;
-  width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-}
-.hidden { display: none !important; }
+ /* --- NOVA TELA DE CHAT INTERNO --- */
+  .chat-screen {
+    position: absolute; inset: 0; background: #e5ddd5;
+    display: flex; flex-direction: column; z-index: 10000;
+    color: #333;
+  }
+  .chat-header {
+    background: #075e54; color: white; padding: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 15px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .msg {
+    max-width: 80%; padding: 8px 12px; border-radius: 8px;
+    font-size: 0.95rem; position: relative; line-height: 1.4;
+    word-wrap: break-word;
+  }
+  .msg-admin { align-self: flex-start; background: white; border-bottom-left-radius: 0; }
+  .msg-user { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 0; }
+  
+  .chat-input-area {
+    background: #f0f0f0; padding: 10px; display: flex; gap: 8px; align-items: center;
+  }
+  .chat-input-area input {
+    flex: 1; border: none; padding: 12px; border-radius: 20px; outline: none;
+  }
+  .send-btn {
+    background: #075e54; color: white; border: none;
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hidden { display: none !important; }
 </style>
 <!-- Modal estilo WhatsApp -->
 <div id="whatsapp-alert" class="whatsapp-alert hidden">
@@ -440,23 +443,22 @@
   
 
 </div>
+<!-- Estrutura do Chat Interno -->
 <div id="chat-screen" class="chat-screen hidden">
   <div class="chat-header">
-    <button id="chat-back" class="back-btn" style="position:static">←</button>
-    <div id="chat-user-photo" class="contact-thumb" style="width:35px; height:35px; min-width:35px"></div>
-    <span id="chat-user-name" style="font-weight:600">Admin</span>
+    <button id="chat-back" class="back-btn">←</button>
+    <div id="chat-user-thumb" class="contact-thumb" style="width:35px; height:35px; font-size:1.1rem"></div>
+    <span id="chat-user-name" style="font-weight:600">Suporte</span>
   </div>
   
-  <div id="chat-messages" class="chat-messages">
-    </div>
+  <div id="chat-messages" class="chat-messages"></div>
 
   <div class="chat-input-area">
-    <input type="text" id="chat-input" placeholder="Mensagem">
+    <input type="text" id="chat-input" placeholder="Digite uma mensagem">
     <button id="chat-send" class="send-btn">➤</button>
   </div>
 </div>
 
-<!-- ... código HTML e CSS permanece igual até <script> ... -->
 
 <script>
 (function(){
@@ -1356,6 +1358,7 @@
 
 </body>
 </html>
+
 
 
 
