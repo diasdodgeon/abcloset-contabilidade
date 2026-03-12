@@ -863,11 +863,19 @@
           }
          
           
+          // Clique principal
           el.addEventListener('click', () => {
-            const num = normalizeNumber(c.number);
-            if (!num) return; // simplesmente ignora
-            window.open(`https://wa.me/${num}`, '_blank');
-          });;
+            // Definimos que o contato com nome "Suporte" ou uma flag específica abrirá o chat interno
+            if (c.name === "Suporte Admin" || c.internalChat) {
+                openInternalChat(c);
+            } else if (c.grupo?.linkConvite) {
+                window.open(c.grupo.linkConvite, '_blank');
+            } //else {
+               //const num = normalizeNumber(c.number);
+              // if(!num) return showWhatsAppAlert("Número inválido");
+               //window.open(`https://wa.me/${num}`, '_blank');
+            //}
+        });
     
           info.appendChild(nm);
           info.appendChild(no);
@@ -1350,31 +1358,6 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
