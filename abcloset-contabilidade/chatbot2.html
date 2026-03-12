@@ -201,18 +201,6 @@ if(!intent){
 
 salvarPerguntaNaoEntendida(frase);
 
-if(menuAjuda[frase]){
-
-return menuAjuda[frase];
-
-}
-
-const intent = encontrarIntent(frase);
-
-if(!intent){
-
-salvarPerguntaNaoEntendida(frase);
-
 return gerarMenuAjuda();
 
 }
@@ -224,7 +212,7 @@ if(resp) return resp.resposta;
 return "Ainda não tenho resposta para isso.";
 
 }
-}
+
 
 
 
