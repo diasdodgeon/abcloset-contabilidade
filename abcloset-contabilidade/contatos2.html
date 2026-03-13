@@ -2312,6 +2312,7 @@ function timeToMinutes(timeString) {
       isAdminLongPress = true;
       toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
     }, 600);
+    navigator.vibrate?.(50);
   }
 
   // Função para o fim do clique no calendário de ADMIN
