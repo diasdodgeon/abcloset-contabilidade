@@ -1375,6 +1375,7 @@ input::-webkit-inner-spin-button {
     ">Estilo</button>
   </nav>
   <audio id="waSound" src="./notific.mp3" preload="auto"></audio>
+  <audio id="daySound" src="./env.mp3" preload="auto"></audio>
   <main class="tab-content-area">
   
   <div id="perfil" class="tab-window active">
@@ -2304,18 +2305,20 @@ function timeToMinutes(timeString) {
 
   let adminTimer;
   let isAdminLongPress = false;
-
+  const som = document.getElementById("daySound");
   // Função para o início do clique no calendário de ADMIN
   function startPressAdmin(day) {
     isAdminLongPress = false;
     adminTimer = setTimeout(() => {
       isAdminLongPress = true;
       navigator.vibrate?.(50);
+      if(som){
+            sound.currentTime = 0;
+            sound.play().catch(()=>{});
+        }
       toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
-    }, 600);
-    
+    }, 300);
   }
-
   // Função para o fim do clique no calendário de ADMIN
   function endPressAdmin(day) {
     clearTimeout(adminTimer);
