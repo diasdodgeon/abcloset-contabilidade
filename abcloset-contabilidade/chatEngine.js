@@ -199,8 +199,6 @@ chat.appendChild(mensagem)
 
 chat.scrollTop = chat.scrollHeight
 
-if(typeof salvarChatCache === "function"){
-salvarChatCache()
 }
 
 
