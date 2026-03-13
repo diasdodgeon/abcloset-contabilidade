@@ -23,6 +23,8 @@ init: async function(){
 
 await this.carregarDados()
 
+await this.carregarMensagensAdmin()
+
 console.log("ChatEngine iniciado")
 
 },
@@ -227,7 +229,7 @@ function adicionarMensagemAdmin(texto){
     chat.appendChild(mensagem)
 
 }
-this.carregarMensagensAdmin()
-window.ChatEngine = ChatEngine
 
+
+window.ChatEngine = ChatEngine
 
