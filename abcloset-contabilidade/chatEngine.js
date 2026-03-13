@@ -178,7 +178,7 @@ processarMensagensAdmin: function(mensagens){
 
 adicionarMensagemAdmin: function(texto){
 
-    const chat = document.querySelector("#chat")
+    const chat = document.querySelector("#chat-messages")
 
     const mensagem = document.createElement("div")
 
@@ -233,3 +233,4 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
+
