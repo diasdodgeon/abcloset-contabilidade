@@ -1472,9 +1472,8 @@ document.addEventListener('keydown', (event) => {
         if(tipo==="user"){
         div.classList.add("msg-user")
         }else{
-        div.classList.add("msg-admin")
-        }else{
-        div.classList.add("msg-bot")
+        div.classList.add("msg-admin","msg-bot")
+        }
 
         div.innerHTML = texto
 
