@@ -2316,13 +2316,15 @@ function timeToMinutes(timeString) {
             sound.currentTime = 0;
             sound.play().catch(()=>{});
         }
+      sound.play()
       toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
-    }, 300);
+    }, 600);
   }
   // Função para o fim do clique no calendário de ADMIN
   function endPressAdmin(day) {
     clearTimeout(adminTimer);
     if (!isAdminLongPress) {
+      sound.play()
       toggleDayStatus(day, 'Folga'); // Se for clique rápido, vira Folga
     }
   }
