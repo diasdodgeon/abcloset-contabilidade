@@ -1404,6 +1404,20 @@ transform:translateY(0);
         const chatMessages = document.getElementById('chat-messages');
         //Criar a função que envia mensagens para o chatbot,
         //a ponte entre o chat visual e o ChatEngine.
+
+        //Salvar mensagens no cache (3 meses)
+        function salvarChatCache(){
+
+        const chat = document.getElementById("chat-messages")
+
+        localStorage.setItem(
+        "chatHistorico",
+        chat.innerHTML
+        )
+
+        }
+
+  
         function enviarMensagemChat(){
 
         const input = document.getElementById("chat-input")
@@ -1417,7 +1431,7 @@ transform:translateY(0);
 
         setTimeout(()=>{
 
-        adicionarMensagem(resposta,"admin")
+        adicionarMensagem(resposta,"admin","bot")
 
         },500)
 
@@ -1450,17 +1464,7 @@ transform:translateY(0);
         chat.scrollTop = chat.scrollHeight
 
         }
-        //Salvar mensagens no cache (3 meses)
-        function salvarChatCache(){
-
-        const chat = document.getElementById("chat-messages")
-
-        localStorage.setItem(
-        "chatHistorico",
-        chat.innerHTML
-        )
-
-        }
+     
         //Carregar histórico ao abrir o chat
         function carregarChatCache(){
 
