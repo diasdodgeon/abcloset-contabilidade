@@ -1358,7 +1358,9 @@ input::-webkit-inner-spin-button {
   50%{transform:scale(1.3)}
   100%{transform:scale(1)}
 }
-
+#waStatusIcon.animate{
+  animation:notifPop 0.35s ease;
+}
 
 </style>
 <div class="mobile-menu-container">
@@ -1760,16 +1762,15 @@ input::-webkit-inner-spin-button {
 </main>
 </div>
 <script type="text/javascript">
-        // =========================================================================
+   // =========================================================================
         // COMANDO DE LIMPEZA DE CACHE (DURANTE DESENVOLVIMENTO)
         // Descomente a linha abaixo para limpar os contatos salvos toda vez que atualizar a página.
         // =========================================================================
-        localStorage.clear(); // <--- LIMPA TUDO (CUIDADO)
+       localStorage.clear(); // <--- LIMPA TUDO (CUIDADO)
         //localStorage.removeItem('wa_contacts_cache'); // <--- LIMPA APENAS OS CONTATOS
         // =========================================================================
 
 
-  
   function toggleNotificationDrawer() {
     const drawer = document.getElementById("notificationDrawer");
     if (drawer) {
@@ -3016,32 +3017,26 @@ function salvarConfiguracoes() {
 
       function animarNovaNotificacao(){
 
-            const icon = document.getElementById("waStatusIcon");
-            const counter = document.getElementById("waCounter");
-            const som = document.getElementById("notifSound");
+      const icon = document.getElementById("waStatusIcon");
+      const counter = document.getElementById("waCounter");
+      const som = document.getElementById("waSound");
 
-            if(icon){
-                icon.classList.add("animate");
+      if(icon){
+          icon.classList.add("animate");
+          setTimeout(()=> icon.classList.remove("animate"),400);
+      }
 
-                setTimeout(()=>{
-                    icon.classList.remove("animate");
-                },400);
-            }
+      if(counter){
+          counter.classList.add("animate");
+          setTimeout(()=> counter.classList.remove("animate"),400);
+      }
 
-            if(counter){
-                counter.classList.add("animate");
+      if(som){
+          som.currentTime = 0;
+          som.play().catch(()=>{});
+      }
+      }
 
-                setTimeout(()=>{
-                    counter.classList.remove("animate");
-                },400);
-            }
-
-            if(som){
-                som.currentTime = 0;
-                som.play().catch(()=>{});
-            }
-
-        }
       function tocarNotificacao(){
 
         const sound = document.getElementById("waSound");
@@ -3128,8 +3123,9 @@ function salvarConfiguracoes() {
           icon.className = "status-icon-container";
 
           icon.innerHTML = `
-            <img src="${WHATS_ICON}" class="notifPop">
+            <img src="${WHATS_ICON}">
             <span id="waCounter">1</span>
+
           `;
 
           statusBar.appendChild(icon);
@@ -3162,8 +3158,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
 
 
 
