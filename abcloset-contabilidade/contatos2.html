@@ -2313,11 +2313,12 @@ function timeToMinutes(timeString) {
       isAdminLongPress = true;
       navigator.vibrate?.(50);
       if(som){
-            sound.currentTime = 0;
-            sound.play().catch(()=>{});
+            som.currentTime = 0;
+            som.play().catch(()=>{});
         }
-      sound.play()
+      
       toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
+      som.play()
     }, 600);
   }
   // Função para o fim do clique no calendário de ADMIN
