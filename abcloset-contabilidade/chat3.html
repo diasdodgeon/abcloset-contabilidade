@@ -269,6 +269,71 @@
     display: flex; align-items: center; justify-content: center;
   }
   .hidden { display: none !important; }
+
+
+
+
+  .msg{
+display:flex;
+margin:6px 10px;
+animation: msgFade .25s ease;
+}
+
+.msg-admin{
+justify-content:flex-start;
+}
+
+.msg-user{
+justify-content:flex-end;
+}
+
+.msg-bubble{
+
+max-width:75%;
+padding:8px 10px;
+border-radius:8px;
+font-size:14px;
+position:relative;
+line-height:1.4;
+
+}
+
+.msg-admin .msg-bubble{
+
+background:#ffffff;
+border:1px solid #e5e5e5;
+
+}
+
+.msg-user .msg-bubble{
+
+background:#dcf8c6;
+
+}
+
+.msg-time{
+
+font-size:10px;
+color:#666;
+margin-left:6px;
+float:right;
+
+}
+
+@keyframes msgFade{
+
+from{
+opacity:0;
+transform:translateY(8px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
 </style>
 <!-- Modal estilo WhatsApp -->
 <div id="whatsapp-alert" class="whatsapp-alert hidden">
@@ -1432,6 +1497,14 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
 
 
 
