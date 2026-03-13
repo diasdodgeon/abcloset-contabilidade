@@ -2170,6 +2170,68 @@ input::-webkit-inner-spin-button {
     
 
   
+    const JSON_URL = "adminMensagens.json";
+    const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
+
+    async function carregarMensagensAdminStatusBar(){
+
+      const response = await fetch(JSON_URL);
+      const data = await response.json();
+
+      const mensagens = data.mensagens;
+
+      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+      const novas = mensagens.filter(m =>
+          !cache.some(c => c.id === m.id)
+      );
+
+      if(novas.length > 0){
+
+          novas.forEach(msg=>{
+              adicionarNotificacao(msg);
+              cache.push(msg);
+          });
+
+          localStorage.setItem("adminMsgs", JSON.stringify(cache));
+
+          mostrarIconeStatus();
+      }
+    }
+
+    function adicionarNotificacao(msg){
+
+      const drawer = document.getElementById("notificationDrawer");
+
+      const item = document.createElement("div");
+      item.className = "notification-item";
+
+      item.innerHTML = `
+        <img src="${WHATS_ICON}">
+        <div>
+          <b>Admin</b><br>
+          ${msg.texto}
+        </div>
+      `;
+
+      drawer.prepend(item);
+    }
+
+    function mostrarIconeStatus(){
+
+      const statusBar = document.getElementById("statusBar");
+
+      if(!document.getElementById("waStatusIcon")){
+
+          const icon = document.createElement("img");
+
+          icon.src = WHATS_ICON;
+          icon.className = "status-icon";
+          icon.id = "waStatusIcon";
+
+          statusBar.appendChild(icon);
+      }
+    }
 
 
   
@@ -2919,72 +2981,12 @@ function salvarConfiguracoes() {
             if (!event.target.closest('.notification-drawer') && !event.target.closest('.status-bar')) {
                  notificationDrawer.classList.remove('open');
             }
+
+
+
+
+
         }
-
-
-    const JSON_URL = "adminMensagens.json";
-    const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
-
-    async function carregarMensagensAdminStatusBar(){
-
-      const response = await fetch(JSON_URL);
-      const data = await response.json();
-
-      const mensagens = data.mensagens;
-
-      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
-      const novas = mensagens.filter(m =>
-          !cache.some(c => c.id === m.id)
-      );
-
-      if(novas.length > 0){
-
-          novas.forEach(msg=>{
-              adicionarNotificacao(msg);
-              cache.push(msg);
-          });
-
-          localStorage.setItem("adminMsgs", JSON.stringify(cache));
-
-          mostrarIconeStatus();
-      }
-    }
-
-    function adicionarNotificacao(msg){
-
-      const drawer = document.getElementById("notificationDrawer");
-
-      const item = document.createElement("div");
-      item.className = "notification-item";
-
-      item.innerHTML = `
-        <img src="${WHATS_ICON}">
-        <div>
-          <b>Admin</b><br>
-          ${msg.texto}
-        </div>
-      `;
-
-      drawer.prepend(item);
-    }
-
-    function mostrarIconeStatus(){
-
-      const statusBar = document.getElementById("statusBar");
-
-      if(!document.getElementById("waStatusIcon")){
-
-          const icon = document.createElement("img");
-
-          icon.src = WHATS_ICON;
-          icon.className = "status-icon";
-          icon.id = "waStatusIcon";
-
-          statusBar.appendChild(icon);
-      }
-    }
-
   
 // INICIALIZAÇÃO
 window.onload = generateCalendar;
@@ -2992,8 +2994,6 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
-
-
 
 
 
