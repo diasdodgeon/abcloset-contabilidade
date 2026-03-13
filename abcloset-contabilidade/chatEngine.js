@@ -192,7 +192,7 @@ async function carregarMensagensAdmin(){
 
 }
 
-processarMensagensAdmin(mensagens){
+function processarMensagensAdmin(mensagens){
 
     const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
 
@@ -211,7 +211,7 @@ processarMensagensAdmin(mensagens){
     localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
 
 }
-adicionarMensagemAdmin(texto){
+function adicionarMensagemAdmin(texto){
 
     const chat = document.querySelector("#chatMensagens")
 
@@ -229,3 +229,4 @@ adicionarMensagemAdmin(texto){
 }
 this.carregarMensagensAdmin()
 window.ChatEngine = ChatEngine
+
