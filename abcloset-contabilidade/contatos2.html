@@ -3023,17 +3023,18 @@ function salvarConfiguracoes() {
 
       if(icon){
           icon.classList.add("animate");
-          setTimeout(()=> icon.classList.remove("animate"),400);
+          setTimeout(()=> icon.classList.remove("animate"),600);
       }
 
       if(counter){
           counter.classList.add("animate");
-          setTimeout(()=> counter.classList.remove("animate"),400);
+          setTimeout(()=> counter.classList.remove("animate"),600);
       }
 
       if(som){
           som.currentTime = 0;
           som.play().catch(()=>{});
+          navigator.vibrate?.(50);
       }
       }
 
@@ -3045,6 +3046,7 @@ function salvarConfiguracoes() {
         if(sound){
             sound.currentTime = 0;
             sound.play().catch(()=>{});
+            navigator.vibrate?.(50);
         }
 
         if(icon){
