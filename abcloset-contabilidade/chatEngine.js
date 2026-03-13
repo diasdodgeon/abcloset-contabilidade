@@ -192,7 +192,7 @@ carregarMensagensAdmin(){
 
 }
 
-processarMensagensAdmin(mensagens){
+function processarMensagensAdmin(mensagens){
 
     const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
 
@@ -230,3 +230,4 @@ adicionarMensagemAdmin(texto){
 
 window.ChatEngine = ChatEngine
 this.carregarMensagensAdmin();
+
