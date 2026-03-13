@@ -1,3 +1,42 @@
+function adicionarMensagem(texto, tipo){
+
+let chat = document.getElementById("chat")
+
+let div = document.createElement("div")
+
+div.className = tipo
+
+div.innerHTML = texto
+
+chat.appendChild(div)
+
+chat.scrollTop = chat.scrollHeight
+
+}
+
+function enviarMensagem(){
+
+let input = document.getElementById("mensagem")
+
+let texto = input.value
+
+if(!texto) return
+
+adicionarMensagem(texto,"usuario")
+
+let resposta = ChatEngine.processar(texto)
+
+setTimeout(()=>{
+
+//adicionarMensagem(resposta,"bot")
+
+},500)
+
+input.value=""
+
+}
+
+
 const menuAjuda = {
 
 1: "Você pode verificar todos os seus agendamentos no painel da agenda dentro do dashboard.",
@@ -14,8 +53,8 @@ const menuAjuda = {
 
 
 
-const ChatEngine = {
 
+const ChatEngine = {
 dadosTreinamento: null,
 funcionalidades: null,
 
@@ -137,45 +176,9 @@ Enquanto isso, talvez eu possa ajudar com uma dessas opções:
 6️⃣ Nenhuma das anteriores
 `
 
-}
+},
 
-}
-function enviarMensagem(){
 
-let input = document.getElementById("mensagem")
-
-let texto = input.value
-
-if(!texto) return
-
-adicionarMensagem(texto,"usuario")
-
-let resposta = ChatEngine.processar(texto)
-
-setTimeout(()=>{
-
-adicionarMensagem(resposta,"bot")
-
-},500)
-
-input.value=""
-
-}
-function adicionarMensagem(texto, tipo){
-
-let chat = document.getElementById("chat")
-
-let div = document.createElement("div")
-
-div.className = tipo
-
-div.innerHTML = texto
-
-chat.appendChild(div)
-
-chat.scrollTop = chat.scrollHeight
-
-}
 
 carregarMensagensAdmin: async function(){
 
@@ -192,7 +195,7 @@ carregarMensagensAdmin: async function(){
 
     }
 
-}
+},
 
 processarMensagensAdmin: function(mensagens){
 
@@ -212,10 +215,10 @@ processarMensagensAdmin: function(mensagens){
 
     localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
 
-}
+},
 adicionarMensagemAdmin: function(texto){
 
-    const chat = document.querySelector("chat")
+    const chat = document.querySelector("#chat")
 
     const mensagem = document.createElement("div")
 
@@ -230,5 +233,6 @@ adicionarMensagemAdmin: function(texto){
 
 }
 
+}
 
 window.ChatEngine = ChatEngine
