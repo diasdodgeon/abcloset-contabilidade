@@ -178,20 +178,29 @@ processarMensagensAdmin: function(mensagens){
 
 adicionarMensagemAdmin: function(texto){
 
-    const chat = document.querySelector("#chat-messages")
+const chat = document.querySelector("#chat-messages")
 
-    const mensagem = document.createElement("div")
+if(!chat) return
 
-    mensagem.className = "mensagem admin"
+const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
 
-    mensagem.innerHTML = `
-        <b>📢 Mensagem do Admin</b><br>
-        ${texto}
-    `
+const mensagem = document.createElement("div")
 
-    chat.appendChild(mensagem)
+mensagem.className = "msg msg-admin"
+
+mensagem.innerHTML = `
+<div class="msg-bubble">
+    ${texto}
+    <span class="msg-time">${hora}</span>
+</div>
+`
+
+chat.appendChild(mensagem)
+
+chat.scrollTop = chat.scrollHeight
 
 }
+
 }
 window.ChatEngine = ChatEngine
 
@@ -233,4 +242,3 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
-
