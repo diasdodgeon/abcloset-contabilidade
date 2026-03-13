@@ -2953,6 +2953,7 @@ function salvarConfiguracoes() {
           novas.forEach(msg=>{
               adicionarNotificacao(msg);
               cache.push(msg);
+              mostrarIconeStatus();
           });
 
           localStorage.setItem("adminMsgs", JSON.stringify(cache));
@@ -2969,9 +2970,9 @@ function salvarConfiguracoes() {
             adicionarNotificacao(msg);
         });
 
-        if(cache.length>0){
+        cache.forEach(()=>{
             mostrarIconeStatus();
-        }
+        });
       }
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -3044,7 +3045,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
 
 
 
