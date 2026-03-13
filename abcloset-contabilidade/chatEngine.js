@@ -175,11 +175,11 @@ chat.scrollTop = chat.scrollHeight
 
 }
 
-function carregarMensagensAdmin(){
+async function carregarMensagensAdmin(){
 
     try{
 
-        const resposta = await fetch("./adminMensagens.json")
+        const resposta = await fetch("adminMensagens.json")
         const dados = await resposta.json()
 
         this.processarMensagensAdmin(dados.mensagens)
@@ -227,6 +227,5 @@ adicionarMensagemAdmin(texto){
     chat.appendChild(mensagem)
 
 }
-
-window.ChatEngine = ChatEngine
 this.carregarMensagensAdmin()
+window.ChatEngine = ChatEngine
