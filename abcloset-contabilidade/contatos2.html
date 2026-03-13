@@ -1760,6 +1760,16 @@ input::-webkit-inner-spin-button {
 </main>
 </div>
 <script type="text/javascript">
+ // =========================================================================
+        // COMANDO DE LIMPEZA DE CACHE (DURANTE DESENVOLVIMENTO)
+        // Descomente a linha abaixo para limpar os contatos salvos toda vez que atualizar a página.
+        // =========================================================================
+        localStorage.clear(); // <--- LIMPA TUDO (CUIDADO)
+        //localStorage.removeItem('wa_contacts_cache'); // <--- LIMPA APENAS OS CONTATOS
+        // =========================================================================
+
+
+  
   function toggleNotificationDrawer() {
     const drawer = document.getElementById("notificationDrawer");
     if (drawer) {
@@ -3152,8 +3162,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
 
 
 
