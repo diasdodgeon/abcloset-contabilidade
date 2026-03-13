@@ -641,7 +641,8 @@
             console.log('⚠️ Nenhum networking carregado:', err.message);
           }
            await ChatEngine.init()
-           this.carregarMensagensAdmin()
+          
+          
         }
     
       
@@ -1406,42 +1407,7 @@
 
         }
 
-        function processarMensagensAdmin(mensagens){
-
-          const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
-      
-          mensagens.forEach(msg => {
-      
-              if(!cache.includes(msg.id)){
-      
-                  this.adicionarMensagemAdmin(msg.texto)
-      
-                  cache.push(msg.id)
-      
-              }
-      
-          })
-      
-          localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
-      
-      }
-      function adicionarMensagemAdmin(texto){
-      
-          const chat = document.querySelector("#chatMensagens")
-      
-          const mensagem = document.createElement("div")
-      
-          mensagem.className = "mensagem admin"
-      
-          mensagem.innerHTML = `
-              <b>📢 Mensagem do Admin</b><br>
-              ${texto}
-          `
-      
-          chat.appendChild(mensagem)
-      
-      }
-      this.carregarMensagensAdmin()
+       
 
   
         // --- Inicialização ---
@@ -1466,6 +1432,7 @@
 
 </body>
 </html>
+
 
 
 
