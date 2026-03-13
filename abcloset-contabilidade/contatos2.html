@@ -2325,7 +2325,7 @@ function timeToMinutes(timeString) {
   function endPressAdmin(day) {
     clearTimeout(adminTimer);
     if (!isAdminLongPress) {
-      sound.play()
+      som.play()
       toggleDayStatus(day, 'Folga'); // Se for clique rápido, vira Folga
     }
   }
