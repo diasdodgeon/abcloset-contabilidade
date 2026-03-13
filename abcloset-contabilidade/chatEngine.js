@@ -177,7 +177,7 @@ chat.scrollTop = chat.scrollHeight
 
 }
 
-async carregarMensagensAdmin(){
+carregarMensagensAdmin(){
 
     try{
 
@@ -232,6 +232,7 @@ adicionarMensagemAdmin(texto){
 
 
 window.ChatEngine = ChatEngine
+
 
 
 
