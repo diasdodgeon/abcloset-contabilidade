@@ -177,7 +177,7 @@ chat.scrollTop = chat.scrollHeight
 
 }
 
-async function carregarMensagensAdmin(){
+async carregarMensagensAdmin(){
 
     try{
 
@@ -194,7 +194,7 @@ async function carregarMensagensAdmin(){
 
 }
 
-function processarMensagensAdmin(mensagens){
+processarMensagensAdmin(mensagens){
 
     const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
 
@@ -213,7 +213,7 @@ function processarMensagensAdmin(mensagens){
     localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
 
 }
-function adicionarMensagemAdmin(texto){
+adicionarMensagemAdmin(texto){
 
     const chat = document.querySelector("#chatMensagens")
 
@@ -232,4 +232,6 @@ function adicionarMensagemAdmin(texto){
 
 
 window.ChatEngine = ChatEngine
+
+
 
