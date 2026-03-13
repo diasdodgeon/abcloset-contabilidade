@@ -175,7 +175,7 @@ chat.scrollTop = chat.scrollHeight
 
 }
 
-carregarMensagensAdmin(){
+function carregarMensagensAdmin(){
 
     try{
 
@@ -192,7 +192,7 @@ carregarMensagensAdmin(){
 
 }
 
-function processarMensagensAdmin(mensagens){
+processarMensagensAdmin(mensagens){
 
     const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
 
@@ -229,5 +229,4 @@ adicionarMensagemAdmin(texto){
 }
 
 window.ChatEngine = ChatEngine
-this.carregarMensagensAdmin();
-
+this.carregarMensagensAdmin()
