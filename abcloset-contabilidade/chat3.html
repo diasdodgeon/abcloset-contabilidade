@@ -641,6 +641,7 @@
             console.log('⚠️ Nenhum networking carregado:', err.message);
           }
            await ChatEngine.init()
+           this.carregarMensagensAdmin()
         }
     
       
@@ -1404,12 +1405,52 @@
         document.getElementById("chat-messages").innerHTML = cache
 
         }
+
+        function processarMensagensAdmin(mensagens){
+
+          const cache = JSON.parse(localStorage.getItem("adminMensagensVistas")) || []
+      
+          mensagens.forEach(msg => {
+      
+              if(!cache.includes(msg.id)){
+      
+                  this.adicionarMensagemAdmin(msg.texto)
+      
+                  cache.push(msg.id)
+      
+              }
+      
+          })
+      
+          localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
+      
+      }
+      function adicionarMensagemAdmin(texto){
+      
+          const chat = document.querySelector("#chatMensagens")
+      
+          const mensagem = document.createElement("div")
+      
+          mensagem.className = "mensagem admin"
+      
+          mensagem.innerHTML = `
+              <b>📢 Mensagem do Admin</b><br>
+              ${texto}
+          `
+      
+          chat.appendChild(mensagem)
+      
+      }
+      this.carregarMensagensAdmin()
+
+  
         // --- Inicialização ---
         
         load();
         renderList();
         carregarChatCache();       //carrega o historico de messagens
         loadNetworking();         // carrega contatos e stories da rede
+        
         filterExpiredStories(); // remove stories vencidos automaticamente da lista
         
         updateStoryCounter();
@@ -1425,6 +1466,7 @@
 
 </body>
 </html>
+
 
 
 
