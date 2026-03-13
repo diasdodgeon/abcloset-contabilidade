@@ -179,7 +179,7 @@ async function carregarMensagensAdmin(){
 
     try{
 
-        const resposta = await fetch("adminMensagens.json")
+        const resposta = await fetch("./adminMensagens.json")
         const dados = await resposta.json()
 
         this.processarMensagensAdmin(dados.mensagens)
@@ -229,4 +229,5 @@ function adicionarMensagemAdmin(texto){
 }
 this.carregarMensagensAdmin()
 window.ChatEngine = ChatEngine
+
 
