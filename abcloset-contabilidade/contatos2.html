@@ -1296,7 +1296,9 @@ input::-webkit-inner-spin-button {
     <button class="tab-button" onclick="openTab(event, 'seguranca')">Senha</button>
     <button class="tab-button" onclick="openTab(event, 'ajuda')">Ajuda</button>
     <button class="tab-button" onclick="openTab(event, 'horarios')">Horários</button>
-    <button class="tab-button" onclick="openTab(event, 'aparencia') carregarMensagensAdmin()">Estilo</button>
+    <button class="tab-button" id="abriEstilo" onclick="openTab(event, 'aparencia')
+    
+    ">Estilo</button>
   </nav>
 
   <main class="tab-content-area">
@@ -2976,7 +2978,7 @@ function salvarConfiguracoes() {
           statusBar.appendChild(icon);
       }
     }
-document.getElementById("aparencia").addEventListener("click", ()=>{
+document.getElementById("abriEstilo").addEventListener("click", ()=>{
 
         carregarMensagensAdmin();
 
