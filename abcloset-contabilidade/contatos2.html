@@ -2316,7 +2316,8 @@ function timeToMinutes(timeString) {
       toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
       if(som){
             som.currentTime = 0;
-            som.play().catch(()=>{});
+            som.volume = 1;
+            som.play();
         }
     }, 600);
   }
@@ -2328,7 +2329,8 @@ function timeToMinutes(timeString) {
       toggleDayStatus(day, 'Folga'); // Se for clique rápido, vira Folga
       if(som){
             som.currentTime = 0;
-            som.play().catch(()=>{});
+            som.volume = 1;
+            som.play();
         }
     }
   }
