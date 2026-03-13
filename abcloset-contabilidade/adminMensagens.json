@@ -1,20 +1,10 @@
 {
   "mensagens":[
     {
-      "id":1,
-      "data":"2026-03-12",
-      "texto":"🚀 Nova atualização disponível! Agora você pode compartilhar sua agenda com clientes usando QR Code."
-    }
-  ]
-
-},
-{
-  "mensagens":[
-    {
       "id":2,
-      "data":"2026-03-12",
-      "texto":"🚀 Nova atualização disponível! Agora você pode compartilhar sua agenda com clientes usando QR Code."
+      "data":"2026-03-13",
+      "texto":"🚀 Nova atualização disponível! Agora você pode compartilhar links de agendamento."
     }
   ]
 
-},
+}
