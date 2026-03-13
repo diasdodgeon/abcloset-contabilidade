@@ -199,7 +199,10 @@ chat.appendChild(mensagem)
 
 chat.scrollTop = chat.scrollHeight
 
+if(typeof salvarChatCache === "function"){
+salvarChatCache()
 }
+
 
 }
 window.ChatEngine = ChatEngine
@@ -242,3 +245,4 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
+
