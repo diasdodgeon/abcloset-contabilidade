@@ -1,44 +1,6 @@
-function adicionarMensagem(texto, tipo){
+const ChatEngine = {
 
-let chat = document.getElementById("chat")
-
-let div = document.createElement("div")
-
-div.className = tipo
-
-div.innerHTML = texto
-
-chat.appendChild(div)
-
-chat.scrollTop = chat.scrollHeight
-
-}
-
-function enviarMensagem(){
-
-let input = document.getElementById("mensagem")
-
-let texto = input.value
-
-if(!texto) return
-
-adicionarMensagem(texto,"usuario")
-
-let resposta = ChatEngine.processar(texto)
-
-setTimeout(()=>{
-
-//adicionarMensagem(resposta,"bot")
-
-},500)
-
-input.value=""
-
-}
-
-
-const menuAjuda = {
-
+menuAjuda: { 
 1: "Você pode verificar todos os seus agendamentos no painel da agenda dentro do dashboard.",
 
 2: "Para redefinir seus horários de atendimento, acesse as configurações da agenda e altere os dias e horários disponíveis.",
@@ -49,12 +11,8 @@ const menuAjuda = {
 
 5: "Para cancelar um agendamento basta acessar a lista de clientes e remover o horário desejado."
 
-};
+},
 
-
-
-
-const ChatEngine = {
 dadosTreinamento: null,
 funcionalidades: null,
 
@@ -126,6 +84,7 @@ ${item.acoes.map(a=>"• "+a).join("<br>")}
 return null
 
 },
+
 buscarIntent: function(pergunta){
 
 let docs = this.dadosTreinamento.documentos
@@ -147,6 +106,7 @@ if(resposta) return resposta.resposta
 return null
 
 },
+
 registrarNaoEntendido: function(pergunta){
 
 let lista = JSON.parse(localStorage.getItem("perguntasNaoEntendidas") || "[]")
@@ -156,6 +116,7 @@ lista.push(pergunta)
 localStorage.setItem("perguntasNaoEntendidas", JSON.stringify(lista))
 
 },
+
 menuAjuda: function(){
 
 return `
@@ -177,8 +138,6 @@ Enquanto isso, talvez eu possa ajudar com uma dessas opções:
 `
 
 },
-
-
 
 carregarMensagensAdmin: async function(){
 
@@ -216,6 +175,7 @@ processarMensagensAdmin: function(mensagens){
     localStorage.setItem("adminMensagensVistas", JSON.stringify(cache))
 
 },
+
 adicionarMensagemAdmin: function(texto){
 
     const chat = document.querySelector("#chat")
@@ -232,7 +192,44 @@ adicionarMensagemAdmin: function(texto){
     chat.appendChild(mensagem)
 
 }
+}
+window.ChatEngine = ChatEngine
+
+
+function enviarMensagem(){
+
+let input = document.getElementById("mensagem")
+
+let texto = input.value
+
+if(!texto) return
+
+adicionarMensagem(texto,"usuario")
+
+let resposta = ChatEngine.processar(texto)
+
+setTimeout(()=>{
+
+//adicionarMensagem(resposta,"bot")
+
+},500)
+
+input.value=""
 
 }
 
-window.ChatEngine = ChatEngine
+function adicionarMensagem(texto, tipo){
+
+let chat = document.getElementById("chat")
+
+let div = document.createElement("div")
+
+div.className = tipo
+
+div.innerHTML = texto
+
+chat.appendChild(div)
+
+chat.scrollTop = chat.scrollHeight
+
+}
