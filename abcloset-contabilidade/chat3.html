@@ -524,14 +524,32 @@ transform:translateY(0);
 
 <script src="chatEngine.js"></script>
 <script>
+  
+//Esse código adiciona um ouvinte de evento ao documento que verifica se a tecla `F5` foi pressionada. Se sim, ele impede o comportamento padrão da tecla `F5` e exibe uma caixa de confirmação com a mensagem "Deseja mesmo formatar o cache?".
 
-        // =========================================================================
-        // COMANDO DE LIMPEZA DE CACHE (DURANTE DESENVOLVIMENTO)
-        // Descomente a linha abaixo para limpar os contatos salvos toda vez que atualizar a página.
-        // =========================================================================
-        //localStorage.clear(); // <--- LIMPA TUDO (CUIDADO)
-        //localStorage.removeItem('wa_contacts_cache'); // <--- LIMPA APENAS OS CONTATOS
-        // =========================================================================
+//Se o usuário clicar em "OK" (ou "S" em alguns navegadores), o código limpa o cache do `localStorage` usando o método `clear()` e recarrega a página usando `window.location.reload()`.
+
+//Se o usuário clicar em "Cancelar" (ou "N" em alguns navegadores), o código exibe uma mensagem no console indicando que o comando foi abortado.
+
+//*Observações*
+
+//1. O método `confirm()` exibe uma caixa de diálogo com dois botões: "OK" e "Cancelar".
+//2. O valor de retorno do método `confirm()` é `true` se o usuário clicar em "OK" e `false` se o usuário clicar em "Cancelar".
+//3. O método `localStorage.clear()` limpa todos os dados armazenados no `localStorage`.
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'F5') {
+    event.preventDefault();
+    const resposta = confirm('Deseja mesmo formatar o cache?');
+    if (resposta) {
+      localStorage.clear();
+      console.log('Cache limpo com sucesso!');
+      window.location.reload();
+    } else {
+      console.log('Comando abortado.');
+    }
+  }
+});
 
   
         const chatInput = document.getElementById('chat-input');
@@ -1455,7 +1473,8 @@ transform:translateY(0);
         div.classList.add("msg-user")
         }else{
         div.classList.add("msg-admin")
-        }
+        }else{
+        div.classList.add("msg-bot")
 
         div.innerHTML = texto
 
