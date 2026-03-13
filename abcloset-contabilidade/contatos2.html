@@ -2184,8 +2184,14 @@ input::-webkit-inner-spin-button {
   
     document.getElementById(tabId).classList.add("active");
     evt.currentTarget.classList.add("active");
+    document.getElementById("abriEstilo").addEventListener("click", ()=>{
+
+        carregarMensagensAdmin();
+
+    });
 
     generatePreviewCalendar()
+
 
   }
   
@@ -2845,12 +2851,12 @@ function salvarConfiguracoes() {
             SoundManager.play("./enot.mp3");
         }
 
-        //// Função para abrir o modal
+        // Função para abrir o modal
         //openBtn.onclick = function() {
         //    modal.style.display = "flex";
-       //     videoElement.play();
-       //    SoundManager.play("./tone.mp3");
-        }
+        //    videoElement.play();
+        //    SoundManager.play("./tone.mp3");
+        //
         // 🆕 Nova função para fechar SÓ a gaveta de notificações
         //const closeDrawer = function() {
          //   notificationDrawer.classList.remove('open');
@@ -2978,11 +2984,7 @@ function salvarConfiguracoes() {
           statusBar.appendChild(icon);
       }
     }
-document.getElementById("abriEstilo").addEventListener("click", ()=>{
 
-        carregarMensagensAdmin();
-
-    });
   
 // INICIALIZAÇÃO
 window.onload = generateCalendar;
@@ -2990,7 +2992,6 @@ window.onload = generatePreviewCalendar;
 </script>
 </body>
 </html>
-
 
 
 
