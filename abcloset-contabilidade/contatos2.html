@@ -2312,21 +2312,24 @@ function timeToMinutes(timeString) {
     adminTimer = setTimeout(() => {
       isAdminLongPress = true;
       navigator.vibrate?.(50);
+      
+      toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
       if(som){
             som.currentTime = 0;
             som.play().catch(()=>{});
         }
-      
-      toggleDayStatus(day, 'Meio-Período'); // Se segurar, vira Meio-Período
-      som.play()
     }, 600);
   }
   // Função para o fim do clique no calendário de ADMIN
   function endPressAdmin(day) {
     clearTimeout(adminTimer);
     if (!isAdminLongPress) {
-      som.play()
+      
       toggleDayStatus(day, 'Folga'); // Se for clique rápido, vira Folga
+      if(som){
+            som.currentTime = 0;
+            som.play().catch(()=>{});
+        }
     }
   }
 
