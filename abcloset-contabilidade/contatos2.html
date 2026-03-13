@@ -1288,6 +1288,22 @@ input::-webkit-inner-spin-button {
   margin-left:4px;
 }
 
+.status-icon-container{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.status-icon-container img{
+  width:16px;
+}
+
+#waCounter{
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+}
+
 </style>
 <div class="mobile-menu-container">
   <nav class="side-tabs">
@@ -1453,7 +1469,7 @@ input::-webkit-inner-spin-button {
                     <div class="status-bar" id="statusBar" onclick="toggleNotificationDrawer()">
                         <div class="time" id="currentTime">10:47</div>
                         <div class="icons">
-                            ⏰📬⚙️📆
+                            ⏰📬⚙️📆 
                             <span class="signal">🔋📶</span>
                         </div>
                     </div>
@@ -2945,6 +2961,24 @@ function salvarConfiguracoes() {
       }
     }
 
+    function carregarCache(){
+
+        const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+        cache.forEach(msg=>{
+            adicionarNotificacao(msg);
+        });
+
+        if(cache.length>0){
+            mostrarIconeStatus();
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        carregarCache();
+        carregarMensagensAdminStatusBar();
+      });
+
     function adicionarNotificacao(msg){
 
       const drawer = document.getElementById("notificationList");
@@ -2967,15 +3001,26 @@ function salvarConfiguracoes() {
 
       const statusBar = document.getElementById("statusBar");
 
-      if(!document.getElementById("waStatusIcon")){
+      let icon = document.getElementById("waStatusIcon");
 
-          const icon = document.createElement("img");
+      if(!icon){
 
-          icon.src = WHATS_ICON;
-          icon.className = "status-icon";
+          icon = document.createElement("div");
           icon.id = "waStatusIcon";
+          icon.className = "status-icon-container";
+
+          icon.innerHTML = `
+            <img src="${WHATS_ICON}">
+            <span id="waCounter">1</span>
+          `;
 
           statusBar.appendChild(icon);
+
+      }else{
+
+          const counter = document.getElementById("waCounter");
+          counter.innerText = parseInt(counter.innerText)+1;
+
       }
     }
 
@@ -2999,6 +3044,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
 
