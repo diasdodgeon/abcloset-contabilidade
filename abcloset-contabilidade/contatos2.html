@@ -3087,8 +3087,11 @@ function salvarConfiguracoes() {
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
 
+        //Quando carregar do cache, mostrar apenas mensagens não interagidas.
         cache.forEach(msg=>{
-            adicionarNotificacao(msg);
+            if(!msg.interaction){
+                adicionarNotificacao(msg);
+            }
         });
 
         //if(cache.length > 0){
@@ -3102,6 +3105,9 @@ function salvarConfiguracoes() {
       if(novas.length > 0){
 
           novas.forEach(msg=>{
+              //Quando detectar novas mensagens, garantir que elas entrem com:interaction = false
+              msg.interaction = false;
+
               adicionarNotificacao(msg);
               cache.push(msg);
               mostrarIconeStatus();
@@ -3119,23 +3125,48 @@ function salvarConfiguracoes() {
 }
     
 
-    function adicionarNotificacao(msg){
+function adicionarNotificacao(msg){
 
-      const drawer = document.getElementById("notificationList");
+  const drawer = document.getElementById("notificationList");
 
-      const item = document.createElement("div");
-      item.className = "notification-item";
+  const item = document.createElement("div");
+  item.className = "notification-item";
 
-      item.innerHTML = `
-        <img src="${WHATS_ICON}">
-        <div>
-          <b>Admin</b><br>
-          ${msg.texto}
-        </div>
-      `;
+  item.innerHTML = `
+    <img src="${WHATS_ICON}">
+    <div>
+      <b>Admin</b><br>
+      ${msg.texto}
+    </div>
+  `;
 
-      drawer.prepend(item);
-    }
+  item.onclick = () => {
+
+      marcarComoInteragida(msg.id);
+
+      // aqui futuramente você pode redirecionar para o chat
+      console.log("Abrir chat admin");
+
+  };
+
+  drawer.prepend(item);
+}
+function marcarComoInteragida(id){
+
+  const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+  const msg = cache.find(m => m.id === id);
+
+  if(msg){
+      msg.interaction = true;
+  }
+
+  localStorage.setItem("adminMsgs", JSON.stringify(cache));
+
+}
+
+
+
 
     function mostrarIconeStatus(){
 
@@ -3161,8 +3192,12 @@ function salvarConfiguracoes() {
 
       }else{
           const counter = document.getElementById("waCounter");
-          counter.innerText = cache.length;
+          //counter.innerText = cache.length;
           //counter.innerText = parseInt(counter.innerText)+1;
+
+          //contar somente as nao-interagidas
+          const naoLidas = cache.filter(m => !m.interaction);
+          counter.innerText = naoLidas.length;
 
       }
     }
@@ -3190,38 +3225,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
