@@ -3172,6 +3172,7 @@ function marcarComoInteragida(id){
 
       const statusBar = document.getElementById("statusBar");
       const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+      const msg = cache.find(m => m.id === id);
 
 
       let icon = document.getElementById("waStatusIcon");
@@ -3187,7 +3188,7 @@ function marcarComoInteragida(id){
             <span id="waCounter">1</span>
 
           `;
-          while(msg.interaction = true){
+          while(msg.interaction = false){
             statusBar.appendChild(icon);
           }
           //statusBar.appendChild(icon);
