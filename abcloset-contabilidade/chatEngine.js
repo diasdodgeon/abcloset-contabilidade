@@ -1,8 +1,16 @@
 const somEnviar = new Audio("./env.mp3")
 const somReceber = new Audio("./receive.mp3")
 
-somEnviar.volume = 0.5
-somReceber.volume = 0.5
+document.addEventListener("click", ()=>{
+
+somEnviar.play().then(()=> somEnviar.pause())
+somReceber.play().then(()=> somReceber.pause())
+
+},{once:true})
+
+
+somEnviar.volume = 1
+somReceber.volume = 1
 
 
 const ChatEngine = {
@@ -258,7 +266,7 @@ input.value=""
 }
 
 function adicionarMensagem(texto, tipo){
-    
+
 somReceber.currentTime = 0
 somReceber.play()
 
@@ -275,6 +283,5 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
-
 
 
