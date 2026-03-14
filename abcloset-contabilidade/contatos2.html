@@ -3091,12 +3091,12 @@ function salvarConfiguracoes() {
             adicionarNotificacao(msg);
         });
 
-        if(cache.length > 0){
-            mostrarIconeStatus(cache.length);
-        }
-        //cache.forEach(()=>{
-       //     mostrarIconeStatus();
-       // });
+        //if(cache.length > 0){
+        //    mostrarIconeStatus(cache.length);
+       // }
+        cache.forEach(()=>{
+            mostrarIconeStatus();
+        });
       }
       
       if(novas.length > 0){
@@ -3161,8 +3161,8 @@ function salvarConfiguracoes() {
 
       }else{
           const counter = document.getElementById("waCounter");
-          //counter.innerText = cache.length;
-          counter.innerText = parseInt(counter.innerText);
+          counter.innerText = cache.length;
+          //counter.innerText = parseInt(counter.innerText)+1;
 
       }
     }
