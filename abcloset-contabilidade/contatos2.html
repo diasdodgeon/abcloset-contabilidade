@@ -3134,6 +3134,8 @@ function salvarConfiguracoes() {
     function mostrarIconeStatus(){
 
       const statusBar = document.getElementById("statusBar");
+      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
 
       let icon = document.getElementById("waStatusIcon");
 
