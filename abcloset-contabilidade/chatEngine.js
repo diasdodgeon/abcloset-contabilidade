@@ -1,3 +1,10 @@
+const somEnviar = new Audio("./env.mp3")
+const somReceber = new Audio("./receive.mp3")
+
+somEnviar.volume = 0.5
+somReceber.volume = 0.5
+
+
 const ChatEngine = {
 
 menuAjuda: { 
@@ -227,6 +234,9 @@ window.ChatEngine = ChatEngine
 
 function enviarMensagem(){
 
+somEnviar.currentTime = 0
+somEnviar.play()
+
 let input = document.getElementById("mensagem")
 
 let texto = input.value
@@ -248,6 +258,9 @@ input.value=""
 }
 
 function adicionarMensagem(texto, tipo){
+    
+somReceber.currentTime = 0
+somReceber.play()
 
 let chat = document.getElementById("chat")
 
@@ -262,5 +275,6 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
+
 
 
