@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Dev Tester</title>
+    
+</head>
+<body>
+<style type="text/css">
+ body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.toolbar {
+    background: #2d2d2d;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+#urlInput {
+    padding: 8px;
+    width: 250px;
+    border-radius: 4px;
+    border: none;
+}
+
+.controls button {
+    padding: 8px 12px;
+    cursor: pointer;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+}
+
+.controls button:hover { background: #555; }
+
+.preview-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    padding: 20px;
+}
+
+.device-frame {
+    background: #000;
+    border: 12px solid #333;
+    border-radius: 30px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Oculta a barra de rolagem no Firefox */
+html {
+    scrollbar-width: none;
+}
+
+/* Oculta no IE e Edge antigo */
+body {
+    -ms-overflow-style: none;
+    /* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+    border-radius: 30px;
+    
+    /* Garante que o iframe não crie barras de rolagem próprias */
+    overflow: hidden; 
+}
+.preview-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinhado ao topo para facilitar o scroll */
+    background: radial-gradient(circle, #252525 0%, #121212 100%);
+    padding: 40px;
+    overflow: auto; /* Permite rolar para ver o tablet inteiro */
+}
+
+.device-frame {
+    /* ... mantenha o resto ... */
+    margin-bottom: 50px; /* Espaço extra no final */
+}
+/* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Oculta a barra de rolagem no Firefox */
+html {
+    scrollbar-width: none;
+}
+
+/* Oculta no IE e Edge antigo */
+body {
+    -ms-overflow-style: none;
+}
+
+/* Barra de rolagem minimalista e moderna */
+::-webkit-scrollbar {
+    width: 4px; /* Bem fina */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2); /* Cor suave e semi-transparente */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Oculta no IE e Edge antigo */
+body {
+    -ms-overflow-style: none;
+    /* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+}
+
+</style>
+
+    <header class="toolbar">
+        <input type="text" id="urlInput" placeholder="Digite a URL (ex: http://127.0.0.1:5500)">
+        
+        <div class="controls">
+    <button onclick="updateDevice(320, 568, false, this)">iPhone SE</button>
+    
+    <button onclick="updateDevice(390, 844, true, this)" class="active">iPhone 15</button>
+    <button onclick="updateDevice(412, 915, false, this)">Pixel 7</button>
+    
+    <button onclick="updateDevice(344, 912, false, this)">Z Fold (Fechado)</button>
+    <button onclick="updateDevice(768, 1076, false, this)">Z Fold (Aberto)</button>
+
+    <button onclick="updateDevice(744, 1133, false, this)">iPad Mini</button>
+    <button onclick="updateDevice(820, 1180, false, this)">iPad Air</button>
+    
+    <button id="rotateBtn">Girar 🔄</button>
+</div>
+        
+        <span id="resDisplay">Tamanho: 390 x 844 px</span>
+    </header>
+
+    <main class="preview-area">
+        <div id="deviceWrapper" class="device-frame">
+            <iframe id="previewFrame" src="about:blank"></iframe>
+        </div>
+    </main>
+
+    <script type="text/javascript">
+        const frame = document.getElementById('deviceWrapper');
+const iframe = document.getElementById('previewFrame');
+const urlInput = document.getElementById('urlInput');
+const resDisplay = document.getElementById('resDisplay');
+const rotateBtn = document.getElementById('rotateBtn');
+
+let currentW = 390;
+let currentH = 844;
+
+// Atualiza a URL ao digitar e dar Enter
+urlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        iframe.src = urlInput.value;
+    }
+});
+
+function updateDevice(w, h) {
+    currentW = w;
+    currentH = h;
+    render();
+}
+
+function render() {
+    frame.style.width = currentW + 'px';
+    frame.style.height = currentH + 'px';
+    resDisplay.innerText = `Tamanho: ${currentW} x ${currentH} px`;
+}
+
+rotateBtn.addEventListener('click', () => {
+    [currentW, currentH] = [currentH, currentW];
+    render();
+});
+
+// Inicialização
+updateDevice(390, 844);
+
+    </script>
+</body>
+</html>
