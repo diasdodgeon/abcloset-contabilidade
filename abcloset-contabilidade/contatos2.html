@@ -3066,7 +3066,40 @@ function salvarConfiguracoes() {
         }
     }
 
+    function mostrarIconeStatus(){
 
+      const statusBar = document.getElementById("statusBar");
+      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+
+      let icon = document.getElementById("waStatusIcon");
+
+      if(!icon){
+
+          icon = document.createElement("div");
+          icon.id = "waStatusIcon";
+          icon.className = "status-icon-container";
+
+          icon.innerHTML = `
+            <img src="${WHATS_ICON}">
+            <span id="waCounter">1</span>
+
+          `;
+
+          statusBar.appendChild(icon);
+
+      }else{
+          const counter = document.getElementById("waCounter");
+          //counter.innerText = cache.length;
+          //counter.innerText = parseInt(counter.innerText)+1;
+
+          //contar somente as nao-interagidas
+          const naoLidas = cache.filter(m => !m.interaction);
+          //counter.innerText = naoLidas.length;
+          atualizarStatusBar();
+
+      }
+    }
 
 
       function animarNovaNotificacao(){
@@ -3199,40 +3232,7 @@ function marcarComoInteragida(id){
 
 
 
-    function mostrarIconeStatus(){
-
-      const statusBar = document.getElementById("statusBar");
-      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
-
-      let icon = document.getElementById("waStatusIcon");
-
-      if(!icon){
-
-          icon = document.createElement("div");
-          icon.id = "waStatusIcon";
-          icon.className = "status-icon-container";
-
-          icon.innerHTML = `
-            <img src="${WHATS_ICON}">
-            <span id="waCounter">1</span>
-
-          `;
-
-          statusBar.appendChild(icon);
-
-      }else{
-          const counter = document.getElementById("waCounter");
-          //counter.innerText = cache.length;
-          //counter.innerText = parseInt(counter.innerText)+1;
-
-          //contar somente as nao-interagidas
-          const naoLidas = cache.filter(m => !m.interaction);
-          //counter.innerText = naoLidas.length;
-          atualizarStatusBar();
-
-      }
-    }
+    
 
     
 document.addEventListener("DOMContentLoaded", () => {
