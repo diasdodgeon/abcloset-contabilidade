@@ -3026,8 +3026,6 @@ function salvarConfiguracoes() {
     const JSON_URL = "./adminMensagens.json";
     const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
 
-
-
     async function carregarMensagensAdminStatusBar(){
 
       const response = await fetch(JSON_URL);
@@ -3040,67 +3038,6 @@ function salvarConfiguracoes() {
       const novas = mensagens.filter(m =>
           !cache.some(c => c.id === m.id)
       );
-
-      function atualizarStatusBar(){
-
-        const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-        const naoLidas = cache.filter(m => !m.interaction);
-
-        const icon = document.getElementById("waStatusIcon");
-        const counter = document.getElementById("waCounter");
-
-        // 🔒 se ainda não existe, não faz nada
-        if(!icon || !counter) return;
-
-        if(naoLidas.length === 0){
-
-            icon.style.display = "none";
-            counter.style.display = "none";
-
-        }else{
-
-            icon.style.display = "block";
-            counter.style.display = "block";
-            counter.innerText = naoLidas.length;
-
-        }
-    }
-
-    function mostrarIconeStatus(){
-
-      const statusBar = document.getElementById("statusBar");
-      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
-
-      let icon = document.getElementById("waStatusIcon");
-
-      if(!icon){
-
-          icon = document.createElement("div");
-          icon.id = "waStatusIcon";
-          icon.className = "status-icon-container";
-
-          icon.innerHTML = `
-            <img src="${WHATS_ICON}">
-            <span id="waCounter">1</span>
-
-          `;
-
-          statusBar.appendChild(icon);
-
-      }else{
-          const counter = document.getElementById("waCounter");
-          //counter.innerText = cache.length;
-          //counter.innerText = parseInt(counter.innerText)+1;
-
-          //contar somente as nao-interagidas
-          const naoLidas = cache.filter(m => !m.interaction);
-          //counter.innerText = naoLidas.length;
-          atualizarStatusBar();
-
-      }
-    }
-
 
       function animarNovaNotificacao(){
 
@@ -3156,7 +3093,7 @@ function salvarConfiguracoes() {
                 adicionarNotificacao(msg);
             }
         });
-        atualizarStatusBar();
+
         //if(cache.length > 0){
         //    mostrarIconeStatus(cache.length);
        // }
@@ -3179,7 +3116,6 @@ function salvarConfiguracoes() {
           });
 
           localStorage.setItem("adminMsgs", JSON.stringify(cache));
-          atualizarStatusBar();
           mostrarIconeStatus();
 
       }
@@ -3226,13 +3162,45 @@ function marcarComoInteragida(id){
   }
 
   localStorage.setItem("adminMsgs", JSON.stringify(cache));
-  atualizarStatusBar();
+
 }
 
 
 
 
-    
+    function mostrarIconeStatus(){
+
+      const statusBar = document.getElementById("statusBar");
+      const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+
+      let icon = document.getElementById("waStatusIcon");
+
+      if(!icon){
+
+          icon = document.createElement("div");
+          icon.id = "waStatusIcon";
+          icon.className = "status-icon-container";
+
+          icon.innerHTML = `
+            <img src="${WHATS_ICON}">
+            <span id="waCounter">1</span>
+
+          `;
+
+          statusBar.appendChild(icon);
+
+      }else{
+          const counter = document.getElementById("waCounter");
+          //counter.innerText = cache.length;
+          //counter.innerText = parseInt(counter.innerText)+1;
+
+          //contar somente as nao-interagidas
+          const naoLidas = cache.filter(m => !m.interaction);
+          counter.innerText = naoLidas.length;
+
+      }
+    }
 
     
 document.addEventListener("DOMContentLoaded", () => {
