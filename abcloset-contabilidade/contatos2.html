@@ -3097,8 +3097,6 @@ function salvarConfiguracoes() {
           mostrarIconeStatus();
 
       }
-    
-}
     function carregarCache(){
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
@@ -3111,12 +3109,9 @@ function salvarConfiguracoes() {
             mostrarIconeStatus(cache.length);
         }
       }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        carregarCache();
-        
-        carregarMensagensAdminStatusBar();
-      });
+      
+}
+    
 
     function adicionarNotificacao(msg){
 
@@ -3162,6 +3157,7 @@ function salvarConfiguracoes() {
 
       }
     }
+
     
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -3185,6 +3181,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
 
