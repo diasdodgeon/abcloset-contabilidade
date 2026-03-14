@@ -4,14 +4,16 @@
      {
       "id":4,
       "data":"2026-03-13",
-      "texto":"🚀 Um novo app foi adicionado ao menu. confira."
+      "texto":"🚀 Um novo app foi adicionado ao menu. confira.",
+      "interaction": false
     },
     {
       "id":1,
       "tipo":"video",
       "data":"2026-03-12",
       "texto":"🚀 Agora você pode compartilhar sua agenda usando QR Code.",
-      "video":"./bemVindo.mp4"
+      "video":"./bemVindo.mp4",
+      "interaction": false
     }
   ]
 
