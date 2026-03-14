@@ -3109,7 +3109,7 @@ function salvarConfiguracoes() {
             mostrarIconeStatus(cache.length);
         }
       }
-      
+      carregarCache();
 }
     
 
@@ -3165,7 +3165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if(abaEstilo){
     abaEstilo.addEventListener("click", () => {
-      carregarCache();
+     
       
       carregarMensagensAdminStatusBar();
     });
