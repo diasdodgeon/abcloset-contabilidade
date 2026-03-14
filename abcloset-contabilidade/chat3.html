@@ -1093,7 +1093,7 @@ document.addEventListener('keydown', (event) => {
             if (!chatInitialized) {
                 addMessage("Olá! Como posso ajudar você hoje?", 'admin');
                 chatInitialized = true;
-                salvarChatCache()
+                //salvarChatCache()
             }
         }
 
@@ -1458,7 +1458,7 @@ document.addEventListener('keydown', (event) => {
         },500)
 
         input.value=""
-
+        
         salvarChatCache()
 
         }
@@ -1476,7 +1476,7 @@ document.addEventListener('keydown', (event) => {
         if(tipo==="user"){
         div.classList.add("msg-user")
         }else{
-        div.classList.add("msg-admin","msg-bot")
+        div.classList.add("msg-admin")
         }
 
         div.innerHTML = texto
@@ -1484,7 +1484,7 @@ document.addEventListener('keydown', (event) => {
         chat.appendChild(div)
 
         chat.scrollTop = chat.scrollHeight
-
+        salvarChatCache()
         }
      
         //Carregar histórico ao abrir o chat
