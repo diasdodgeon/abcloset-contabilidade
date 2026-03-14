@@ -1,14 +1,6 @@
 const somEnviar = new Audio("./env.mp3")
 const somReceber = new Audio("./receive.mp3")
 
-document.addEventListener("click", ()=>{
-
-somEnviar.play().then(()=> somEnviar.pause())
-somReceber.play().then(()=> somReceber.pause())
-
-},{once:true})
-
-
 somEnviar.volume = 1
 somReceber.volume = 1
 
