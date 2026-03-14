@@ -613,7 +613,7 @@ document.addEventListener('keydown', (event) => {
         let currentVideo = null;
         let storyQueue = [];
         let currentContactIndex = 0;
-        
+
       
         
         const STORY_DURATION = 5000; // 5s para imagens
@@ -1445,12 +1445,20 @@ document.addEventListener('keydown', (event) => {
         const chatMessages = document.getElementById('chat-messages');
         //Criar a função que envia mensagens para o chatbot,
         //a ponte entre o chat visual e o ChatEngine.
+        const somEnviar = new Audio("./env.mp3")
+        const somReceber = new Audio("./receive.mp3")
+        
+        
+        
+        somEnviar.volume = 1
+        somReceber.volume = 1
 
         
 
   
         function enviarMensagemChat(){
-
+        somReceber.currentTime = 0
+        somReceber.play()
         const input = document.getElementById("chat-input")
         const texto = input.value.trim()
 
@@ -1475,6 +1483,8 @@ document.addEventListener('keydown', (event) => {
         //Função para adicionar mensagens no chat
 
         function adicionarMensagem(texto,tipo){
+        somEnviar.currentTime = 0
+        somEnviar.play()
 
         const chat = document.getElementById("chat-messages")
 
