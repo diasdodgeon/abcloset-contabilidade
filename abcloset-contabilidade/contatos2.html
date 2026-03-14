@@ -3105,9 +3105,12 @@ function salvarConfiguracoes() {
             adicionarNotificacao(msg);
         });
 
-        if(cache.length > 0){
-            mostrarIconeStatus(cache.length);
-        }
+        //if(cache.length > 0){
+        //    mostrarIconeStatus(cache.length);
+        //}
+        cache.forEach(()=>{
+            mostrarIconeStatus();
+        });
       }
       carregarCache();
 }
@@ -3155,7 +3158,8 @@ function salvarConfiguracoes() {
 
       }else{
           const counter = document.getElementById("waCounter");
-          counter.innerText = cache.length;
+          //counter.innerText = cache.length;
+          counter.innerText = parseInt(counter.innerText)+1;
 
       }
     }
