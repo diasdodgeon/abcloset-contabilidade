@@ -1070,7 +1070,20 @@ document.addEventListener('keydown', (event) => {
         
           listEl.appendChild(el);
         }
-    
+
+        //Salvar mensagens no cache (3 meses)
+        function salvarChatCache(){
+
+        const chat = document.getElementById("chat-messages")
+
+        localStorage.setItem(
+        "chatHistorico",
+        chat.innerHTML
+        )
+
+        }
+
+  
         let chatInitialized = false;
         function openInternalChat(contact) {
             chatScreen.classList.remove('hidden');
@@ -1080,6 +1093,7 @@ document.addEventListener('keydown', (event) => {
             if (!chatInitialized) {
                 addMessage("Olá! Como posso ajudar você hoje?", 'admin');
                 chatInitialized = true;
+                salvarChatCache()
             }
         }
 
@@ -1423,17 +1437,7 @@ document.addEventListener('keydown', (event) => {
         //Criar a função que envia mensagens para o chatbot,
         //a ponte entre o chat visual e o ChatEngine.
 
-        //Salvar mensagens no cache (3 meses)
-        function salvarChatCache(){
-
-        const chat = document.getElementById("chat-messages")
-
-        localStorage.setItem(
-        "chatHistorico",
-        chat.innerHTML
-        )
-
-        }
+        
 
   
         function enviarMensagemChat(){
