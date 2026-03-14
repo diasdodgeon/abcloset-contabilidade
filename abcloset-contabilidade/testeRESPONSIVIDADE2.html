@@ -63,25 +63,6 @@
     position: relative;
 }
 
-/* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    display: none;
-}
-
-/* Oculta a barra de rolagem no Firefox */
-html {
-    scrollbar-width: none;
-}
-
-/* Oculta no IE e Edge antigo */
-body {
-    -ms-overflow-style: none;
-    /* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    display: none;
-}
-
-}
 
 iframe {
     width: 100%;
@@ -103,10 +84,7 @@ iframe {
     overflow: auto; /* Permite rolar para ver o tablet inteiro */
 }
 
-.device-frame {
-    /* ... mantenha o resto ... */
-    margin-bottom: 50px; /* Espaço extra no final */
-}
+
 /* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
     display: none;
@@ -122,31 +100,10 @@ body {
     -ms-overflow-style: none;
 }
 
-/* Barra de rolagem minimalista e moderna */
-::-webkit-scrollbar {
-    width: 4px; /* Bem fina */
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2); /* Cor suave e semi-transparente */
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
 
 /* Oculta no IE e Edge antigo */
 body {
     -ms-overflow-style: none;
-    /* Oculta a barra de rolagem em navegadores baseados em Webkit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    display: none;
-}
 
 }
 
