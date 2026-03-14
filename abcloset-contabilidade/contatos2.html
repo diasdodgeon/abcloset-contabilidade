@@ -3025,7 +3025,26 @@ function salvarConfiguracoes() {
         }
     const JSON_URL = "./adminMensagens.json";
     const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
+function adicionarNotificacao(msg){
 
+      const drawer = document.getElementById("notificationList");
+
+      const item = document.createElement("div");
+      item.className = "notification-item";
+
+      item.innerHTML = `
+        <img src="${WHATS_ICON}">
+        <div>
+          <b>Admin</b><br>
+          ${msg.texto}
+        </div>
+      `;
+
+      drawer.prepend(item);
+    }
+
+
+  
     async function carregarMensagensAdminStatusBar(){
 
       const response = await fetch(JSON_URL);
@@ -3119,24 +3138,7 @@ function salvarConfiguracoes() {
         carregarMensagensAdminStatusBar();
       });
 
-    function adicionarNotificacao(msg){
-
-      const drawer = document.getElementById("notificationList");
-
-      const item = document.createElement("div");
-      item.className = "notification-item";
-
-      item.innerHTML = `
-        <img src="${WHATS_ICON}">
-        <div>
-          <b>Admin</b><br>
-          ${msg.texto}
-        </div>
-      `;
-
-      drawer.prepend(item);
-    }
-
+    
     function mostrarIconeStatus(){
 
       const statusBar = document.getElementById("statusBar");
