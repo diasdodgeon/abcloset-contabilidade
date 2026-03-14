@@ -164,7 +164,7 @@ processarMensagensAdmin: function(mensagens){
 
         if(!cache.includes(msg.id)){
 
-            this.adicionarMensagemAdmin(msg.texto)
+            this.adicionarMensagemAdmin(msg)
 
             cache.push(msg.id)
 
@@ -176,28 +176,47 @@ processarMensagensAdmin: function(mensagens){
 
 },
 
-adicionarMensagemAdmin: function(texto){
+adicionarMensagemAdmin: function(msg){
 
 const chat = document.querySelector("#chat-messages")
-
 if(!chat) return
 
-const hora = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+const hora = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
 
 const mensagem = document.createElement("div")
-
 mensagem.className = "msg msg-admin"
+
+let videoHTML = ""
+
+if(msg.video){
+
+videoHTML = `
+<video class="chat-video" controls>
+<source src="${msg.video}" type="video/mp4">
+</video>
+`
+
+}
 
 mensagem.innerHTML = `
 <div class="msg-bubble">
-    ${texto}
-    <span class="msg-time">${hora}</span>
+
+${videoHTML}
+
+<div class="msg-text">${msg.texto}</div>
+
+<span class="msg-time">${hora}</span>
+
 </div>
 `
 
 chat.appendChild(mensagem)
 
 chat.scrollTop = chat.scrollHeight
+
+if(typeof salvarChatCache==="function"){
+salvarChatCache()
+}
 
 }
 
@@ -243,4 +262,5 @@ chat.appendChild(div)
 chat.scrollTop = chat.scrollHeight
 
 }
+
 
