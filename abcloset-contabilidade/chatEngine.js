@@ -1,8 +1,4 @@
-const somEnviar = new Audio("./env.mp3")
-const somReceber = new Audio("./receive.mp3")
 
-somEnviar.volume = 1
-somReceber.volume = 1
 
 
 const ChatEngine = {
@@ -234,8 +230,7 @@ window.ChatEngine = ChatEngine
 
 function enviarMensagem(){
 
-somEnviar.currentTime = 0
-somEnviar.play()
+
 
 let input = document.getElementById("mensagem")
 
@@ -259,8 +254,7 @@ input.value=""
 
 function adicionarMensagem(texto, tipo){
 
-somReceber.currentTime = 0
-somReceber.play()
+
 
 let chat = document.getElementById("chat")
 
