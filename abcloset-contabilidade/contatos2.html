@@ -3083,6 +3083,22 @@ function salvarConfiguracoes() {
 
       }
 
+   function carregarCache(){
+
+        const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+        cache.forEach(msg=>{
+            adicionarNotificacao(msg);
+        });
+
+        if(cache.length > 0){
+            mostrarIconeStatus(cache.length);
+        }
+        //cache.forEach(()=>{
+       //     mostrarIconeStatus();
+       // });
+      }
+      
       if(novas.length > 0){
 
           novas.forEach(msg=>{
@@ -3097,22 +3113,9 @@ function salvarConfiguracoes() {
           mostrarIconeStatus();
 
       }
-    function carregarCache(){
-
-        const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
-        cache.forEach(msg=>{
-            adicionarNotificacao(msg);
-        });
-
-        //if(cache.length > 0){
-        //    mostrarIconeStatus(cache.length);
-        //}
-        cache.forEach(()=>{
-            mostrarIconeStatus();
-        });
-      }
+     else{
       carregarCache();
+     }
 }
     
 
