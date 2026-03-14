@@ -3038,7 +3038,7 @@ function salvarConfiguracoes() {
       const novas = mensagens.filter(m =>
           !cache.some(c => c.id === m.id)
       );
-
+}
       function animarNovaNotificacao(){
 
       const icon = document.getElementById("waStatusIcon");
@@ -3094,12 +3094,11 @@ function salvarConfiguracoes() {
           });
 
           localStorage.setItem("adminMsgs", JSON.stringify(cache));
-
           mostrarIconeStatus();
 
       }
     
- }
+
     function carregarCache(){
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
@@ -3108,13 +3107,14 @@ function salvarConfiguracoes() {
             adicionarNotificacao(msg);
         });
 
-        cache.forEach(()=>{
-            mostrarIconeStatus();
-        });
+        if(cache.length > 0){
+            mostrarIconeStatus(cache.length);
+        }
       }
 
       document.addEventListener("DOMContentLoaded", () => {
         carregarCache();
+        
         carregarMensagensAdminStatusBar();
       });
 
@@ -3157,19 +3157,20 @@ function salvarConfiguracoes() {
           statusBar.appendChild(icon);
 
       }else{
-
           const counter = document.getElementById("waCounter");
-          counter.innerText = parseInt(counter.innerText)+1;
+          counter.innerText = cache.length;
 
       }
     }
-   
+    
 document.addEventListener("DOMContentLoaded", () => {
 
   const abaEstilo = document.getElementById("abriEstilo"); // ou "aparencia"
 
   if(abaEstilo){
     abaEstilo.addEventListener("click", () => {
+      carregarCache();
+      
       carregarMensagensAdminStatusBar();
     });
   }
@@ -3184,7 +3185,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
 
 
 
