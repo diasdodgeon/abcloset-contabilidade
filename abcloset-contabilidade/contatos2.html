@@ -3026,6 +3026,34 @@ function salvarConfiguracoes() {
     const JSON_URL = "./adminMensagens.json";
     const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
 
+
+function atualizarStatusBar(){
+
+    const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+
+    const naoLidas = cache.filter(m => !m.interaction);
+
+    const icon = document.getElementById("whatsappIcon");
+    const counter = document.getElementById("notificationCounter");
+
+    if(naoLidas.length === 0){
+
+        icon.style.display = "none";
+        counter.style.display = "none";
+
+    }else{
+
+        icon.style.display = "block";
+        counter.style.display = "block";
+
+        counter.innerText = naoLidas.length;
+
+    }
+
+}
+
+
+
     async function carregarMensagensAdminStatusBar(){
 
       const response = await fetch(JSON_URL);
@@ -3093,7 +3121,7 @@ function salvarConfiguracoes() {
                 adicionarNotificacao(msg);
             }
         });
-
+        atualizarStatusBar();
         //if(cache.length > 0){
         //    mostrarIconeStatus(cache.length);
        // }
@@ -3116,6 +3144,7 @@ function salvarConfiguracoes() {
           });
 
           localStorage.setItem("adminMsgs", JSON.stringify(cache));
+          atualizarStatusBar();
           mostrarIconeStatus();
 
       }
@@ -3162,7 +3191,7 @@ function marcarComoInteragida(id){
   }
 
   localStorage.setItem("adminMsgs", JSON.stringify(cache));
-
+  atualizarStatusBar();
 }
 
 
@@ -3197,7 +3226,8 @@ function marcarComoInteragida(id){
 
           //contar somente as nao-interagidas
           const naoLidas = cache.filter(m => !m.interaction);
-          counter.innerText = naoLidas.length;
+          //counter.innerText = naoLidas.length;
+          atualizarStatusBar();
 
       }
     }
