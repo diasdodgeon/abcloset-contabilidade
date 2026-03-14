@@ -3027,31 +3027,6 @@ function salvarConfiguracoes() {
     const WHATS_ICON = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
 
 
-function atualizarStatusBar(){
-
-    const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
-    const naoLidas = cache.filter(m => !m.interaction);
-
-    const icon = document.getElementById("whatsappIcon");
-    const counter = document.getElementById("notificationCounter");
-
-    if(naoLidas.length === 0){
-
-        icon.style.display = "none";
-        counter.style.display = "none";
-
-    }else{
-
-        icon.style.display = "block";
-        counter.style.display = "block";
-
-        counter.innerText = naoLidas.length;
-
-    }
-
-}
-
 
 
     async function carregarMensagensAdminStatusBar(){
@@ -3067,6 +3042,35 @@ function atualizarStatusBar(){
           !cache.some(c => c.id === m.id)
       );
 
+      function atualizarStatusBar(){
+
+        const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
+    
+        const naoLidas = cache.filter(m => !m.interaction);
+    
+        const icon = document.getElementById("waStatusIcon");
+        const counter = document.getElementById("waCounter");
+    
+        if(naoLidas.length === 0){
+    
+            icon.style.display = "none";
+            counter.style.display = "none";
+    
+        }else{
+    
+            icon.style.display = "block";
+            counter.style.display = "block";
+    
+            counter.innerText = naoLidas.length;
+    
+        }
+    
+    }
+
+
+
+
+      
       function animarNovaNotificacao(){
 
       const icon = document.getElementById("waStatusIcon");
