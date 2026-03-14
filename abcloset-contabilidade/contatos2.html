@@ -3094,12 +3094,12 @@ function salvarConfiguracoes() {
           });
 
           localStorage.setItem("adminMsgs", JSON.stringify(cache));
+
           mostrarIconeStatus();
 
       }
-}
     
-
+ }
     function carregarCache(){
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
@@ -3108,14 +3108,13 @@ function salvarConfiguracoes() {
             adicionarNotificacao(msg);
         });
 
-        if(cache.length > 0){
-            mostrarIconeStatus(cache.length);
-        }
+        cache.forEach(()=>{
+            mostrarIconeStatus();
+        });
       }
 
       document.addEventListener("DOMContentLoaded", () => {
         carregarCache();
-        
         carregarMensagensAdminStatusBar();
       });
 
@@ -3159,19 +3158,18 @@ function salvarConfiguracoes() {
 
       }else{
 
-          counter.innerText = cache.length;
+          const counter = document.getElementById("waCounter");
+          counter.innerText = parseInt(counter.innerText)+1;
 
       }
     }
-    
+   
 document.addEventListener("DOMContentLoaded", () => {
 
   const abaEstilo = document.getElementById("abriEstilo"); // ou "aparencia"
 
   if(abaEstilo){
     abaEstilo.addEventListener("click", () => {
-      carregarCache();
-      drawer.innerHTML = "";
       carregarMensagensAdminStatusBar();
     });
   }
@@ -3186,6 +3184,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
 
