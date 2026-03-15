@@ -3086,7 +3086,7 @@ function salvarConfiguracoes() {
    function carregarCache(){
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
-
+        const naoLidas = cache.filter(m => !m.interaction);
         //Quando carregar do cache, mostrar apenas mensagens não interagidas.
         cache.forEach(msg=>{
             if(!msg.interaction){
@@ -3094,12 +3094,12 @@ function salvarConfiguracoes() {
             }
         });
 
-        //if(cache.length > 0){
-        //    mostrarIconeStatus(cache.length);
-       // }
-        cache.forEach(()=>{
-            mostrarIconeStatus();
-        });
+         if(cache.length > 0){
+            mostrarIconeStatus(naoLidas.length);             
+         }
+        //cache.forEach(()=>{
+       //     mostrarIconeStatus();
+       // });
       }
       
       if(novas.length > 0){
@@ -3188,6 +3188,8 @@ function marcarComoInteragida(id){
             <span id="waCounter">1</span>
 
           `;
+        //Aqui, estamos usando o método some() para verificar se há algum objeto no array adminMsgs com a propriedade "interaction" igual a false. Se houver, o código dentro do if é executado.
+        //O método some() retorna true se encontrar pelo menos um elemento que atenda à condição, e false caso contrário.
         const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
         if (adminMsgs && adminMsgs.some(msg => !msg.interaction)) {
           console.log('Há mensagens não lidas!');
