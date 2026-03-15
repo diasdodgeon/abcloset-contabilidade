@@ -3188,21 +3188,32 @@ function marcarComoInteragida(id){
             <span id="waCounter">1</span>
 
           `;
-        const counter = document.getElementById("waCounter");
-        //contar somente as nao-interagidas
-        const naoLidas = cache.filter(m => !m.interaction);
         const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
         if (adminMsgs && adminMsgs.some(msg => !msg.interaction)) {
           console.log('Há mensagens não lidas!');
           // código a ser executado quando houver mensagens com interaction = false
           statusBar.appendChild(icon);
-          counter.innerText = naoLidas.length;
           
         }
-         
+          //statusBar.appendChild(icon);
+
+      }else{
+          const counter = document.getElementById("waCounter");
+          //counter.innerText = cache.length;
+          //counter.innerText = parseInt(counter.innerText)+1;
+
+          //contar somente as nao-interagidas
+          const naoLidas = cache.filter(m => !m.interaction);
+          const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
+          if (adminMsgs && adminMsgs.some(msg => !msg.interaction)) {
+          
+            // código a ser executado quando houver mensagens com interaction = false
+            counter.innerText = naoLidas.length + 1;
+            
+          }
+          //counter.innerText = naoLidas.length;
 
       }
-    }
 
     
 document.addEventListener("DOMContentLoaded", () => {
