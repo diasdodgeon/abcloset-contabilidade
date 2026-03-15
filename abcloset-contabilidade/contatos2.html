@@ -3091,7 +3091,7 @@ function salvarConfiguracoes() {
 
 
         const naoLidas = cache.filter(m => !m.interaction);
-        const counter = document.getElementById("waCounter");
+        
         //Quando carregar do cache, mostrar apenas mensagens não interagidas.
         cache.forEach(msg=>{
             if(!msg.interaction){
@@ -3117,13 +3117,13 @@ function salvarConfiguracoes() {
 
               adicionarNotificacao(msg);
               cache.push(msg);
-              //mostrarIconeStatus();
+              mostrarIconeStatus();
               animarNovaNotificacao(); // 👈 aqui
               tocarNotificacao();
           });
 
-          localStorage.setItem("adminMsgs", JSON.stringify(cache));
-          mostrarIconeStatus();
+          //localStorage.setItem("adminMsgs", JSON.stringify(cache));
+          //mostrarIconeStatus();
 
       }
      else{
