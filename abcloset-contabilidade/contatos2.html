@@ -2530,42 +2530,7 @@ function salvarConfiguracoes() {
             // Você pode adicionar mais notificações aqui
         ];
         
-        // =========================================================
-        // 🆕 2. DADOS DOS VÍDEOS (Conteúdo estático que virá após as notificações)
-        // =========================================================
-        const youtubeVideos = [
-            {
-                title: 'Título do Vídeo Principal',
-                detail: 'Novo Conteúdo: Assista agora!',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            {
-                title: 'Tutorial Rápido de HTML e CSS',
-                detail: 'Há 2 horas - 5,4k visualizações',
-                link: 'https://www.youtube.com/watch?v=31vJkPQCcwE',
-                thumb: 'https://img.youtube.com/vi/31vJkPQCcwE/hqdefault.jpg'
-            },
-            // Adicione mais vídeos aqui
-        ];
+
         // ⚠️ ATENÇÃO: Se o wallpaper foi salvo, aplique-o ao carregar o sistema!
         
         
@@ -3225,7 +3190,66 @@ function mostrarIconeStatus(){
       }
 
     }
+async function carregarVideosAdmin() {
 
+  const response = await fetch("videosAdmin.json");
+  const videos = await response.json();
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const novos = videos.filter(v =>
+      !cache.some(c => c.id === v.id)
+  );
+
+  if (novos.length > 0) {
+
+      const atualizado = [...cache, ...novos];
+
+      localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
+
+  }
+  function renderizarVideos() {
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const naoInteragidos = cache.filter(v => !v.interaction);
+
+  naoInteragidos.forEach(video => {
+
+      const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+
+      const item = createListItem(
+          null,
+          video.title,
+          video.detail,
+          `youtubeApp.html?id=${video.youtubeId}`,
+          thumb
+      );
+
+      notificationList.innerHTML += item;
+
+  });
+
+}
+function marcarVideoComoVisto(id) {
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const atualizado = cache.map(v => {
+
+      if (v.id === id) {
+          v.interaction = true;
+      }
+
+      return v;
+  });
+
+  localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
+
+}
+  marcarVideoComoVisto();
+  renderizarVideos();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -3236,6 +3260,7 @@ document.addEventListener("DOMContentLoaded", () => {
      
       
       carregarMensagensAdminStatusBar();
+      carregarVideosAdmin();
     });
   }
 
