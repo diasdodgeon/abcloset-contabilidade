@@ -2607,6 +2607,24 @@ function salvarConfiguracoes() {
       localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
 
   }
+
+function marcarVideoComoVisto(id) {
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const atualizado = cache.map(v => {
+
+      if (v.id === id) {
+          v.interaction = true;
+      }
+
+      return v;
+  });
+
+  localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
+
+}
+            
   function renderizarVideos() {
 
   const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
@@ -2640,30 +2658,15 @@ function salvarConfiguracoes() {
       );
   item.onclick = () => {
 
-       marcarVideoComoVisto();
+       marcarVideoComoVisto(atualizado.id);
 
       // aqui futuramente você pode redirecionar para o chat
       console.log("Abrir chat admin");
 
   };
 }
-function marcarVideoComoVisto(id) {
 
-  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
-
-  const atualizado = cache.map(v => {
-
-      if (v.id === id) {
-          v.interaction = true;
-      }
-
-      return v;
-  });
-
-  localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
-
-}
-  marcarVideoComoVisto();
+  
   renderizarVideos();
 }
 
