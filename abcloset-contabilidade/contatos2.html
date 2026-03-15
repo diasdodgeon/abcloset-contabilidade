@@ -3087,18 +3087,21 @@ function salvarConfiguracoes() {
 
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
         const naoLidas = cache.filter(m => !m.interaction);
+        const counter = document.getElementById("waCounter");
         //Quando carregar do cache, mostrar apenas mensagens não interagidas.
         cache.forEach(msg=>{
             if(!msg.interaction){
                 adicionarNotificacao(msg);
+                mostrarIconeStatus();
+                counter.innerText = naoLidas.length;
             }
         });
 
-         if(cache.length > 0){
-            mostrarIconeStatus(naoLidas.length);             
-         }
+        // if(cache.length > 0){
+         //   mostrarIconeStatus(naoLidas.length);             
+        // }
         //cache.forEach(()=>{
-       //     mostrarIconeStatus();
+        //    mostrarIconeStatus();
        // });
       }
       
