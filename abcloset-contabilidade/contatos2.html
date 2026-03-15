@@ -2628,6 +2628,16 @@ function salvarConfiguracoes() {
       notificationList.innerHTML += item;
 
   });
+
+  const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+
+      const item = createListItem(
+          null,
+          video.title,
+          video.detail,
+          `youtubeApp.html?id=${video.youtubeId}`,
+          thumb
+      );
   item.onclick = () => {
 
        marcarVideoComoVisto();
