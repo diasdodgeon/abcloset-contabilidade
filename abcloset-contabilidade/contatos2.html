@@ -3192,7 +3192,7 @@ function mostrarIconeStatus(){
     }
 async function carregarVideosAdmin() {
 
-  const response = await fetch("videosAdmin.json");
+  const response = await fetch("./videosAdmin.json");
   const videos = await response.json();
 
   const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
