@@ -2558,7 +2558,7 @@ function salvarConfiguracoes() {
               const isVideo = link && thumb;
                 //<a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
                 const itemHTML = `
-
+                      <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
                         ${isVideo ? 
                             // Se for vídeo, usa a thumbnail
                             `<div class="video-thumbnail">
