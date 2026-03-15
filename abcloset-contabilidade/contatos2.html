@@ -3090,19 +3090,6 @@ function salvarConfiguracoes() {
         const cache = JSON.parse(localStorage.getItem("adminMsgs")) || [];
 
 
-  const item = document.createElement("div");
-  item.className = "notification-item";
-
-  item.innerHTML = `
-    <img src="${WHATS_ICON}">
-    <div>
-      <b>Admin</b><br>
-      ${msg.texto}
-    </div>
-  `;
-
-
-     
         const naoLidas = cache.filter(m => !m.interaction);
         const counter = document.getElementById("waCounter");
         //Quando carregar do cache, mostrar apenas mensagens não interagidas.
@@ -3110,7 +3097,7 @@ function salvarConfiguracoes() {
             if(!msg.interaction){
                 adicionarNotificacao(msg);
                 mostrarIconeStatus();
-                counter.innerText = naoLidas.length;
+               
             }
         });
 
