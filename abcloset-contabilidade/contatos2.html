@@ -3116,16 +3116,15 @@ function salvarConfiguracoes() {
           novas.forEach(msg=>{
               //Quando detectar novas mensagens, garantir que elas entrem com:interaction = false
               msg.interaction = false;
-             
+
               adicionarNotificacao(msg);
               cache.push(msg);
               //mostrarIconeStatus(); 
               animarNovaNotificacao(); // 👈 aqui
               tocarNotificacao();
-            
           });
 
-          //localStorage.setItem("adminMsgs", JSON.stringify(cache));
+          localStorage.setItem("adminMsgs", JSON.stringify(cache));
           mostrarIconeStatus();
 
       }
@@ -3184,7 +3183,7 @@ function mostrarIconeStatus(){
 
 
       let icon = document.getElementById("waStatusIcon");
-
+      const contador = document.getElementById("contadorNotificacao");
       if(!icon){
 
           icon = document.createElement("div");
@@ -3196,6 +3195,8 @@ function mostrarIconeStatus(){
             <span id="waCounter">1</span>
 
           `;
+        
+        
         //Aqui, estamos usando o método some() para verificar se há algum objeto no array adminMsgs com a propriedade "interaction" igual a false. Se houver, o código dentro do if é executado.
         //O método some() retorna true se encontrar pelo menos um elemento que atenda à condição, e false caso contrário.
         const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
@@ -3205,18 +3206,20 @@ function mostrarIconeStatus(){
           statusBar.appendChild(icon);
           
         }
-          
+          //statusBar.appendChild(icon);
 
       }else{
+
+          
+
           const counter = document.getElementById("waCounter");
-         
+          //counter.innerText = cache.length;
+          //counter.innerText = parseInt(counter.innerText)+1;
+
           //contar somente as nao-interagidas
           const naoLidas = cache.filter(m => !m.interaction);
          
           counter.innerText = naoLidas.length;
-
-          
-
 
       }
 
