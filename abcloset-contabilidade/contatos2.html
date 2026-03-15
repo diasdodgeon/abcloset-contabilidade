@@ -2628,7 +2628,14 @@ function salvarConfiguracoes() {
       notificationList.innerHTML += item;
 
   });
+  item.onclick = () => {
 
+       marcarVideoComoVisto();
+
+      // aqui futuramente você pode redirecionar para o chat
+      console.log("Abrir chat admin");
+
+  };
 }
 function marcarVideoComoVisto(id) {
 
