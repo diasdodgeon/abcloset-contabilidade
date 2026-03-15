@@ -1789,28 +1789,34 @@ document.addEventListener('keydown', (event) => {
     }
   }
 });
-// Em celulares, usamos os eventos touchstart e touchend para detectar quando o usuário clica e segura na tela por pelo menos 10 segundos.
-// Se o tempo segurado for maior ou igual a 10 segundos, a caixa de diálogo é exibida com a mensagem "Deseja mesmo formatar o cache?".
-// Se o usuário clicar em "OK", o localStorage é limpo. Se clicar em "Cancelar", a ação é cancelada.
-let tempoInicio = 0; 
-let tempoFim = 0;
-document.addEventListener('touchstart', (event) => {
-  tempoInicio = new Date().getTime();
-});
-document.addEventListener('touchend', (event) => {
-  tempoFim = new Date().getTime();
-  const tempoSegurado = (tempoFim - tempoInicio) / 1000;
+//Em celulares, usamos o evento devicemotion para aplicar o comando localStorage.clear() quando o dispositivo é sacudido:
+//1. O evento devicemotion é disparado quando o dispositivo é movido.
+//2. A aceleração do dispositivo é calculada e armazenada em aceleracao.
+//3. A sacudida atual é calculada como a magnitude da aceleração(usando o teorema de Pitágoras).
+//4. A diferença entre a sacudida atual e a última sacudida é calculada.
+//5. Se a diferença for maior que 10 e a sacudida atual for maior que 15, o dispositivo é considerado "sacudido", e o codigo dispara o metodo confirm('Deseja mesmo formatar o cache?'), então, localStorage é limpo.
+let ultimaSacudida = 0;
+window.addEventListener('devicemotion', (event) => {
+  const aceleracao = event.acceleration;
+  const sacudidaAtual = Math.sqrt(aceleracao.x ** 2 + aceleracao.y ** 2 + aceleracao.z ** 2);
+  const diferenca = sacudidaAtual - ultimaSacudida;
 
-  if (tempoSegurado >= 10) {
+  if (diferenca > 10 && sacudidaAtual > 15) {
+    // O dispositivo foi sacudido
     const resposta = confirm('Deseja mesmo formatar o cache?');
     if (resposta) {
       localStorage.clear();
-      console.log('Cache limpo!');
+      console.log('Cache limpo com sucesso!');
+      window.location.reload();
     } else {
-      console.log('Ação cancelada!');
+      console.log('Comando abortado.');
     }
+    
   }
+
+  ultimaSacudida = sacudidaAtual;
 });
+
 
   function toggleNotificationDrawer() {
     const drawer = document.getElementById("notificationDrawer");
