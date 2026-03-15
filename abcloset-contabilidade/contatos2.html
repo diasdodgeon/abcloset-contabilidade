@@ -2585,10 +2585,10 @@ function salvarConfiguracoes() {
             });
             
             // 3.2 Adiciona a Lista de Vídeos (Conteúdo de rodapé)
-            youtubeVideos.forEach(v => {
-                const item = createListItem(null, v.title, v.detail, v.link, v.thumb);
-                notificationList.innerHTML += item;
-            });
+            //youtubeVideos.forEach(v => {
+            //    const item = createListItem(null, v.title, v.detail, v.link, v.thumb);
+           //     notificationList.innerHTML += item;
+           // });
 
         }
 
@@ -3192,7 +3192,7 @@ function mostrarIconeStatus(){
     }
 async function carregarVideosAdmin() {
 
-  const response = await fetch("videosAdmin.json");
+  const response = await fetch("./videosAdmin.json");
   const videos = await response.json();
 
   const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
