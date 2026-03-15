@@ -3119,7 +3119,8 @@ function salvarConfiguracoes() {
 
               adicionarNotificacao(msg);
               cache.push(msg);
-              mostrarIconeStatus(); 
+              mostrarIconeStatus();
+              localStorage.setItem("adminMsgs", JSON.stringify(cache));
               animarNovaNotificacao(); // 👈 aqui
               tocarNotificacao();
           });
