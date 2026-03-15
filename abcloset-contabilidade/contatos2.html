@@ -3220,7 +3220,7 @@ function mostrarIconeStatus(){
           const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
           const quantidadeMensagensNaoLidas = adminMsgs.filter(msg => !msg.interaction).length;
           console.log(`Há ${quantidadeMensagensNaoLidas} mensagens não lidas.`);
-          counter.innerText = parseInt(quantidadeMensagensNaoLidas);
+          counter.innerText = quantidadeMensagensNaoLidas;
 
 
       }
