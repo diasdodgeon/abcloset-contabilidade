@@ -1792,7 +1792,7 @@ document.addEventListener('keydown', (event) => {
 // Em celulares, usamos os eventos touchstart e touchend para detectar quando o usuário clica e segura na tela por pelo menos 10 segundos.
 // Se o tempo segurado for maior ou igual a 10 segundos, a caixa de diálogo é exibida com a mensagem "Deseja mesmo formatar o cache?".
 // Se o usuário clicar em "OK", o localStorage é limpo. Se clicar em "Cancelar", a ação é cancelada.
-let tempoInicio = 0;
+let tempoInicio = 0; 
 let tempoFim = 0;
 document.addEventListener('touchstart', (event) => {
   tempoInicio = new Date().getTime();
