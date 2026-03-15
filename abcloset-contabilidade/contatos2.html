@@ -3188,6 +3188,7 @@ function marcarComoInteragida(id){
             <span id="waCounter">1</span>
 
           `;
+        const counter = document.getElementById("waCounter");
         //contar somente as nao-interagidas
         const naoLidas = cache.filter(m => !m.interaction);
         const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
