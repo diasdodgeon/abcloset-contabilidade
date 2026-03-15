@@ -1,0 +1,18 @@
+[
+  {
+    "id": "video001",
+    "title": "Tutorial do Sistema",
+    "detail": "Novo vídeo disponível",
+    "youtubeId": "jkF6Lheuk8g",
+    "interaction": false,
+    "timestamp": "2026-03-15T10:00:00"
+  },
+  {
+    "id": "video002",
+    "title": "Atualização do App",
+    "detail": "Veja as novidades",
+    "youtubeId": "sDiHRCJaB4s",
+    "interaction": false,
+    "timestamp": "2026-03-16T10:00:00"
+  }
+]
