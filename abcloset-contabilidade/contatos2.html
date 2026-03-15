@@ -2556,9 +2556,9 @@ function salvarConfiguracoes() {
              //Função auxiliar para criar um item de notificação/vídeo
             const createListItem = (icon, title, detail, link, thumb) => {
               const isVideo = link && thumb;
-                
+                //<a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
                 const itemHTML = `
-                    <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
+
                         ${isVideo ? 
                             // Se for vídeo, usa a thumbnail
                             `<div class="video-thumbnail">
