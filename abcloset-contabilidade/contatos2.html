@@ -3188,12 +3188,13 @@ function marcarComoInteragida(id){
             <span id="waCounter">1</span>
 
           `;
+        const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
+        if (adminMsgs && adminMsgs.some(msg => !msg.interaction)) {
+          console.log('Há mensagens não lidas!');
           // código a ser executado quando houver mensagens com interaction = false
-          if (localStorage.getItem('adminMsgs') === "interaction": false) {
-            console.log('Há mensagens não lidas!'); 
-            
-            statusBar.appendChild(icon);
-          } 
+          statusBar.appendChild(icon);
+          
+        }
           //statusBar.appendChild(icon);
 
       }else{
