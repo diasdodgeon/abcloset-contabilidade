@@ -3118,13 +3118,13 @@ function salvarConfiguracoes() {
 
       }else{
           const counter = document.getElementById("waCounter");
-          counter.innerText = cache.length;
+          //counter.innerText = cache.length;
           //counter.innerText = parseInt(counter.innerText)+1;
 
           //contar somente as nao-interagidas
-          //const naoLidas = cache.filter(m => !m.interaction);
+          const naoLidas = cache.filter(m => !m.interaction);
          
-          //counter.innerText = naoLidas.length;
+          counter.innerText = naoLidas.length;
 
       }
 
