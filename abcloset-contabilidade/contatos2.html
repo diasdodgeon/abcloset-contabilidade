@@ -2554,35 +2554,35 @@ function salvarConfiguracoes() {
             notificationList.innerHTML = ''; // Limpa a lista antes de adicionar novos itens
 
             // Função auxiliar para criar um item de notificação/vídeo
-            const createListItem = (icon, title, detail, link, thumb) => {
-                const isVideo = link && thumb;
+            //const createListItem = (icon, title, detail, link, thumb) => {
+                //const isVideo = link && thumb;
                 
-                const itemHTML = `
-                    <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
-                        ${isVideo ? 
+                //const itemHTML = `
+                   // <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
+                    //    ${isVideo ? 
                             // Se for vídeo, usa a thumbnail
-                            `<div class="video-thumbnail">
-                                <img src="${thumb}" alt="Thumbnail ${title}">
-                            </div>` :
+                        //    `<div class="video-thumbnail">
+                         //       <img src="${thumb}" alt="Thumbnail ${title}">
+                        //    </div>` :
                             // Se for notificação, usa um círculo com o emoji
-                            `<div class="video-thumbnail notification-icon-circle">
-                                ${icon}
-                            </div>`
-                        }
-                        <div class="video-info">
-                            <strong>${title}</strong>
-                            <span>${detail}</span>
-                        </div>
-                    </a>
-                `;
-                return itemHTML;
+                        //    `<div class="video-thumbnail notification-icon-circle">
+                         //       ${icon}
+                        //    </div>`
+                       // }
+                        //<div class="video-info">
+                          //  <strong>${title}</strong>
+                          //  <span>${detail}</span>
+                       // </div>
+                    //</a>
+               // `;
+               // return itemHTML;
             };
 
             // 3.1 Adiciona Notificações do Sistema
-            systemNotifications.forEach(n => {
-                const item = createListItem(n.icon, n.title, n.detail);
-                notificationList.innerHTML += item;
-            });
+            //systemNotifications.forEach(n => {
+           //     const item = createListItem(n.icon, n.title, n.detail);
+           //     notificationList.innerHTML += item;
+          //  });
             
             // 3.2 Adiciona a Lista de Vídeos (Conteúdo de rodapé)
             //youtubeVideos.forEach(v => {
@@ -2590,7 +2590,7 @@ function salvarConfiguracoes() {
            //     notificationList.innerHTML += item;
            // });
 
-        }
+       // }
 
         // Chama a função ao carregar o script para popular o mockup
         renderNotifications();
