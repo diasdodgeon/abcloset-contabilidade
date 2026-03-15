@@ -3204,15 +3204,8 @@ function marcarComoInteragida(id){
 
           //contar somente as nao-interagidas
           const naoLidas = cache.filter(m => !m.interaction);
-          const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
-          if (adminMsgs && adminMsgs.some(msg => !msg.interaction)) {
-          
-            // código a ser executado quando houver mensagens com interaction = false
-            counter.innerText = naoLidas.length;
-            
-            
-          }
-          //counter.innerText = naoLidas.length;
+         
+          counter.innerText = naoLidas.length;
 
       }
 
