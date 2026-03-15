@@ -3116,15 +3116,16 @@ function salvarConfiguracoes() {
           novas.forEach(msg=>{
               //Quando detectar novas mensagens, garantir que elas entrem com:interaction = false
               msg.interaction = false;
-
+              localStorage.setItem("adminMsgs", JSON.stringify(cache));
               adicionarNotificacao(msg);
               cache.push(msg);
               //mostrarIconeStatus(); 
               animarNovaNotificacao(); // 👈 aqui
               tocarNotificacao();
+            
           });
 
-          localStorage.setItem("adminMsgs", JSON.stringify(cache));
+          
           mostrarIconeStatus();
 
       }
