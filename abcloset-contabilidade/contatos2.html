@@ -3116,7 +3116,7 @@ function salvarConfiguracoes() {
           novas.forEach(msg=>{
               //Quando detectar novas mensagens, garantir que elas entrem com:interaction = false
               msg.interaction = false;
-              localStorage.setItem("adminMsgs", JSON.stringify(cache));
+             
               adicionarNotificacao(msg);
               cache.push(msg);
               //mostrarIconeStatus(); 
@@ -3125,7 +3125,7 @@ function salvarConfiguracoes() {
             
           });
 
-          
+          //localStorage.setItem("adminMsgs", JSON.stringify(cache));
           mostrarIconeStatus();
 
       }
@@ -3209,13 +3209,21 @@ function mostrarIconeStatus(){
 
       }else{
           const counter = document.getElementById("waCounter");
-          //counter.innerText = cache.length;
-          //counter.innerText = parseInt(counter.innerText)+1;
-
-          //contar somente as nao-interagidas
           const naoLidas = cache.filter(m => !m.interaction);
-         
-          counter.innerText = naoLidas.length;
+          let icon = document.getElementById("waStatusIcon");
+          if(naoLidas.length > 0){
+
+            icon.style.display = "flex";
+            counter.style.display = "flex";
+            counter.textContent = naoLidas.length;
+
+          }else{
+
+              icon.style.display = "none";
+              counter.style.display = "none";
+
+          }
+
 
       }
 
