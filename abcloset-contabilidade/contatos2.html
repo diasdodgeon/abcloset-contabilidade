@@ -2553,29 +2553,29 @@ function salvarConfiguracoes() {
             // B. Cria a Lista Detalhada na Gaveta
             notificationList.innerHTML = ''; // Limpa a lista antes de adicionar novos itens
 
-            // Função auxiliar para criar um item de notificação/vídeo
-            //const createListItem = (icon, title, detail, link, thumb) => {
-                //const isVideo = link && thumb;
+             Função auxiliar para criar um item de notificação/vídeo
+            const createListItem = (icon, title, detail, link, thumb) => {
+              const isVideo = link && thumb;
                 
-                //const itemHTML = `
-                   // <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
-                    //    ${isVideo ? 
+                const itemHTML = `
+                    <a href="${link || '#'}" target="${link ? '_blank' : '_self'}" class="video-item ${!isVideo ? 'notification-item' : ''}">
+                        ${isVideo ? 
                             // Se for vídeo, usa a thumbnail
-                        //    `<div class="video-thumbnail">
-                         //       <img src="${thumb}" alt="Thumbnail ${title}">
-                        //    </div>` :
-                            // Se for notificação, usa um círculo com o emoji
-                        //    `<div class="video-thumbnail notification-icon-circle">
-                         //       ${icon}
-                        //    </div>`
-                       // }
-                        //<div class="video-info">
-                          //  <strong>${title}</strong>
-                          //  <span>${detail}</span>
-                       // </div>
-                    //</a>
-               // `;
-               // return itemHTML;
+                            `<div class="video-thumbnail">
+                                <img src="${thumb}" alt="Thumbnail ${title}">
+                            </div>` :
+                            //Se for notificação, usa um círculo com o emoji
+                            `<div class="video-thumbnail notification-icon-circle">
+                                ${icon}
+                            </div>`
+                        }
+                        <div class="video-info">
+                            <strong>${title}</strong>
+                           <span>${detail}</span>
+                       </div>
+                    </a>
+                `;
+                return itemHTML;
             };
 
             // 3.1 Adiciona Notificações do Sistema
@@ -2584,13 +2584,75 @@ function salvarConfiguracoes() {
            //     notificationList.innerHTML += item;
           //  });
             
-            // 3.2 Adiciona a Lista de Vídeos (Conteúdo de rodapé)
+             //3.2 Adiciona a Lista de Vídeos (Conteúdo de rodapé)
             //youtubeVideos.forEach(v => {
-            //    const item = createListItem(null, v.title, v.detail, v.link, v.thumb);
-           //     notificationList.innerHTML += item;
-           // });
+            //   const item = createListItem(null, v.title, v.detail, v.link, v.thumb);
+            //    notificationList.innerHTML += item;
+          //  });
+          async function carregarVideosAdmin() {
 
-       // }
+  const response = await fetch("./videosAdmin.json");
+  const videos = await response.json();
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const novos = videos.filter(v =>
+      !cache.some(c => c.id === v.id)
+  );
+
+  if (novos.length > 0) {
+
+      const atualizado = [...cache, ...novos];
+
+      localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
+
+  }
+  function renderizarVideos() {
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const naoInteragidos = cache.filter(v => !v.interaction);
+
+  naoInteragidos.forEach(video => {
+
+      const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+
+      const item = createListItem(
+          null,
+          video.title,
+          video.detail,
+          `youtubeApp.html?id=${video.youtubeId}`,
+          thumb
+      );
+
+      notificationList.innerHTML += item;
+
+  });
+
+}
+function marcarVideoComoVisto(id) {
+
+  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
+
+  const atualizado = cache.map(v => {
+
+      if (v.id === id) {
+          v.interaction = true;
+      }
+
+      return v;
+  });
+
+  localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
+
+}
+  marcarVideoComoVisto();
+  renderizarVideos();
+}
+
+
+          
+        }
 
         // Chama a função ao carregar o script para popular o mockup
         renderNotifications();
@@ -3190,66 +3252,7 @@ function mostrarIconeStatus(){
       }
 
     }
-async function carregarVideosAdmin() {
 
-  const response = await fetch("./videosAdmin.json");
-  const videos = await response.json();
-
-  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
-
-  const novos = videos.filter(v =>
-      !cache.some(c => c.id === v.id)
-  );
-
-  if (novos.length > 0) {
-
-      const atualizado = [...cache, ...novos];
-
-      localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
-
-  }
-  function renderizarVideos() {
-
-  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
-
-  const naoInteragidos = cache.filter(v => !v.interaction);
-
-  naoInteragidos.forEach(video => {
-
-      const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
-
-      const item = createListItem(
-          null,
-          video.title,
-          video.detail,
-          `youtubeApp.html?id=${video.youtubeId}`,
-          thumb
-      );
-
-      notificationList.innerHTML += item;
-
-  });
-
-}
-function marcarVideoComoVisto(id) {
-
-  const cache = JSON.parse(localStorage.getItem("videosAdmin")) || [];
-
-  const atualizado = cache.map(v => {
-
-      if (v.id === id) {
-          v.interaction = true;
-      }
-
-      return v;
-  });
-
-  localStorage.setItem("videosAdmin", JSON.stringify(atualizado));
-
-}
-  marcarVideoComoVisto();
-  renderizarVideos();
-}
 
 document.addEventListener("DOMContentLoaded", () => {
 
