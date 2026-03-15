@@ -3205,22 +3205,17 @@ function mostrarIconeStatus(){
           statusBar.appendChild(icon);
           
         }
-          //statusBar.appendChild(icon);
+          
 
       }else{
-         // const counter = document.getElementById("waCounter");
-          //counter.innerText = cache.length;
-          //counter.innerText = parseInt(counter.innerText)+1;
-
-          //contar somente as nao-interagidas
-         // const naoLidas = cache.filter(m => !m.interaction);
+          const counter = document.getElementById("waCounter");
          
-          //counter.innerText = naoLidas.length;
+          contar somente as nao-interagidas
+          const naoLidas = cache.filter(m => !m.interaction);
+         
+          counter.innerText = naoLidas.length;
 
-          const adminMsgs = JSON.parse(localStorage.getItem('adminMsgs'));
-          const quantidadeMensagensNaoLidas = adminMsgs.filter(msg => !msg.interaction).length;
-          console.log(`Há ${quantidadeMensagensNaoLidas} mensagens não lidas.`);
-          counter.innerText = quantidadeMensagensNaoLidas;
+          
 
 
       }
