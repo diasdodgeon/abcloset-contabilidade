@@ -243,86 +243,6 @@ const initialControls = document.getElementById('initial-controls');
 const editControls = document.getElementById('edit-controls');
 const inputFile = document.getElementById('input-file');
 
-    let stream = null;
-    // Função para tirar a foto
-    function takeSnapshot() {
-        const ctx = canvas.getContext('2d');
-        
-        // Define o tamanho do canvas igual ao vídeo real
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        // Desenha o frame atual do vídeo no canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Converte o desenho em imagem base64
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        
-        // Coloca a foto capturada no lugar da imagem padrão
-        img.src = dataUrl;
-        
-        // Desliga a câmera
-        stopCamera();
-        
-        // Agora a imagem está lá, pronta para ser movida/redimensionada!
-        alert("Capturado! Ajuste a posição se desejar.");
-    }
-
-    // Ação do Botão Confirmar (O "Gatilho")
-   document.getElementById('btn-confirm').onclick = () => {
-        // Se o vídeo estiver aparecendo, ele funciona como "BOTÃO DE TIRAR FOTO"
-        if (video.style.display === 'block') {
-            takeSnapshot();
-        } else {
-            // Se o vídeo já sumiu e sobrou a foto, ele funciona como "FINALIZAR EDIÇÃO"
-            alert("Fachada salva com sucesso!");
-            editControls.style.display = 'none';
-            initialControls.style.display = 'flex';
-            img.style.opacity = '1';
-        }
-    };
-    // --- FUNÇÕES DE CÂMERA ---
-    async function startCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment" }, 
-                audio: false 
-            });
-            elements.video.srcObject = stream;
-            elements.video.style.display = 'block';
-            toggleUI(true);
-        } catch (err) {
-            alert("Erro ao acessar câmera: " + err);
-        }
-    }
-
-    function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            elements.video.style.display = 'none';
-        }
-    }
-
-// --- EVENTOS ---
-
-document.getElementById('btn-camera').onclick = () => startCamera();
-
-document.getElementById('btn-confirm').onclick = () => {
-    // Se o vídeo estiver ligado, primeiro tiramos a foto
-    if (video.style.display === 'block') {
-        takeSnapshot();
-        // Feedback: O vídeo sumiu, a imagem nova apareceu, agora liberamos o movimento.
-        alert("Foto capturada! Agora ajuste o enquadramento.");
-    } else {
-        // Se já for a imagem, apenas confirma a posição final
-        confirmFinalPosition();
-    }
-};
-
-document.getElementById('btn-cancel').onclick = () => {
-    stopCamera();
-    exitEditMode();
-};
 
 
 let state = {
@@ -452,6 +372,89 @@ inputFile.onchange = (e) => {
     [elements.bright, elements.contrast].forEach(slider => {
         if(slider) slider.oninput = applyFilters;
     });
+
+
+    let stream = null;
+    // Função para tirar a foto
+    function takeSnapshot() {
+        const ctx = canvas.getContext('2d');
+        
+        // Define o tamanho do canvas igual ao vídeo real
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Desenha o frame atual do vídeo no canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Converte o desenho em imagem base64
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        
+        // Coloca a foto capturada no lugar da imagem padrão
+        img.src = dataUrl;
+        
+        // Desliga a câmera
+        stopCamera();
+        
+        // Agora a imagem está lá, pronta para ser movida/redimensionada!
+        alert("Capturado! Ajuste a posição se desejar.");
+    }
+
+    // Ação do Botão Confirmar (O "Gatilho")
+    document.getElementById('btn-confirm').onclick = () => {
+        // Se o vídeo estiver aparecendo, ele funciona como "BOTÃO DE TIRAR FOTO"
+        if (video.style.display === 'block') {
+            takeSnapshot();
+        } else {
+            // Se o vídeo já sumiu e sobrou a foto, ele funciona como "FINALIZAR EDIÇÃO"
+            alert("Fachada salva com sucesso!");
+            editControls.style.display = 'none';
+            initialControls.style.display = 'flex';
+            img.style.opacity = '1';
+        }
+    };
+    // --- FUNÇÕES DE CÂMERA ---
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" }, 
+                audio: false 
+            });
+            elements.video.srcObject = stream;
+            elements.video.style.display = 'block';
+            toggleUI(true);
+        } catch (err) {
+            alert("Erro ao acessar câmera: " + err);
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            elements.video.style.display = 'none';
+        }
+    }
+
+// --- EVENTOS ---
+
+document.getElementById('btn-camera').onclick = () => startCamera();
+
+document.getElementById('btn-confirm').onclick = () => {
+    // Se o vídeo estiver ligado, primeiro tiramos a foto
+    if (video.style.display === 'block') {
+        takeSnapshot();
+        // Feedback: O vídeo sumiu, a imagem nova apareceu, agora liberamos o movimento.
+        alert("Foto capturada! Agora ajuste o enquadramento.");
+    } else {
+        // Se já for a imagem, apenas confirma a posição final
+        confirmFinalPosition();
+    }
+};
+
+document.getElementById('btn-cancel').onclick = () => {
+    stopCamera();
+    exitEditMode();
+};
+
   document.getElementById('btn-cancel').onclick = () => exitEditMode();
 
 document.getElementById('btn-confirm').onclick = () => {
