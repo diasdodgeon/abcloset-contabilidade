@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>editor</title>
+  <title>editor</title>
 </head>
 <body>
-	<style type="text/css">
+  <style type="text/css">
 /* Container principal com o tamanho exato do seu mockup */
 .banner-editor {
     position: relative;
@@ -115,7 +115,7 @@
 
 .circle-btn:active {
   transform: scale(0.9); /* Efeito de clique no celular */
-}		
+}   
 .banner-wrapper {
     position: relative;
     width: 100%;
@@ -168,50 +168,67 @@
     z-index: 2;
     background: #000;
 }
-	</style>
-<div id="banner-fachada-container" class="banner-wrapper">
-    <img id="banner-img" src="banner.jpg" alt="Fachada">
+input[type=range] {
+    width: 100%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    appearance: none; /* Remove estilo padrão */
+}
 
-    <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+/* O "círculo" de arrastar fica maior para o dedo */
+input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #4f46e5;
+    border-radius: 50%;
+    cursor: pointer;
+}
+  </style>
+<div class="app-container">
+    <div id="banner-fachada-container" class="banner-wrapper">
+        <img id="banner-img" src="banner.jpg" alt="Fachada">
 
-    <div id="initial-controls" class="banner-controls">
-        <button id="btn-camera" class="circle-btn">📷</button>
-        <button id="btn-gallery" class="circle-btn">🗂️</button>
+        
+        <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+        <canvas id="capture-canvas" style="display: none;"></canvas> ```
+        <div id="initial-controls" class="banner-controls">
+            <button id="btn-camera" class="circle-btn">📷</button>
+            <button id="btn-gallery" class="circle-btn">🗂️</button>
+        </div>
+
+        <div id="edit-controls" class="edit-actions" style="display: none;">
+            <button id="btn-cancel" class="action-btn cancel">❌</button>
+            <button id="btn-confirm" class="action-btn confirm">✔️</button>
+        </div>
+
+        <input type="file" id="input-file" accept="image/*" hidden>
     </div>
 
-    <div id="edit-controls" class="edit-actions" style="display: none;">
-        <button id="btn-cancel" class="action-btn cancel">❌</button>
-        <button id="btn-confirm" class="action-btn confirm">✔️</button>
+    <div class="form-body">
+        <div class="control-group">
+            <label>Brilho</label>
+            <input type="range" id="range-brightness" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label>Contraste</label>
+            <input type="range" id="range-contrast" min="0" max="200" value="100">
+        </div>
     </div>
 </div>
 <script type="text/javascript">
-const container = document.getElementById('banner-fachada-container');
-const img = document.getElementById('banner-img');
-const initialControls = document.getElementById('initial-controls');
-const editControls = document.getElementById('edit-controls');
-const inputFile = document.getElementById('input-file');
 
-// --- EVENTOS ---
-
-document.getElementById('btn-camera').onclick = () => startCamera();
-
-document.getElementById('btn-confirm').onclick = () => {
-    // Se o vídeo estiver ligado, primeiro tiramos a foto
-    if (video.style.display === 'block') {
-        takeSnapshot();
-        // Feedback: O vídeo sumiu, a imagem nova apareceu, agora liberamos o movimento.
-        alert("Foto capturada! Agora ajuste o enquadramento.");
-    } else {
-        // Se já for a imagem, apenas confirma a posição final
-        confirmFinalPosition();
-    }
-};
-
-document.getElementById('btn-cancel').onclick = () => {
-    stopCamera();
-    exitEditMode();
-};
-
+document.addEventListener("DOMContentLoaded", () => {
+    const video = document.getElementById('camera-stream');
+    const img = document.getElementById('banner-img');
+    const canvas = document.getElementById('capture-canvas');
+    const btnConfirm = document.getElementById('btn-confirm');
+    const editControls = document.getElementById('edit-controls');
+    const initialControls = document.getElementById('initial-controls');
+    const inputFile = document.getElementById('input-file');
+    const container = document.getElementById('banner-fachada-container');
 
 let state = {
     x: 0, y: 0, scale: 1,
@@ -219,6 +236,11 @@ let state = {
     lastX: 0, lastY: 0,
     lastDist: 0 // Para o pinch-zoom (dois dedos)
 };
+
+
+
+    // --- EVENTOS DE BOTÃO ---
+document.getElementById('btn-gallery').onclick = () => inputFile.click();
 
 // --- TROCA DE INTERFACE ---
 function enterEditMode(source) {
@@ -277,8 +299,6 @@ function updateTransform() {
     img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
 }
 
-// --- EVENTOS DE BOTÃO ---
-document.getElementById('btn-gallery').onclick = () => inputFile.click();
 
 inputFile.onchange = (e) => {
     const file = e.target.files[0];
@@ -293,66 +313,52 @@ inputFile.onchange = (e) => {
 };
 
 
-let stream = null; // Armazena o fluxo da câmera
-
-const video = document.getElementById('camera-stream');
-const imgElement = document.getElementById('banner-img');
-
-// 1. LIGAR A CÂMERA
-async function startCamera() {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "environment" }, // Tenta usar a câmera traseira se possível
-            audio: false 
-        });
-        video.srcObject = stream;
+    // Função para tirar a foto
+    function takeSnapshot() {
+        const ctx = canvas.getContext('2d');
         
-        // UI: Mostra vídeo, esconde controles iniciais, mostra botões de ação
-        video.style.display = 'block';
-        enterEditMode(); 
-    } catch (err) {
-        console.error("Erro ao acessar câmera: ", err);
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+        // Define o tamanho do canvas igual ao vídeo real
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Desenha o frame atual do vídeo no canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Converte o desenho em imagem base64
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        
+        // Coloca a foto capturada no lugar da imagem padrão
+        img.src = dataUrl;
+        
+        // Desliga a câmera
+        stopCamera();
+        
+        // Agora a imagem está lá, pronta para ser movida/redimensionada!
+        alert("Capturado! Ajuste a posição se desejar.");
     }
-}
 
-// 2. PARAR A CÂMERA
-function stopCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+    // Ação do Botão Confirmar (O "Gatilho")
+    btnConfirm.onclick = () => {
+        // Se o vídeo estiver aparecendo, ele funciona como "BOTÃO DE TIRAR FOTO"
+        if (video.style.display === 'block') {
+            takeSnapshot();
+        } else {
+            // Se o vídeo já sumiu e sobrou a foto, ele funciona como "FINALIZAR EDIÇÃO"
+            alert("Fachada salva com sucesso!");
+            editControls.style.display = 'none';
+            initialControls.style.display = 'flex';
+            img.style.opacity = '1';
+        }
+    };
+
+    function stopCamera() {
+        const stream = video.srcObject;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
         video.style.display = 'none';
     }
-}
-
-// 3. CAPTURAR O FRAME (TIRAR FOTO)
-function takeSnapshot() {
-    const canvas = document.createElement('canvas');
-    // Mantemos a resolução nativa do vídeo para a foto não ficar pixelada
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Converte o frame do vídeo em uma imagem (Base64)
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    imgElement.src = dataUrl;
-    
-    stopCamera();
-    // Agora o usuário já pode usar a lógica de zoom/pan na foto capturada!
-}
-
-
-
-document.getElementById('btn-cancel').onclick = () => exitEditMode();
-
-document.getElementById('btn-confirm').onclick = () => {
-    // Aqui no futuro salvaremos a posição exata
-    img.style.opacity = '1';
-    editControls.style.display = 'none';
-    initialControls.style.display = 'flex';
-    alert("Posição da fachada definida!");
-};
+});
 </script>
 </body>
 </html>
