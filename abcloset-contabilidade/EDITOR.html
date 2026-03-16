@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>editor</title>
+</head>
+<body>
+	<style type="text/css">
+/* Container principal com o tamanho exato do seu mockup */
+.banner-editor {
+    position: relative;
+    width: 100%;
+    height: 180px; /* Mesma altura do seu videoScreen */
+    background-color: #333;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* A imagem que preenche o fundo */
+#preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem não distorça */
+    transition: 0.3s;
+}
+
+/* Container dos botões */
+.capture-actions {
+    position: absolute;
+    display: flex;
+    gap: 20px;
+    z-index: 5;
+}
+
+/* Estilo dos botões redondos */
+.capture-actions button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.capture-actions button:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+} 
+:root {
+  --btn-size: 15vw; /* O botão cresce baseado na largura da tela */
+  --btn-max: 65px;  /* Limite para não ficar gigante em tablets */
+}
+
+.app-container {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.banner-wrapper {
+  position: relative;
+  width: 100%;
+  /* Mantém a proporção 2:1 (ex: 360px largura / 180px altura) */
+  aspect-ratio: 2 / 1; 
+  background-color: #222;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Preenche o espaço sem esticar */
+  display: block;
+}
+
+/* Centralização absoluta dos botões */
+.banner-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.2); /* Escurece levemente o fundo para destacar os ícones */
+}
+
+.circle-btn {
+  width: var(--btn-size);
+  height: var(--btn-size);
+  max-width: var(--btn-max);
+  max-height: var(--btn-max);
+  border-radius: 50%;
+  border: none;
+  background: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.circle-btn:active {
+  transform: scale(0.9); /* Efeito de clique no celular */
+}		
+.banner-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    background-color: #222;
+    overflow: hidden; /* Corta o que estiver fora do container */
+    touch-action: none; /* Impede o scroll da página ao mexer na imagem */
+}
+
+#banner-img {
+    position: absolute;
+    user-select: none;
+    pointer-events: none; /* O container capturará os gestos */
+    will-change: transform; /* Otimiza a animação no celular */
+}
+
+/* Botões de Ação Inferiores */
+.edit-actions {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.action-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cancel { background: #ff4d4d; color: white; }
+.confirm { background: #2ecc71; color: white; }
+#camera-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que o vídeo preencha o banner sem sobras */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background: #000;
+}
+	</style>
+<div id="banner-fachada-container" class="banner-wrapper">
+    <img id="banner-img" src="banner.jpg" alt="Fachada">
+
+    <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+
+    <div id="initial-controls" class="banner-controls">
+        <button id="btn-camera" class="circle-btn">📷</button>
+        <button id="btn-gallery" class="circle-btn">🗂️</button>
+    </div>
+
+    <div id="edit-controls" class="edit-actions" style="display: none;">
+        <button id="btn-cancel" class="action-btn cancel">❌</button>
+        <button id="btn-confirm" class="action-btn confirm">✔️</button>
+    </div>
+</div>
+<script type="text/javascript">
+const container = document.getElementById('banner-fachada-container');
+const img = document.getElementById('banner-img');
+const initialControls = document.getElementById('initial-controls');
+const editControls = document.getElementById('edit-controls');
+const inputFile = document.getElementById('input-file');
+
+// --- EVENTOS ---
+
+document.getElementById('btn-camera').onclick = () => startCamera();
+
+document.getElementById('btn-confirm').onclick = () => {
+    // Se o vídeo estiver ligado, primeiro tiramos a foto
+    if (video.style.display === 'block') {
+        takeSnapshot();
+        // Feedback: O vídeo sumiu, a imagem nova apareceu, agora liberamos o movimento.
+        alert("Foto capturada! Agora ajuste o enquadramento.");
+    } else {
+        // Se já for a imagem, apenas confirma a posição final
+        confirmFinalPosition();
+    }
+};
+
+document.getElementById('btn-cancel').onclick = () => {
+    stopCamera();
+    exitEditMode();
+};
+
+
+let state = {
+    x: 0, y: 0, scale: 1,
+    isDragging: false,
+    lastX: 0, lastY: 0,
+    lastDist: 0 // Para o pinch-zoom (dois dedos)
+};
+
+// --- TROCA DE INTERFACE ---
+function enterEditMode(source) {
+    initialControls.style.display = 'none';
+    editControls.style.display = 'flex';
+    img.style.opacity = '0.6'; // Feedback visual de que está editando
+}
+
+function exitEditMode() {
+    initialControls.style.display = 'flex';
+    editControls.style.display = 'none';
+    img.style.opacity = '1';
+    resetImage();
+}
+
+function resetImage() {
+    state.x = 0; state.y = 0; state.scale = 1;
+    updateTransform();
+}
+
+// --- LÓGICA DE MANIPULAÇÃO ---
+container.addEventListener('touchstart', (e) => {
+    if (editControls.style.display === 'none') return;
+    
+    state.isDragging = true;
+    if (e.touches.length === 1) {
+        state.lastX = e.touches[0].clientX - state.x;
+        state.lastY = e.touches[0].clientY - state.y;
+    } else if (e.touches.length === 2) {
+        state.lastDist = getDistance(e.touches);
+    }
+});
+
+container.addEventListener('touchmove', (e) => {
+    if (!state.isDragging) return;
+
+    if (e.touches.length === 1) {
+        state.x = e.touches[0].clientX - state.lastX;
+        state.y = e.touches[0].clientY - state.lastY;
+    } else if (e.touches.length === 2) {
+        const dist = getDistance(e.touches);
+        const delta = dist / state.lastDist;
+        state.scale *= delta;
+        state.lastDist = dist;
+    }
+    updateTransform();
+});
+
+container.addEventListener('touchend', () => state.isDragging = false);
+
+function getDistance(touches) {
+    return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+}
+
+function updateTransform() {
+    img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+}
+
+// --- EVENTOS DE BOTÃO ---
+document.getElementById('btn-gallery').onclick = () => inputFile.click();
+
+inputFile.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            img.src = event.target.result;
+            enterEditMode();
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+
+let stream = null; // Armazena o fluxo da câmera
+
+const video = document.getElementById('camera-stream');
+const imgElement = document.getElementById('banner-img');
+
+// 1. LIGAR A CÂMERA
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "environment" }, // Tenta usar a câmera traseira se possível
+            audio: false 
+        });
+        video.srcObject = stream;
+        
+        // UI: Mostra vídeo, esconde controles iniciais, mostra botões de ação
+        video.style.display = 'block';
+        enterEditMode(); 
+    } catch (err) {
+        console.error("Erro ao acessar câmera: ", err);
+        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+    }
+}
+
+// 2. PARAR A CÂMERA
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.style.display = 'none';
+    }
+}
+
+// 3. CAPTURAR O FRAME (TIRAR FOTO)
+function takeSnapshot() {
+    const canvas = document.createElement('canvas');
+    // Mantemos a resolução nativa do vídeo para a foto não ficar pixelada
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Converte o frame do vídeo em uma imagem (Base64)
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    imgElement.src = dataUrl;
+    
+    stopCamera();
+    // Agora o usuário já pode usar a lógica de zoom/pan na foto capturada!
+}
+
+
+
+document.getElementById('btn-cancel').onclick = () => exitEditMode();
+
+document.getElementById('btn-confirm').onclick = () => {
+    // Aqui no futuro salvaremos a posição exata
+    img.style.opacity = '1';
+    editControls.style.display = 'none';
+    initialControls.style.display = 'flex';
+    alert("Posição da fachada definida!");
+};
+</script>
+</body>
+</html>
