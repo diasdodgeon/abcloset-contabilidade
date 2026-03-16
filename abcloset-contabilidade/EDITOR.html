@@ -312,52 +312,67 @@ inputFile.onchange = (e) => {
     }
 };
 
+document.getElementById('btn-camera').onclick = () => startCamera();
+let stream = null; // Armazena o fluxo da câmera
 
-    // Função para tirar a foto
-    function takeSnapshot() {
-        const ctx = canvas.getContext('2d');
+
+const imgElement = document.getElementById('banner-img');
+
+// 1. LIGAR A CÂMERA
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "environment" }, // Tenta usar a câmera traseira se possível
+            audio: false 
+        });
+        video.srcObject = stream;
         
-        // Define o tamanho do canvas igual ao vídeo real
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        // Desenha o frame atual do vídeo no canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Converte o desenho em imagem base64
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        
-        // Coloca a foto capturada no lugar da imagem padrão
-        img.src = dataUrl;
-        
-        // Desliga a câmera
-        stopCamera();
-        
-        // Agora a imagem está lá, pronta para ser movida/redimensionada!
-        alert("Capturado! Ajuste a posição se desejar.");
+        // UI: Mostra vídeo, esconde controles iniciais, mostra botões de ação
+        video.style.display = 'block';
+        enterEditMode(); 
+    } catch (err) {
+        console.error("Erro ao acessar câmera: ", err);
+        alert("Não foi possível acessar a câmera. Verifique as permissões.");
     }
+}
 
-    // Ação do Botão Confirmar (O "Gatilho")
-    btnConfirm.onclick = () => {
-        // Se o vídeo estiver aparecendo, ele funciona como "BOTÃO DE TIRAR FOTO"
-        if (video.style.display === 'block') {
-            takeSnapshot();
-        } else {
-            // Se o vídeo já sumiu e sobrou a foto, ele funciona como "FINALIZAR EDIÇÃO"
-            alert("Fachada salva com sucesso!");
-            editControls.style.display = 'none';
-            initialControls.style.display = 'flex';
-            img.style.opacity = '1';
-        }
-    };
-
-    function stopCamera() {
-        const stream = video.srcObject;
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
+// 2. PARAR A CÂMERA
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
         video.style.display = 'none';
     }
+}
+
+// 3. CAPTURAR O FRAME (TIRAR FOTO)
+function takeSnapshot() {
+    const canvas = document.createElement('canvas');
+    // Mantemos a resolução nativa do vídeo para a foto não ficar pixelada
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Converte o frame do vídeo em uma imagem (Base64)
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    imgElement.src = dataUrl;
+    
+    stopCamera();
+    // Agora o usuário já pode usar a lógica de zoom/pan na foto capturada!
+}
+
+
+
+document.getElementById('btn-cancel').onclick = () => exitEditMode();
+
+document.getElementById('btn-confirm').onclick = () => {
+    // Aqui no futuro salvaremos a posição exata
+    img.style.opacity = '1';
+    editControls.style.display = 'none';
+    initialControls.style.display = 'flex';
+    alert("Posição da fachada definida!");
+};
 });
 </script>
 </body>
