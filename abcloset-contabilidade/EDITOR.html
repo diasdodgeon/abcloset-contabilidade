@@ -169,27 +169,78 @@
     background: #000;
 }
 	</style>
-<div id="banner-fachada-container" class="banner-wrapper">
-    <img id="banner-img" src="banner.jpg" alt="Fachada">
+<div class="app-container">
+    <div id="banner-fachada-container" class="banner-wrapper">
+        <img id="banner-img" src="banner.jpg" alt="Fachada">
 
-    <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+        <video id="camera-stream" autoplay playsinline style="display: none;"></video>
 
-    <div id="initial-controls" class="banner-controls">
-        <button id="btn-camera" class="circle-btn">📷</button>
-        <button id="btn-gallery" class="circle-btn">🗂️</button>
+        <div id="initial-controls" class="banner-controls">
+            <button id="btn-camera" class="circle-btn">📷</button>
+            <button id="btn-gallery" class="circle-btn">🗂️</button>
+        </div>
+
+        <div id="edit-controls" class="edit-actions" style="display: none;">
+            <button id="btn-cancel" class="action-btn cancel">❌</button>
+            <button id="btn-confirm" class="action-btn confirm">✔️</button>
+        </div>
+
+        <input type="file" id="input-file" accept="image/*" hidden>
     </div>
 
-    <div id="edit-controls" class="edit-actions" style="display: none;">
-        <button id="btn-cancel" class="action-btn cancel">❌</button>
-        <button id="btn-confirm" class="action-btn confirm">✔️</button>
+    <div class="form-body">
+        <div class="control-group">
+            <label>Brilho</label>
+            <input type="range" id="range-brightness" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label>Contraste</label>
+            <input type="range" id="range-contrast" min="0" max="200" value="100">
+        </div>
     </div>
 </div>
 <script type="text/javascript">
-const container = document.getElementById('banner-fachada-container');
-const img = document.getElementById('banner-img');
-const initialControls = document.getElementById('initial-controls');
-const editControls = document.getElementById('edit-controls');
-const inputFile = document.getElementById('input-file');
+document.addEventListener("DOMContentLoaded", () => {
+    // Seleção de elementos
+    const elements = {
+        container: document.getElementById('banner-fachada-container'),
+        img: document.getElementById('banner-img'),
+        video: document.getElementById('camera-stream'),
+        inputFile: document.getElementById('input-file'),
+        initialControls: document.getElementById('initial-controls'),
+        editControls: document.getElementById('edit-controls'),
+        btnCamera: document.getElementById('btn-camera'),
+        btnGallery: document.getElementById('btn-gallery'),
+        btnCancel: document.getElementById('btn-cancel'),
+        btnConfirm: document.getElementById('btn-confirm'),
+        // Sliders
+        bright: document.getElementById('range-brightness'),
+        contrast: document.getElementById('range-contrast')
+    };
+
+    let stream = null;
+
+    // --- FUNÇÕES DE CÂMERA ---
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" }, 
+                audio: false 
+            });
+            elements.video.srcObject = stream;
+            elements.video.style.display = 'block';
+            toggleUI(true);
+        } catch (err) {
+            alert("Erro ao acessar câmera: " + err);
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            elements.video.style.display = 'none';
+        }
+    }
 
 // --- EVENTOS ---
 
@@ -293,58 +344,54 @@ inputFile.onchange = (e) => {
 };
 
 
-let stream = null; // Armazena o fluxo da câmera
-
-const video = document.getElementById('camera-stream');
-const imgElement = document.getElementById('banner-img');
-
-// 1. LIGAR A CÂMERA
-async function startCamera() {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "environment" }, // Tenta usar a câmera traseira se possível
-            audio: false 
-        });
-        video.srcObject = stream;
-        
-        // UI: Mostra vídeo, esconde controles iniciais, mostra botões de ação
-        video.style.display = 'block';
-        enterEditMode(); 
-    } catch (err) {
-        console.error("Erro ao acessar câmera: ", err);
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+	
+    // --- UTILITÁRIOS ---
+    function toggleUI(isEditing) {
+        elements.initialControls.style.display = isEditing ? 'none' : 'flex';
+        elements.editControls.style.display = isEditing ? 'flex' : 'none';
     }
-}
 
-// 2. PARAR A CÂMERA
-function stopCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        video.style.display = 'none';
+    // --- EVENTOS (Com verificação de segurança) ---
+    if (elements.btnGallery) {
+        elements.btnGallery.onclick = () => elements.inputFile.click();
     }
-}
 
-// 3. CAPTURAR O FRAME (TIRAR FOTO)
-function takeSnapshot() {
-    const canvas = document.createElement('canvas');
-    // Mantemos a resolução nativa do vídeo para a foto não ficar pixelada
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Converte o frame do vídeo em uma imagem (Base64)
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    imgElement.src = dataUrl;
-    
-    stopCamera();
-    // Agora o usuário já pode usar a lógica de zoom/pan na foto capturada!
-}
+    if (elements.inputFile) {
+        elements.inputFile.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    elements.img.src = event.target.result;
+                    toggleUI(true);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+    }
 
+    if (elements.btnCamera) {
+        elements.btnCamera.onclick = () => startCamera();
+    }
 
+    if (elements.btnCancel) {
+        elements.btnCancel.onclick = () => {
+            stopCamera();
+            toggleUI(false);
+        };
+    }
 
-document.getElementById('btn-cancel').onclick = () => exitEditMode();
+    // Lógica dos Sliders (Brilho e Contraste)
+    function applyFilters() {
+        const b = elements.bright.value;
+        const c = elements.contrast.value;
+        elements.img.style.filter = `brightness(${b}%) contrast(${c}%)`;
+    }
+
+    [elements.bright, elements.contrast].forEach(slider => {
+        if(slider) slider.oninput = applyFilters;
+    });
+	document.getElementById('btn-cancel').onclick = () => exitEditMode();
 
 document.getElementById('btn-confirm').onclick = () => {
     // Aqui no futuro salvaremos a posição exata
@@ -353,6 +400,8 @@ document.getElementById('btn-confirm').onclick = () => {
     initialControls.style.display = 'flex';
     alert("Posição da fachada definida!");
 };
+});
+	
 </script>
 </body>
 </html>
