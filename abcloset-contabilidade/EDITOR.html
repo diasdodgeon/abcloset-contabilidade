@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -156,8 +157,8 @@
     justify-content: center;
 }
 
-.cancel { background: #ff4d4d; color: white; }
-.confirm { background: #2ecc71; color: white; }
+.cancel { background: #ff5757; color: white; }
+.confirm { background: #69dd9a; color: white; }
 #camera-stream {
     width: 100%;
     height: 100%;
@@ -215,8 +216,8 @@ input[type=range]::-webkit-slider-thumb {
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     background: rgba(255, 255, 255, 0.5);
     border: 4px solid #fff;
     border-radius: 50%;
@@ -263,7 +264,7 @@ input[type=range]::-webkit-slider-thumb {
 .banner-editor {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 500px;
     background-color: #000;
     overflow: hidden; /* Mantém o corte visual apenas nas bordas do banner */
     display: flex;
@@ -291,7 +292,7 @@ input[type=range]::-webkit-slider-thumb {
     transition: opacity 0.3s; /* Não coloque transition no transform, ou o toque ficará lento */
 }
   </style>
-  <canvas id="capture-canvas" style="display: none;"></canvas> ```
+  <canvas id="capture-canvas" style="display: none;"></canvas>
 <div id="banner-fachada-container" class="banner-editor" style="max-width: none ">
     <img id ="preview-img" src="banner.jpg" alt="Fachada" style=" transform: translate(0,0) scale(1);">
 
@@ -487,4 +488,3 @@ function getDistance(touches) {
 </script>
 </body>
 </html>
-
