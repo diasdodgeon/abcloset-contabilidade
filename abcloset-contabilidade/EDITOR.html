@@ -200,7 +200,7 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 /* Ajuste para permitir manipulação total sem corte inicial */
-#preview-img {
+.preview-img {
     position: absolute;
     max-width: none; /* Permite que a imagem seja maior que o container */
     min-width: 100%;
@@ -259,10 +259,41 @@ input[type=range]::-webkit-slider-thumb {
     transition: opacity 0.3s;
     cursor: move;
 }
+/* Container do banner */
+.banner-editor {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #000;
+    overflow: hidden; /* Mantém o corte visual apenas nas bordas do banner */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+}
 
+#preview-img {
+    position: absolute;
+    /* Remover estas linhas se existirem: width: 100%; height: 100%; object-fit: cover; */
+    
+    /* Forçar a imagem a ignorar o tamanho do container pai */
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+
+    /* Garantir que ela comece cobrindo pelo menos a área visível */
+    min-width: 100%;
+    min-height: 100%;
+
+    cursor: move;
+    transform-origin: center; /* O zoom acontecerá a partir do centro */
+    transition: opacity 0.3s; /* Não coloque transition no transform, ou o toque ficará lento */
+}
   </style>
-<div id="banner-fachada-container" class="banner-editor">
-    <img id="preview-img" src="banner.jpg" alt="Fachada" style="transform: translate(0,0) scale(1);">
+  <canvas id="capture-canvas" style="display: none;"></canvas> ```
+<div id="banner-fachada-container" class="banner-editor" style="max-width: none ">
+    <img id ="preview-img" src="banner.jpg" alt="Fachada" style=" transform: translate(0,0) scale(1);">
 
     <video id="camera-stream" autoplay playsinline style="display: none;"></video>
 
@@ -311,20 +342,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- LOGICA DE GALERIA ---
     document.getElementById('btn-gallery').onclick = () => inputFile.click();
 
+    // 1. CORREÇÃO DA GALERIA (No evento onchange do input-file)
     inputFile.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                img.src = event.target.result;
-                // Entra em modo de edição imediatamente após carregar
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            img.src = event.target.result;
+            
+            // O segredo está aqui: esperar carregar e resetar o Transformer
+            img.onload = () => {
+                resetImageToFreeMode();
                 initialControls.style.display = 'none';
                 editControls.style.display = 'flex';
-                
+                img.style.opacity = "0.8"; 
             };
-            reader.readAsDataURL(file);
-        }
-    };
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
     // --- LOGICA DE CÂMERA ---
     document.getElementById('btn-camera').onclick = async () => {
@@ -339,6 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // 2. CORREÇÃO DA CÂMERA (No evento de captura)
+    // Quando capturar da Câmera
     document.getElementById('btn-capture').onclick = () => {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
@@ -346,11 +384,13 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas.getContext('2d').drawImage(video, 0, 0);
         
         img.src = canvas.toDataURL('image/jpeg');
-        stopCamera();
         
-        // Após capturar, libera para redimensionar
-        cameraControls.style.display = 'none';
-        editControls.style.display = 'flex';
+        img.onload = () => {
+            stopCamera();
+            resetImageToFreeMode(); // Aplica o modo livre na foto da câmera
+            cameraControls.style.display = 'none';
+            editControls.style.display = 'flex';
+        };
     };
 
     function stopCamera() {
@@ -366,9 +406,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // --- CANCELAR E CONFIRMAR ---
+    // 3. CORREÇÃO DO BOTÃO CANCELAR (Reset total para a imagem padrão)
     document.getElementById('btn-cancel-edit').onclick = () => {
-        img.src = defaultImage; // Retorna para a imagem padrão do projeto
-        showInitialUI();
+        img.src = "banner.jpg"; // Volta para a imagem padrão do projeto
+        img.onload = () => {
+            resetImageToFreeMode(); // Limpa qualquer zoom/movimento que foi feito
+            showInitialUI();
+        };
     };
 
     document.getElementById('btn-confirm-edit').onclick = () => {
@@ -381,7 +425,19 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateTransform() {
     img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
 }
-
+// Função para resetar posição e escala (importante para não começar cortada)
+// Esta função será o seu "Setador de Atributos" toda vez que a imagem mudar
+function resetImageToFreeMode() {
+    state.x = 0;
+    state.y = 0;
+    state.scale = 1;
+    
+    // Removemos qualquer trava de largura/altura que possa ter sido injetada
+    img.style.width = 'auto';
+    img.style.height = 'auto';
+    
+    updateTransform();
+}
 
 
 
@@ -426,7 +482,9 @@ container.addEventListener('touchend', () => state.isDragging = false);
 function getDistance(touches) {
     return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
 }
+
 });
 </script>
 </body>
 </html>
+
