@@ -186,81 +186,213 @@ input[type=range]::-webkit-slider-thumb {
     border-radius: 50%;
     cursor: pointer;
 }
+
+.banner-editor {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none; /* Bloqueia scroll da página ao manipular imagem */
+}
+
+/* Ajuste para permitir manipulação total sem corte inicial */
+#preview-img {
+    position: absolute;
+    max-width: none; /* Permite que a imagem seja maior que o container */
+    min-width: 100%;
+    min-height: 100%;
+    transition: opacity 0.3s;
+    cursor: move;
+}
+
+/* Botão de Captura (Círculo branco semitransparente) */
+.camera-shutter {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 4px solid #fff;
+    border-radius: 50%;
+    z-index: 20;
+    cursor: pointer;
+}
+
+/* Botão de Fechar Câmera (X no topo direito) */
+.camera-x {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    z-index: 20;
+    cursor: pointer;
+}
+
+.edit-actions {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 15;
+}
+/* Ajuste para permitir manipulação total sem corte inicial */
+#preview-img {
+    position: absolute;
+    max-width: none; /* Permite que a imagem seja maior que o container */
+    min-width: 100%;
+    min-height: 100%;
+    transition: opacity 0.3s;
+    cursor: move;
+}
+
   </style>
-<div class="app-container">
-    <div id="banner-fachada-container" class="banner-wrapper">
-        <img id="banner-img" src="banner.jpg" alt="Fachada">
+<div id="banner-fachada-container" class="banner-editor">
+    <img id="preview-img" src="banner.jpg" alt="Fachada" style="transform: translate(0,0) scale(1);">
 
-        
-        <video id="camera-stream" autoplay playsinline style="display: none;"></video>
-        <canvas id="capture-canvas" style="display: none;"></canvas> ```
-        <div id="initial-controls" class="banner-controls">
-            <button id="btn-camera" class="circle-btn">📷</button>
-            <button id="btn-gallery" class="circle-btn">🗂️</button>
-        </div>
+    <video id="camera-stream" autoplay playsinline style="display: none;"></video>
 
-        <div id="edit-controls" class="edit-actions" style="display: none;">
-            <button id="btn-cancel" class="action-btn cancel">❌</button>
-            <button id="btn-confirm" class="action-btn confirm">✔️</button>
-        </div>
-
-        <input type="file" id="input-file" accept="image/*" hidden>
+    <div id="initial-controls" class="capture-actions">
+        <button id="btn-camera">📷</button>
+        <button id="btn-gallery">🗂️</button>
     </div>
 
-    <div class="form-body">
-        <div class="control-group">
-            <label>Brilho</label>
-            <input type="range" id="range-brightness" min="0" max="200" value="100">
-        </div>
-        <div class="control-group">
-            <label>Contraste</label>
-            <input type="range" id="range-contrast" min="0" max="200" value="100">
-        </div>
+    <div id="edit-controls" class="edit-actions" style="display: none;">
+        <button id="btn-cancel-edit" class="action-btn cancel">❌</button>
+        <button id="btn-confirm-edit" class="action-btn confirm">✔️</button>
     </div>
+
+    <div id="camera-controls" style="display: none;">
+        <button id="btn-close-camera" class="camera-x">✕</button>
+        <button id="btn-capture" class="camera-shutter"></button>
+    </div>
+
+    <input type="file" id="input-file" accept="image/*" hidden>
 </div>
 <script type="text/javascript">
 
 document.addEventListener("DOMContentLoaded", () => {
+    const img = document.getElementById('preview-img');
     const video = document.getElementById('camera-stream');
-    const img = document.getElementById('banner-img');
-    const canvas = document.getElementById('capture-canvas');
-    const btnConfirm = document.getElementById('btn-confirm');
-    const editControls = document.getElementById('edit-controls');
     const initialControls = document.getElementById('initial-controls');
+    const editControls = document.getElementById('edit-controls');
+    const cameraControls = document.getElementById('camera-controls');
     const inputFile = document.getElementById('input-file');
     const container = document.getElementById('banner-fachada-container');
+    let stream = null;
+    const defaultImage = "banner.jpg"; // Caminho da sua imagem padrão
 
-let state = {
+    // --- RESET E INTERFACE ---
+    function showInitialUI() {
+        initialControls.style.display = 'flex';
+        editControls.style.display = 'none';
+        cameraControls.style.display = 'none';
+        video.style.display = 'none';
+        
+        // Reset de estilo e posição
+        img.style.transform = `translate(0,0) scale(1)`;
+        img.style.opacity = "1";
+    }
+
+    // --- LOGICA DE GALERIA ---
+    document.getElementById('btn-gallery').onclick = () => inputFile.click();
+
+    inputFile.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                img.src = event.target.result;
+                // Entra em modo de edição imediatamente após carregar
+                initialControls.style.display = 'none';
+                editControls.style.display = 'flex';
+                
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // --- LOGICA DE CÂMERA ---
+    document.getElementById('btn-camera').onclick = async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            initialControls.style.display = 'none';
+            cameraControls.style.display = 'block';
+        } catch (err) {
+            alert("Erro ao acessar câmera.");
+        }
+    };
+
+    document.getElementById('btn-capture').onclick = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        img.src = canvas.toDataURL('image/jpeg');
+        stopCamera();
+        
+        // Após capturar, libera para redimensionar
+        cameraControls.style.display = 'none';
+        editControls.style.display = 'flex';
+    };
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+        }
+        video.style.display = 'none';
+    }
+
+    document.getElementById('btn-close-camera').onclick = () => {
+        stopCamera();
+        showInitialUI();
+    };
+
+    // --- CANCELAR E CONFIRMAR ---
+    document.getElementById('btn-cancel-edit').onclick = () => {
+        img.src = defaultImage; // Retorna para a imagem padrão do projeto
+        showInitialUI();
+    };
+
+    document.getElementById('btn-confirm-edit').onclick = () => {
+        alert("Fachada definida!");
+        showInitialUI();
+        // Aqui a imagem permanece a editada, mas os botões voltam ao início
+    };
+
+    // [O código de movimentação/zoom com TouchEvents deve ser mantido aqui]
+    function updateTransform() {
+    img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+}
+
+
+
+
+
+
+    let state = {
     x: 0, y: 0, scale: 1,
     isDragging: false,
     lastX: 0, lastY: 0,
     lastDist: 0 // Para o pinch-zoom (dois dedos)
 };
-
-
-
-    // --- EVENTOS DE BOTÃO ---
-document.getElementById('btn-gallery').onclick = () => inputFile.click();
-
-// --- TROCA DE INTERFACE ---
-function enterEditMode(source) {
-    initialControls.style.display = 'none';
-    editControls.style.display = 'flex';
-    img.style.opacity = '0.6'; // Feedback visual de que está editando
-}
-
-function exitEditMode() {
-    initialControls.style.display = 'flex';
-    editControls.style.display = 'none';
-    img.style.opacity = '1';
-    resetImage();
-}
-
-function resetImage() {
-    state.x = 0; state.y = 0; state.scale = 1;
-    updateTransform();
-}
-
 // --- LÓGICA DE MANIPULAÇÃO ---
 container.addEventListener('touchstart', (e) => {
     if (editControls.style.display === 'none') return;
@@ -294,85 +426,6 @@ container.addEventListener('touchend', () => state.isDragging = false);
 function getDistance(touches) {
     return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
 }
-
-function updateTransform() {
-    img.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
-}
-
-
-inputFile.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            img.src = event.target.result;
-            enterEditMode();
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-document.getElementById('btn-camera').onclick = () => startCamera();
-let stream = null; // Armazena o fluxo da câmera
-
-
-const imgElement = document.getElementById('banner-img');
-
-// 1. LIGAR A CÂMERA
-async function startCamera() {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "environment" }, // Tenta usar a câmera traseira se possível
-            audio: false 
-        });
-        video.srcObject = stream;
-        
-        // UI: Mostra vídeo, esconde controles iniciais, mostra botões de ação
-        video.style.display = 'block';
-        enterEditMode(); 
-    } catch (err) {
-        console.error("Erro ao acessar câmera: ", err);
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
-    }
-}
-
-// 2. PARAR A CÂMERA
-function stopCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        video.style.display = 'none';
-    }
-}
-
-// 3. CAPTURAR O FRAME (TIRAR FOTO)
-function takeSnapshot() {
-    const canvas = document.createElement('canvas');
-    // Mantemos a resolução nativa do vídeo para a foto não ficar pixelada
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Converte o frame do vídeo em uma imagem (Base64)
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    imgElement.src = dataUrl;
-    
-    stopCamera();
-    // Agora o usuário já pode usar a lógica de zoom/pan na foto capturada!
-}
-
-
-
-document.getElementById('btn-cancel').onclick = () => exitEditMode();
-
-document.getElementById('btn-confirm').onclick = () => {
-    // Aqui no futuro salvaremos a posição exata
-    img.style.opacity = '1';
-    editControls.style.display = 'none';
-    initialControls.style.display = 'flex';
-    alert("Posição da fachada definida!");
-};
 });
 </script>
 </body>
