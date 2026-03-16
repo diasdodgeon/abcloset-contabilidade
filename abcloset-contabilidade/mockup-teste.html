@@ -1163,10 +1163,10 @@ input::-webkit-inner-spin-button {
     }
     /* O seletor .back-btn AGORA SÓ TEM OS ESTILOS DA BARRA DE NAVEGAÇÃO, que estão corretos. */
 
-    /* --- Gallery grid --- */
+/* --- Gallery grid --- */
     .wallpaper-gallery {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        display: flex;
+        flex-direction: column repeat(2, 1fr);
         gap: 10px;
         padding: 10px;
         overflow-y: auto;
