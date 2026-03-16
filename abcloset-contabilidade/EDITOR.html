@@ -269,7 +269,7 @@ const inputFile = document.getElementById('input-file');
     }
 
     // Ação do Botão Confirmar (O "Gatilho")
-    btnConfirm.onclick = () => {
+   document.getElementById('btn-confirm').onclick = () => {
         // Se o vídeo estiver aparecendo, ele funciona como "BOTÃO DE TIRAR FOTO"
         if (video.style.display === 'block') {
             takeSnapshot();
