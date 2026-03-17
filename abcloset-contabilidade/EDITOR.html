@@ -338,8 +338,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById('banner-fachada-container');
     const tutorial = document.getElementById('tutorial-anim');
     ;
+    const defaultImage = "banner.jpg";
+    let stream = null;
     
-
     // 1. Função para disparar o tutorial
     function startTutorial() {
         tutorial.style.display = 'block';
@@ -353,12 +354,32 @@ document.addEventListener("DOMContentLoaded", () => {
             tutorial.style.display = 'none';
         }
     }
+    // 1. CARREGAR AO INICIAR
+    // Tenta recuperar a imagem salva e o enquadramento
+    const savedFachada = localStorage.getItem('fachada_image');
+    const savedTransform = localStorage.getItem('fachada_transform');
+
+    if (savedFachada) {
+        img.src = savedFachada;
+        if (savedTransform) {
+            // Aplica o enquadramento salvo (x, y, scale)
+            img.style.transform = savedTransform;
+            // Atualiza o objeto 'state' interno para o JS não se perder
+            const match = savedTransform.match(/translate3d\((.+)px, (.+)px, .+\) scale\((.+)\)/);
+            if (match) {
+                state.x = parseFloat(match[1]);
+                state.y = parseFloat(match[2]);
+                state.scale = parseFloat(match[3]);
+            }
+        }
+    } else {
+        img.src = defaultImage;
+    }
 
 
 
-
-    let stream = null;
-    const defaultImage = "banner.jpg"; // Caminho da sua imagem padrão
+   
+     
 
     // --- RESET E INTERFACE ---
     function showInitialUI() {
@@ -448,19 +469,51 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // --- CANCELAR E CONFIRMAR ---
-    // 3. CORREÇÃO DO BOTÃO CANCELAR (Reset total para a imagem padrão)
+// 3. LOGICA DE CANCELAMENTO (RESTAURAR ÚLTIMA SALVA)
     document.getElementById('btn-cancel-edit').onclick = () => {
-        img.src = "banner.jpg"; // Volta para a imagem padrão do projeto
-        img.onload = () => {
-            resetImageToFreeMode(); // Limpa qualquer zoom/movimento que foi feito
-            showInitialUI();
-        };
+        const lastSaved = localStorage.getItem('fachada_image');
+        const lastTransform = localStorage.getItem('fachada_transform');
+
+        if (lastSaved) {
+            img.src = lastSaved;
+            img.onload = () => {
+                if (lastTransform) {
+                    img.style.transform = lastTransform;
+                    // Sincroniza o estado interno
+                    const match = lastTransform.match(/translate3d\((.+)px, (.+)px, .+\) scale\((.+)\)/);
+                    if (match) {
+                        state.x = parseFloat(match[1]);
+                        state.y = parseFloat(match[2]);
+                        state.scale = parseFloat(match[3]);
+                    }
+                } else {
+                    resetImagePosition();
+                }
+            };
+        } else {
+            // Se nunca salvou nada, volta para a padrão de fábrica
+            img.src = defaultImage;
+            img.onload = resetImagePosition;
+        }
+
+        stopTutorial(); // Garante que a mãozinha suma
+        showInitialUI();
     };
 
+    // 2. LOGICA DE CONFIRMAÇÃO (SALVAR)
     document.getElementById('btn-confirm-edit').onclick = () => {
-        alert("Fachada definida!");
+        // Salva a imagem atual (em Base64 se for da galeria/camera)
+        localStorage.setItem('fachada_image', img.src);
+        
+        // Salva o enquadramento exato
+        const currentTransform = img.style.transform;
+        localStorage.setItem('fachada_transform', currentTransform);
+
+        alert("Nova fachada salva com sucesso!");
+        
+        // Finaliza o modo de edição
+        img.style.opacity = "1";
         showInitialUI();
-        // Aqui a imagem permanece a editada, mas os botões voltam ao início
     };
 
     // [O código de movimentação/zoom com TouchEvents deve ser mantido aqui]
