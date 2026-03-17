@@ -290,13 +290,25 @@ input[type=range]::-webkit-slider-thumb {
     transform-origin: center; /* O zoom acontecerá a partir do centro */
     transition: opacity 0.3s; /* Não coloque transition no transform, ou o toque ficará lento */
 }
+#tutorial-anim {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza exatamente */
+    width: 700px; /* Ajuste o tamanho conforme sua animação */
+    z-index: 30; /* Acima de tudo */
+    pointer-events: none; /* O toque passa "através" da mãozinha */
+    opacity: 0.8;
+}
+
+
   </style>
   <canvas id="capture-canvas" style="display: none;"></canvas>
 <div id="banner-fachada-container" class="banner-editor" style="max-width: none ">
     <img id ="preview-img" src="banner.jpg" alt="Fachada" style=" transform: translate(0,0) scale(1);">
 
     <video id="camera-stream" autoplay playsinline style="display: none;"></video>
-
+    <video id="tutorial-anim" src="animacao.webm" loop muted playsinline style="display: none;"></video>
     <div id="initial-controls" class="capture-actions">
         <button id="btn-camera">📷</button>
         <button id="btn-gallery">🗂️</button>
@@ -324,6 +336,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraControls = document.getElementById('camera-controls');
     const inputFile = document.getElementById('input-file');
     const container = document.getElementById('banner-fachada-container');
+    const tutorial = document.getElementById('tutorial-anim');
+    ;
+    
+
+    // 1. Função para disparar o tutorial
+    function startTutorial() {
+        tutorial.style.display = 'block';
+        tutorial.play();
+    }
+
+    // 2. Função para parar o tutorial
+    function stopTutorial() {
+        if (tutorial.style.display === 'block') {
+            tutorial.pause();
+            tutorial.style.display = 'none';
+        }
+    }
+
+
+
+
     let stream = null;
     const defaultImage = "banner.jpg"; // Caminho da sua imagem padrão
 
@@ -355,8 +388,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 resetImageToFreeMode();
                 initialControls.style.display = 'none';
                 editControls.style.display = 'flex';
-                img.style.opacity = "0.8"; 
+                img.style.opacity = "0.8";
+                // Se estivermos entrando no modo de edição, mostre a mãozinha
+                if (editControls.style.display === 'flex') {
+                    startTutorial();
+                } 
             };
+            // Quando o usuário tocar no container para começar a mover
+            container.addEventListener('touchstart', () => {
+                stopTutorial(); // A mãozinha some no exato momento do toque
+            }, { passive: true });
+
         };
         reader.readAsDataURL(file);
     }
@@ -431,6 +473,7 @@ function resetImageToFreeMode() {
     state.x = 0;
     state.y = 0;
     state.scale = 1;
+
     
     // Removemos qualquer trava de largura/altura que possa ter sido injetada
     img.style.width = 'auto';
