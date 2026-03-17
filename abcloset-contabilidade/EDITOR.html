@@ -300,7 +300,33 @@ input[type=range]::-webkit-slider-thumb {
     pointer-events: none; /* O toque passa "através" da mãozinha */
     opacity: 0.8;
 }
+.zoom-container {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 25;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 5px;
+    border-radius: 20px;
+}
 
+#camera-zoom {
+    /* Transforma o slider em vertical */
+    appearance: slider-vertical;
+    width: 8px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.zoom-container span {
+    color: white;
+    font-size: 14px;
+}
 
   </style>
   <canvas id="capture-canvas" style="display: none;"></canvas>
@@ -321,6 +347,12 @@ input[type=range]::-webkit-slider-thumb {
 
     <div id="camera-controls" style="display: none;">
         <button id="btn-close-camera" class="camera-x">✕</button>
+
+        <div class="zoom-container">
+            <input type="range" id="camera-zoom" min="1" max="5" step="0.1" value="1">
+            <span>🔍</span>
+        </div>
+
         <button id="btn-capture" class="camera-shutter"></button>
     </div>
 
@@ -340,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ;
     const defaultImage = "banner.jpg";
     let stream = null;
-    
+
     // 1. Função para disparar o tutorial
     function startTutorial() {
         tutorial.style.display = 'block';
@@ -424,15 +456,51 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(file);
     }
 };
+    
+    function setupZoom() {
+    const zoomInput = document.getElementById('camera-zoom');
+    const capabilities = videoTrack.getCapabilities();
 
+    // Verifica se a câmera suporta zoom
+    if (capabilities.zoom) {
+        zoomInput.min = capabilities.zoom.min;
+        zoomInput.max = capabilities.zoom.max;
+        zoomInput.step = capabilities.zoom.step;
+        zoomInput.value = capabilities.zoom.min;
+
+        zoomInput.oninput = async () => {
+            try {
+                await videoTrack.applyConstraints({
+                    advanced: [{ zoom: zoomInput.value }]
+                });
+            } catch (e) {
+                console.warn("Falha ao aplicar zoom:", e);
+            }
+        };
+        zoomInput.parentElement.style.display = 'flex';
+    } else {
+        // Esconde a barra se a câmera não tiver suporte
+        zoomInput.parentElement.style.display = 'none';
+    }
+}
+    
     // --- LOGICA DE CÂMERA ---
     document.getElementById('btn-camera').onclick = async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
             video.srcObject = stream;
+
+            // Captura a trilha de vídeo para controlar o zoom
+            videoTrack = stream.getVideoTracks()[0];
+
+
             video.style.display = 'block';
             initialControls.style.display = 'none';
             cameraControls.style.display = 'block';
+
+            // Configura o Slider de Zoom se o hardware permitir
+            setupZoom();
+
         } catch (err) {
             alert("Erro ao acessar câmera.");
         }
