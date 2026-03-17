@@ -260,17 +260,32 @@ input[type=range]::-webkit-slider-thumb {
     cursor: move;
 }
 /* Container do banner */
+/* Container do banner modificado para ser fixo no topo */
 .banner-editor {
-    position: relative;
+    position: sticky; /* Mantém o banner fixo ao scrollar */
+    top: 0;
     width: 100%;
-    height: 500px;
+    height: 500px; /* Ajuste para uma altura confortável em telas mobile */
     background-color: #000;
-    overflow: hidden; /* Mantém o corte visual apenas nas bordas do banner */
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     touch-action: none;
+    z-index: 1000; /* Garante que o banner esteja sempre ACIMA de qualquer outro item */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Sombra para dar profundidade ao "buraco" por onde os itens passam */
 }
+
+/* Container para tudo que fica abaixo do banner */
+.form-content-area {
+    position: relative;
+    z-index: 1; /* Abaixo do banner */
+    background-color: #fff;
+    padding-top: 10px; /* Espaço após o banner */
+    min-height: 100vh; /* Garante que sempre haja área para scroll */
+}
+
+
 
 #preview-img {
     position: absolute;
@@ -311,26 +326,179 @@ input[type=range]::-webkit-slider-thumb {
     gap: 10px;
     z-index: 25;
     background: rgba(0, 0, 0, 0.3);
-    padding: 5px 5px;
-    border-radius: 10px;
+    padding: 10px 5px;
+    border-radius: 20px;
 }
 
 #camera-zoom {
     /* Transforma o slider em vertical */
     appearance: slider-vertical;
-    width: 50px;
+    width: 20px;
     height: 380px;
     background: rgba(255, 255, 255, 0.5);
 }
 
 .zoom-container span {
     color: white;
-    font-size: 50px;
+    font-size: 14px;
+}
+
+/* Ajuste no menu de molduras para garantir o visual limpo */
+.molduras-section {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px 0;
+    /* Removemos a borda superior se estiver colado no banner */
+    border-top: none; 
+}
+
+
+.section-title {
+    padding-left: 15px;
+    font-size: 28px;
+    color: #000;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Container de Rolagem Horizontal */
+.molduras-menu-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 0 15px 15px 15px;
+    min-height: 200px; /* Altura mínima solicitada */
+    align-items: center;
+    
+    /* Esconde a barra de rolagem (opcional para estética) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+}
+
+.molduras-menu-scroll::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Item do Menu (O Retângulo) */
+.moldura-item {
+    flex: 0 0 auto; /* Impede que os itens encolham */
+    width: 260px; /* Largura da miniatura */
+    height: 160px; /* Altura da miniatura para manter proporção */
+    background: #f9f9f9;
+    border: 3px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Destaque para o item selecionado */
+.moldura-item.active {
+    border-color: #4f46e5;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+/* Estilo da Miniatura */
+.mini-banner-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.mini-banner-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a moldura apareça inteira */
+    padding: 5px;
+}
+
+.mini-banner-preview.empty span {
+    font-size: 12px;
+    color: #999;
+    font-weight: bold;
+}
+
+.frame-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10; /* Acima da imagem, abaixo dos botões de controle */
+    pointer-events: none; /* Permite manipular a foto por trás da moldura */
+    
+    /* Aplica a máscara referenciando o ID do SVG acima */
+    -webkit-mask: url(#mascara-svg);
+    mask: url(#mascara-svg);
+    
+    /* Cor inicial da moldura (será alterada pelo slider futuramente) */
+    background-color: #000; 
+    
+    display: none; /* Escondido até uma moldura ser selecionada */
+}
+
+
+.customization-section {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.section-subtitle {
+    font-size: 30px;
+    color: #000;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+/* Estilo do Slider de Espectro */
+#color-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 10px;
+    /* Gradiente cobrindo todos os matizes do HSL */
+    background: linear-gradient(to right, 
+        #ff0000 0%, #ffff00 17%, #00ff00 33%, 
+        #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    outline: none;
+}
+
+/* O "Puck" (botão de arrastar) do slider */
+#color-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #fff;
+    border: 3px solid #333;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
   </style>
   <canvas id="capture-canvas" style="display: none;"></canvas>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <mask id="mascara-svg" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+      <image id="mask-image-source" href="" width="1" height="1" preserveAspectRatio="none" />
+    </mask>
+  </defs>
+</svg>
+
+
 <div id="banner-fachada-container" class="banner-editor" style="max-width: none ">
+    <div id="frame-overlay" class="frame-layer"></div>
     <img id ="preview-img" src="banner.jpg" alt="Fachada" style=" transform: translate(0,0) scale(1);">
 
     <video id="camera-stream" autoplay playsinline style="display: none;"></video>
@@ -357,6 +525,68 @@ input[type=range]::-webkit-slider-thumb {
     </div>
 
     <input type="file" id="input-file" accept="image/*" hidden>
+</div>
+
+
+
+
+<div class="form-content-area">
+
+    <section class="molduras-section">
+        <h3 class="section-title">Molduras</h3>
+        
+        <div id="molduras-menu" class="molduras-menu-scroll">
+            <div class="moldura-item active" data-src="none">
+                <div class="mini-banner-preview empty">
+                    <span style="font-size: 30px;">Nenhuma</span>
+                </div>
+            </div>
+
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 1">
+                </div>
+            </div>
+
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 2">
+                </div>
+            </div>
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 3">
+                </div>
+            </div>
+
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 4">
+                </div>
+            </div>
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 5">
+                </div>
+            </div>
+
+            <div class="moldura-item" data-src="moldura.png">
+                <div class="mini-banner-preview">
+                    <img src="moldura.png" alt="Moldura 6">
+                </div>
+            </div>
+
+            </div>
+    </section>
+    <div class="form-content-area">
+        <section id="color-picker-container" class="customization-section" style="display: none; padding: 20px;">
+            <p class="section-subtitle">Cor da Moldura</p>
+            <div class="slider-wrapper">
+                <input type="range" id="color-slider" min="0" max="360" value="0">
+            </div>
+        </section>
+    </div>
+
 </div>
 <script type="text/javascript">
 
@@ -640,6 +870,95 @@ container.addEventListener('touchmove', (e) => {
     }
     updateTransform();
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const menu = document.getElementById('molduras-menu');
+    const itens = document.querySelectorAll('.moldura-item');
+
+    itens.forEach(item => {
+        item.addEventListener('click', () => {
+            // 1. Remove a classe ativa de todos
+            itens.forEach(i => i.classList.remove('active'));
+            
+            // 2. Adiciona no item clicado
+            item.classList.add('active');
+
+            // 3. Pega o caminho da moldura
+            const frameSrc = item.getAttribute('data-src');
+
+            // 4. Dispara a lógica de aplicação (integração com seu código de máscara)
+            aplicarMolduraNoBanner(frameSrc);
+
+            // 5. Scroll suave para centralizar o item clicado (UX)
+            item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+    });
+});
+
+// Função de exemplo para integrar com o que fizemos anteriormente
+function aplicarMolduraNoBanner(src) {
+    const frameLayer = document.getElementById('frame-overlay');
+    const maskImageSource = document.getElementById('mask-image-source');
+
+    const colorContainer = document.getElementById('color-picker-container');
+
+    
+
+    // 1. Atualiza a imagem dentro da definição da máscara SVG
+    // Isso transforma o PNG em uma máscara vetorial para o CSS
+    maskImageSource.setAttribute('href', src);
+    
+    // 2. Garante que a camada de cor esteja visível
+    frameLayer.style.display = 'block';
+    
+    // 3. Mostra o container de cores
+
+    if (src === 'none') {
+        if(frameLayer) frameLayer.style.display = 'none';
+        if(colorContainer) colorContainer.style.display = 'none';
+    } else {
+        if(frameLayer) {
+            frameLayer.style.display = 'block';
+            if(maskImageSource) {
+                maskImageSource.setAttributeNS('http://www.w3.org/1999/xlink', 'href', src);
+            }
+        }
+        // Mostra o slider apenas quando uma moldura é selecionada
+        if(colorContainer) colorContainer.style.display = 'block';
+    }
+}
+// Atualize o evento de clique nos itens do menu
+document.querySelectorAll('.moldura-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const frameSrc = item.getAttribute('data-src');
+        
+        // Ativa visualmente o item no menu
+        document.querySelectorAll('.moldura-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Chama a conversão para máscara
+        aplicarMolduraNoBanner(frameSrc);
+    });
+});
+
+
+    const colorSlider = document.getElementById('color-slider');
+    const frameOverlay = document.getElementById('frame-overlay');
+    const colorContainer = document.getElementById('color-picker-container');
+
+    // Escuta a mudança no slider
+    colorSlider.oninput = function() {
+        const hue = this.value;
+        
+        // Aplicamos a cor usando HSL (Hue, Saturation, Lightness)
+        // Saturação em 100% e Brilho em 50% garante cores vivas
+        if (frameOverlay) {
+            frameOverlay.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+        }
+    };
+
+
 
 container.addEventListener('touchend', () => state.isDragging = false);
 
