@@ -273,7 +273,7 @@ input[type=range]::-webkit-slider-thumb {
     justify-content: center;
     touch-action: none;
     z-index: 1000; /* Garante que o banner esteja sempre ACIMA de qualquer outro item */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Sombra para dar profundidade ao "buraco" por onde os itens passam */
+    /*box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Sombra para dar profundidade ao "buraco" por onde os itens passam */
 }
 
 /* Container para tudo que fica abaixo do banner */
@@ -441,7 +441,7 @@ input[type=range]::-webkit-slider-thumb {
     mask: url(#mascara-svg);
     
     /* Cor inicial da moldura (será alterada pelo slider futuramente) */
-    background-color: #000; 
+    background-color: white; 
     
     display: none; /* Escondido até uma moldura ser selecionada */
 }
@@ -483,6 +483,43 @@ input[type=range]::-webkit-slider-thumb {
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+.categorias-section {
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.categorias-menu-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 0 15px;
+    height: 100px;
+    align-items: center;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.categoria-tag {
+    flex: 0 0 auto;
+    padding: 8px 20px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    font-size: 25px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.categoria-tag.active {
+    background: #4f46e5;
+    color: white;
+    font-weight: bold;
 }
 
   </style>
@@ -531,9 +568,23 @@ input[type=range]::-webkit-slider-thumb {
 
 
 <div class="form-content-area">
-
-    <section class="molduras-section">
+    <section class="categorias-section">
         <h3 class="section-title">Molduras</h3>
+        <div id="categorias-menu" class="categorias-menu-scroll">
+            <div class="categoria-tag active" data-filter="all">Todas</div>
+            <div class="categoria-tag" data-filter="basicas">Básicas</div>
+            <div class="categoria-tag" data-filter="especiais">Especiais</div>
+            <div class="categoria-tag" data-filter="promocao">Promoção</div>
+            <div class="categoria-tag" data-filter="festivas">Festivas</div>
+          
+            <div class="categoria-tag" data-filter="petshop">petshop</div>
+            <div class="categoria-tag" data-filter="restaurante">restaurante</div>
+            <div class="categoria-tag" data-filter="bar">bar</div>
+            <div class="categoria-tag" data-filter="comercio">comercio</div>
+        </div>
+    </section>
+    <section class="molduras-section">
+        
         
         <div id="molduras-menu" class="molduras-menu-scroll">
             <div class="moldura-item active" data-src="none">
@@ -542,37 +593,44 @@ input[type=range]::-webkit-slider-thumb {
                 </div>
             </div>
 
-            <div class="moldura-item" data-src="moldura.png">
-                <div class="mini-banner-preview">
+            <div class="moldura-item" data-src="moldura.png"
+            data-category="basicas" data-type="mask">
+                <div class="mini-banner-preview" >
                     <img src="moldura.png" alt="Moldura 1">
                 </div>
             </div>
 
-            <div class="moldura-item" data-src="moldura.png">
-                <div class="mini-banner-preview">
-                    <img src="moldura.png" alt="Moldura 2">
-                </div>
-            </div>
-            <div class="moldura-item" data-src="moldura.png">
+            
+            <div class="moldura-item" data-src="moldura.png"
+            data-category="basicas" data-type="mask">
                 <div class="mini-banner-preview">
                     <img src="moldura.png" alt="Moldura 3">
                 </div>
             </div>
 
-            <div class="moldura-item" data-src="moldura.png">
+            <div class="moldura-item" data-src="moldura.png"
+            data-category="basicas" data-type="mask">
                 <div class="mini-banner-preview">
                     <img src="moldura.png" alt="Moldura 4">
                 </div>
             </div>
-            <div class="moldura-item" data-src="moldura.png">
+            <div class="moldura-item" data-src="moldura.png"
+            data-category="basicas" data-type="mask">
                 <div class="mini-banner-preview">
                     <img src="moldura.png" alt="Moldura 5">
                 </div>
             </div>
 
-            <div class="moldura-item" data-src="moldura.png">
+            <div class="moldura-item" data-src="moldura.png"
+            data-category="basicas" data-type="mask">
                 <div class="mini-banner-preview">
                     <img src="moldura.png" alt="Moldura 6">
+                </div>
+            </div>
+            <div class="moldura-item" data-src="moldura2.png"
+            data-category="especiais" data-type="fixed" >
+                <div class="mini-banner-preview" >
+                    <img src="moldura2.png" alt="Moldura 2">
                 </div>
             </div>
 
@@ -872,7 +930,7 @@ container.addEventListener('touchmove', (e) => {
 });
 
 
-document.addEventListener("DOMContentLoaded", () => {
+
     const menu = document.getElementById('molduras-menu');
     const itens = document.querySelectorAll('.moldura-item');
 
@@ -894,53 +952,94 @@ document.addEventListener("DOMContentLoaded", () => {
             item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         });
     });
-});
 
-// Função de exemplo para integrar com o que fizemos anteriormente
-function aplicarMolduraNoBanner(src) {
-    const frameLayer = document.getElementById('frame-overlay');
-    const maskImageSource = document.getElementById('mask-image-source');
 
-    const colorContainer = document.getElementById('color-picker-container');
 
-    
+  const tags = document.querySelectorAll('.categoria-tag');
+    const molduras = document.querySelectorAll('.moldura-item');
 
-    // 1. Atualiza a imagem dentro da definição da máscara SVG
-    // Isso transforma o PNG em uma máscara vetorial para o CSS
-    maskImageSource.setAttribute('href', src);
-    
-    // 2. Garante que a camada de cor esteja visível
-    frameLayer.style.display = 'block';
-    
-    // 3. Mostra o container de cores
+    // --- LÓGICA DE FILTRO POR CATEGORIA ---
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            const filtro = tag.getAttribute('data-filter');
+            
+            // Ativa a tag visualmente
+            tags.forEach(t => t.classList.remove('active'));
+            tag.classList.add('active');
 
-    if (src === 'none') {
-        if(frameLayer) frameLayer.style.display = 'none';
-        if(colorContainer) colorContainer.style.display = 'none';
-    } else {
-        if(frameLayer) {
-            frameLayer.style.display = 'block';
-            if(maskImageSource) {
-                maskImageSource.setAttributeNS('http://www.w3.org/1999/xlink', 'href', src);
-            }
-        }
-        // Mostra o slider apenas quando uma moldura é selecionada
-        if(colorContainer) colorContainer.style.display = 'block';
-    }
-}
-// Atualize o evento de clique nos itens do menu
-document.querySelectorAll('.moldura-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const frameSrc = item.getAttribute('data-src');
-        
-        // Ativa visualmente o item no menu
-        document.querySelectorAll('.moldura-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-
-        // Chama a conversão para máscara
-        aplicarMolduraNoBanner(frameSrc);
+            // Filtra as molduras
+            molduras.forEach(moldura => {
+                const categoria = moldura.getAttribute('data-category');
+                if (filtro === 'all' || categoria === filtro) {
+                    moldura.style.display = 'flex';
+                } else {
+                    moldura.style.display = 'none';
+                }
+            });
+            // Reset do scroll do menu de molduras ao filtrar
+            document.getElementById('molduras-menu').scrollLeft = 0;
+        });
     });
-});
+
+
+
+
+
+// --- LÓGICA DE APLICAÇÃO (DIFERENCIANDO TIPO) ---
+    function aplicarMolduraNoBanner(src, type) {
+        const frameLayer = document.getElementById('frame-overlay');
+        const maskImageSource = document.getElementById('mask-image-source');
+        const colorContainer = document.getElementById('color-picker-container');
+
+
+
+
+        if (!src || src === 'none') {
+            frameLayer.style.display = 'none';
+            colorContainer.style.display = 'none';
+            return;
+        }
+
+        if (type === 'mask') {
+            // COMPORTAMENTO 1: MÁSCARA SVG (Cor Editável)
+            maskImageSource.setAttribute('href', src);
+            frameLayer.style.mask = 'url(#mascara-svg)';
+            frameLayer.style.webkitMask = 'url(#mascara-svg)';
+            frameLayer.style.backgroundImage = 'none'; 
+            //frameLayer.style.backgroundColor = 'white'; 
+            // Mantém a cor atual do slider
+            const hue = document.getElementById('color-slider').value;
+            frameLayer.style.backgroundColor = `hsl(${hue}, 0%, 100%)`;
+            //const hue = document.getElementById('color-slider').value;
+            //frameLayer.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+            colorContainer.style.display = 'block';
+        } else {
+            // COMPORTAMENTO 2: MOLDURA ESPECIAL (Cores Fixas)
+            frameLayer.style.mask = 'none';
+            frameLayer.style.webkitMask = 'none';
+            frameLayer.style.backgroundColor = 'transparent';
+            frameLayer.style.backgroundImage = `url(${src})`;
+            frameLayer.style.backgroundSize = '100% 100%';
+            
+            colorContainer.style.display = 'none'; // Esconde o slider de cor
+        }
+
+        frameLayer.style.display = 'block';
+    }
+
+    // Atualize o clique na moldura para passar o TYPE
+    molduras.forEach(item => {
+        item.addEventListener('click', () => {
+            molduras.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            const src = item.getAttribute('data-src');
+            const type = item.getAttribute('data-type'); // Pega se é 'mask' ou 'fixed'
+            
+            aplicarMolduraNoBanner(src, type);
+            //item.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        });
+    });
 
 
     const colorSlider = document.getElementById('color-slider');
@@ -970,3 +1069,4 @@ function getDistance(touches) {
 </script>
 </body>
 </html>
+                          
