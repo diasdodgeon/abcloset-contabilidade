@@ -2337,7 +2337,7 @@ window.addEventListener('devicemotion', (event) => {
       setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
   }
 
- disco = document.getElementById("disco");
+disco = document.getElementById("disco");
 const elementoGiro = document.getElementById('giro');
 
 // Armazenaremos os elementos e seus ângulos iniciais para facilitar a checagem
@@ -2346,7 +2346,7 @@ const slotsData = [];
 const inicio = 90;
 //para cada novo horario alem dos 8 padrao, adcionamos +4 á "fim"
 const fim = 405;
-
+function disc(){ 
 horarios.forEach((hora, i) => {
   const el = document.createElement("div");
   el.className = "horario";
@@ -2366,7 +2366,8 @@ horarios.forEach((hora, i) => {
   // Guardamos a referência do elemento e seu ângulo relativo
   slotsData.push({ element: el, angle: anguloBase });
 });
-
+}
+disc();
 let grauAtual = 0;
 let velocidade = 0;
 let isDragging = false;
