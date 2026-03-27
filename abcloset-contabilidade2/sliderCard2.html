@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck de Cartas Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #121212;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Simula a tela vertical do celular */
+        .phone-container {
+            width: 100%;
+            max-width: 430px; /* Largura máxima de um smartphone grande */
+            height: 100vh;
+            background-color: #1a1a1a;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Empurra o menu para o rodapé */
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Área do Carrossel no Rodapé */
+        main#carousel {
+            width: 100%;
+            height: 350px; /* Reduzido para encaixar no rodapé */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            perspective: 800px;
+            
+            /* Variáveis de Estado */
+            --position: 3; /* Começa na carta do meio */
+            
+            /* Impedir seleção de texto/imagem durante o arraste */
+            user-select: none; 
+            -webkit-user-select: none;
+            touch-action: pan-y; /* Previne scroll acidental da página ao arrastar pro lado */
+        }
+
+        /* Estilização das Cartas */
+        div.item {
+            position: absolute;
+            width: 160px; /* Tamanho adaptado para celular */
+            height: 240px;
+            border-radius: 16px;
+            background-color: coral;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            cursor: pointer;
+            
+            /* Lógica Matemática do Deck */
+            --r: calc(var(--position) - var(--offset));
+            --abs: max(calc(var(--r) * -1), var(--r));
+            
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.35s ease;
+
+            /* Sobreposição reduzida e inclinação (Deck de cartas) */
+            transform: rotateY(calc(-5deg * var(--r))) 
+                       translateX(calc(-70px * var(--r))) 
+                       scale(calc(1 - (var(--abs) * 0.15)))
+                       translateZ(calc(-2px * var(--abs)));
+
+            /* O topo do deck é sempre a carta central, independente de qual seja */
+            z-index: calc(10 - var(--abs)); 
+            
+            opacity: calc(1 - (var(--abs) * 0.3));
+        }
+
+        /* Cores originais do seu projeto */
+        div.item:nth-of-type(1) { --offset: 1; background-image: url(./image.jpg); }
+        div.item:nth-of-type(2) { --offset: 2; background-image: url(./image2.jpg); }
+        div.item:nth-of-type(3) { --offset: 3; background-image: url(./image.jpg); }
+        div.item:nth-of-type(4) { --offset: 4; background-image: url(./image2.jpg); }
+        div.item:nth-of-type(5) { --offset: 5; background-image: url(./image.jpg); }
+        div.item:nth-of-type(6) { --offset: 6; background-image: url(./image.jpg); }
+        div.item:nth-of-type(7) { --offset: 7; background-image: url(./image2.jpg); }
+        div.item:nth-of-type(8) { --offset: 8; background-image: url(./image.jpg); }
+        div.item:nth-of-type(9) { --offset: 9; background-image: url(./image2.jpg); }
+        div.item:nth-of-type(10) { --offset: 10; background-image: url(./image.jpg); }
+        .item-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            color: #121212;
+            pointer-events: none; /* Evita que o texto quebre o arrastar do mouse */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        
+        <main id="carousel">
+            <div class="item"><div class="item-content">1</div></div>
+            <div class="item"><div class="item-content">2</div></div>
+            <div class="item"><div class="item-content">3</div></div>
+            <div class="item"><div class="item-content">4</div></div>
+            <div class="item"><div class="item-content">5</div></div>
+            <div class="item"><div class="item-content">6</div></div>
+            <div class="item"><div class="item-content">7</div></div>
+            <div class="item"><div class="item-content">8</div></div>
+            <div class="item"><div class="item-content">9</div></div>
+            <div class="item"><div class="item-content">10</div></div>
+        </main>
+
+    </div>
+
+    <script>
+        const carousel = document.getElementById('carousel');
+        const items = document.querySelectorAll('.item');
+        
+        let startX = 0;
+        let isDragging = false;
+        let currentPos = 3; // Posição ativa inicial (centro)
+        const totalItems = items.length;
+
+        function updatePosition(newPos) {
+            // Impedir que saia do limite (1 a 5)
+            if (newPos < 1) newPos = 1;
+            if (newPos > totalItems) newPos = totalItems;
+            
+            currentPos = newPos;
+            carousel.style.setProperty('--position', currentPos);
+        }
+
+        // --- 🖱️ INTERAÇÃO DE CLIQUE DIRETO ---
+        items.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                updatePosition(index + 1);
+            });
+        });
+
+        // --- 🖐️ GESTOS TOUCH (CELULAR) ---
+        carousel.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        carousel.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) { // Sensibilidade do swipe (50px)
+                if (diff > 0) {
+                    updatePosition(currentPos + 1); // Deslizou pra esquerda (próxima carta)
+                } else {
+                    updatePosition(currentPos - 1); // Deslizou pra direita (carta anterior)
+                }
+            }
+        });
+
+        // --- 🖱️ ARRASTE COM MOUSE (PARA DESKTOP) ---
+        carousel.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const diff = startX - e.clientX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    updatePosition(currentPos + 1);
+                } else {
+                    updatePosition(currentPos - 1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
