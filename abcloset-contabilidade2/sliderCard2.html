@@ -393,6 +393,7 @@
                         // 🔥 CORREÇÃO: Define a posição na mesma hora em que anexa ao novo pai!
                         draggingCard.style.left = (cardStartX + dx) + 'px';
                         draggingCard.style.top = (cardStartY + dy) + 'px';
+
                     }
                 }
                 return;
@@ -575,7 +576,7 @@
         let velocidade = 0;
         let isGiroDragging = false;
         let ultimoAnguloMouse = 0;
-        const atrito = 0.98;
+        const atrito = 0.99;
 
         function getAngle(e) {
             const rect = elementoGiro.getBoundingClientRect();
@@ -600,7 +601,7 @@
         }
 
         function aplicarMagnetismo() {
-            if (isGiroDragging || Math.abs(velocidade) > 0.3) return;
+            if (isGiroDragging || Math.abs(velocidade) > 0.1) return;
 
             let menorDistancia = Infinity;
             slotsData.forEach(slot => {
@@ -615,8 +616,8 @@
                     menorDistancia = dist;
                 }
             });
-            grauAtual += menorDistancia * 0.1;
-            velocidade *= 0.85;
+            grauAtual += menorDistancia * 0.5;
+            velocidade *= 0.8;
         }
 
         // Pointer Events Unificados (Mouse + Touch) para a roleta
