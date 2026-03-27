@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Deck de Cartas Inteligente</title>
+    <title>Deck e Roleta Dinâmica</title>
     <style>
         * {
             margin: 0;
@@ -24,7 +24,7 @@
             position: relative;
         }
 
-        /* Simula a tela vertical do celular */
+        /* Simulador de Smartphone (Vertical Nativo) */
         .phone-container {
             width: 100%;
             max-width: 430px;
@@ -32,19 +32,73 @@
             background-color: #1a1a1a;
             position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-end; /* Empurra tudo para a parte inferior automaticamente */
+            flex-direction: column; /* Organiza em coluna (topo -> meio -> baixo) */
             overflow: hidden;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
         /* =========================================
-           1. ZONA DO DECK SUPERIOR (Slots Vazios)
+           1. ZONA DA ROLETA (Central Flexível)
+           ========================================= */
+        .roulette-zone {
+            flex: 1; /* Ocupa todo o espaço vertical livre do meio */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            z-index: 1;
+        }
+
+        #giro {
+            width: 380px; /* Mantém 320px para casar com o raio de 160px do JS */
+            height: 380px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none; /* Impede travar a tela ao girar a roleta */
+        }
+
+        .disco {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient( 
+                #8b2c20 0% 5%, #1a1a1a 5% 10%, #8b2c20 10% 15%, #1a1a1a 15% 20%,
+                #8b2c20 20% 25%, #1a1a1a 25% 30%, #8b2c20 30% 35%, #1a1a1a 35% 40%,
+                #8b2c20 40% 45%, #1a1a1a 45% 50%, #8b2c20 50% 55%, #1a1a1a 55% 60%,
+                #8b2c20 60% 65%, #1a1a1a 65% 70%, #8b2c20 70% 75%, #1a1a1a 75% 80%,
+                #8b2c20 80% 85%, #1a1a1a 85% 90%, #8b2c20 90% 95%, #1a1a1a 95% 100%
+            );
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 5px 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .horario {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            color: rgba(255,255,255,0.3);
+            transition: color 0.3s, font-size 0.3s, text-shadow 0.3s;
+            font-size: 24px;
+            pointer-events: none;
+        }
+
+        .horario.ativo {
+            color: #fff;
+            font-size: 38px;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255,255,255,0.6);
+        }
+
+        /* =========================================
+           2. ZONA DO DECK SUPERIOR (Fixo no Rodapé)
            ========================================= */
         .top-deck-container {
             width: 100%;
-            padding: 10px 10px;
-            justify-content: flex-end;
+            padding: 10px;
             background-color: #121212;
             border-top: 1px solid #333;
             border-bottom: 2px dashed #333;
@@ -52,8 +106,7 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
-
-            z-index: 5; /* Fica acima do slider */
+            z-index: 5;
         }
 
         .deck-title {
@@ -78,7 +131,7 @@
             border: 2px dashed #444;
             border-radius: 8px;
             position: relative;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, border-color 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -89,40 +142,49 @@
             border-color: #00bcd4;
         }
 
+        /* --- ✨ EFEITO DE BRILHO AO ENCAIXAR --- */
+        @keyframes dropGlow {
+            0% { box-shadow: 0 0 0px #00bcd4; border-color: #444; }
+            50% { box-shadow: 0 0 20px #00bcd4; border-color: #00bcd4; }
+            100% { box-shadow: 0 0 0px #00bcd4; border-color: #444; }
+        }
+
+        .slot.drop-success {
+            animation: dropGlow 0.6s ease-out;
+        }
+
         /* =========================================
-           2. ZONA DO SLIDER INFERIOR
+           3. ZONA DO SLIDER INFERIOR (Fixo na Base)
            ========================================= */
         .slider-zone {
             width: 100%;
-            height: 280px; /* Altura fixa confortável para o slider */
+            height: 250px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
             background-color: #121212;
             position: relative;
-            
             z-index: 1;
         }
 
         main#carousel {
             width: 100%;
             height: 100%;
-            bottom: -10px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             transform-style: preserve-3d;
             perspective: 800px;
-            --position: 3; 
+            --position: 5; 
             touch-action: none;
             user-select: none;
         }
 
         .card {
-            width: 140px;
-            height: 210px;
+            width: 120px;
+            height: 180px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             position: absolute;
@@ -136,10 +198,9 @@
             touch-action: none;
             user-select: none;
             transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.35s ease;
-            pointer-events: auto;
         }
 
-        /* Cores base */
+        /* Cores Dinâmicas das Cartas */
         .card[data-card="1"] { background-color: #90f1ef; }
         .card[data-card="2"] { background-color: #ff70a6; }
         .card[data-card="3"] { background-color: #ff9770; }
@@ -151,8 +212,6 @@
         .card[data-card="9"] { background-color: #ffd670; }
         .card[data-card="10"] { background-color: #e9ff70; }
 
-
-        /* Aplicação do 3D Matemático */
         #carousel .card {
             --r: calc(var(--position) - var(--offset));
             --abs: max(calc(var(--r) * -1), var(--r));
@@ -169,9 +228,9 @@
         .card.dragging {
             cursor: grabbing;
             transition: none !important;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
             z-index: 1000 !important;
             opacity: 1 !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
 
         .slot .card {
@@ -186,138 +245,39 @@
             font-size: 16px;
         }
 
-:root {
-  --azul-principal: #4A76F1;
-  --azul-disco: #0d2b6f;
-  --bg-app: #000;
-}
+        /* Power Ups do Topo */
+        #powerUpsAtivos {
+            position: absolute;
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            z-index: 10;
+        }
 
+        .powerUp {
+            width: 45px;
+            height: 45px;
+            background: #111;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            position: relative;
+            border: 1px solid #333;
+        }
 
-
-/* Container Principal */
-.janela-agendamento {
-  position: relative;
-  width: 100%; 
-  height: 100%; 
-  background: #2b2b2b;
-  overflow: hidden;
-  display: flex;
-  
-}
-
-
-
-
-
-/* Área do Disco (Lado Direito) */
-#giro {
-  position: absolute;
-  top: 10%;
-  left: 2%;
-  transform: translate(-50%, -50%);
-  
-  width: 80vw;
-  height: 80vw;
-  max-width: 420px;
-  max-height: 420px;
-
-  z-index: 5;
-  display: flex;
-  justify-content: flex-end;
-  justify-content: center;
-  align-items: center;
-}
-
-#giro:active { cursor: grabbing; }
-
-.disco {
-  width: 100%;
-  height: 100%;
-  background: conic-gradient( 
-    
-    #8b2c20 0% 5%,
-    #1a1a1a 5% 10%,
-    #8b2c20 10% 15%,
-    #1a1a1a 15% 20%,
-    #8b2c20 20% 25%,
-    #1a1a1a 25% 30%,
-    #8b2c20 30% 35%,
-    #1a1a1a 35% 40%,
-    #8b2c20 40% 45%,
-    #1a1a1a 45% 50%,
-    #8b2c20 50% 55%,
-    #1a1a1a 55% 60%,
-    #8b2c20 60% 65%,
-    #1a1a1a 65% 70%,
-    #8b2c20 70% 75%,
-    #1a1a1a 75% 80%,
-    #8b2c20 80% 85%,
-    #1a1a1a 85% 90%,
-    #8b2c20 90% 95%,
-    #1a1a1a 95% 100%
-
-    );
-  border-radius: 50%;
-  position: relative center;
-  box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 10px 0 20px rgba(0,0,0,0.3);
-}
-
-.horario {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-origin: center;
-  color: rgba(255,255,255,0.3);
-  transition: color 0.3s, font-size 0.3s, text-shadow 0.3s;
-  font-size: 24px;
-  pointer-events: none;
-}
-
-.horario.ativo {
-  color: #fff;
-  font-size: 38px;
-  font-weight: bold;
-  text-shadow: 0 0 15px rgba(255,255,255,0.6);
-}
-
-
-
-#powerUpsAtivos {
-  position: absolute;
-  top: 5%;
-  left: 50%;
-  transform: translateX(-50%);
-  
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-
-  z-index: 10;
-}
-
-.powerUp {
-  width: 50px;
-  height: 50px;
-  background: #111;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  position: relative;
-}
-
-.timer {
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  height: 4px;
-  background: lime;
-  border-radius: 2px;
-}
-
-
-
+        .timer {
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            height: 3px;
+            background: lime;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body>
@@ -326,8 +286,10 @@
 
         <div id="powerUpsAtivos"></div>
   
-        <div id="giro" >
-         <div class="disco" id="disco"></div>
+        <div class="roulette-zone">
+            <div id="giro">
+                <div class="disco" id="disco"></div>
+            </div>
         </div>
         
         <div class="top-deck-container">
@@ -364,10 +326,9 @@
         const slots = document.querySelectorAll('.slot');
         const phoneContainer = document.querySelector('.phone-container');
         
-        let currentSliderPos = 5; // Começa na carta central (3)
+        let currentSliderPos = 5;
         let totalCards = 10;
 
-        // Controle de Gestos Inteligentes
         let draggingCard = null;
         let startX, startY;
         let cardStartX, cardStartY;
@@ -386,7 +347,6 @@
 
         function onPointerDown(e) {
             e.stopPropagation();
-
             draggingCard = e.currentTarget;
             originalParent = draggingCard.parentElement;
 
@@ -395,7 +355,6 @@
 
             const rect = draggingCard.getBoundingClientRect();
             const containerRect = phoneContainer.getBoundingClientRect();
-
             cardStartX = rect.left - containerRect.left;
             cardStartY = rect.top - containerRect.top;
 
@@ -409,29 +368,21 @@
 
         function onPointerMove(e) {
             if (!draggingCard) return;
-
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
-            // FASE 1: Se o gesto ainda não foi decidido, analisamos a direção
             if (!gestureDetermined) {
-                const moveThreshold = 10; // Sensibilidade do gatilho (pixels)
+                const moveThreshold = 10;
 
                 if (Math.abs(dx) > moveThreshold || Math.abs(dy) > moveThreshold) {
                     gestureDetermined = true;
-
-                    // Se moveu mais na horizontal -> Deslizar o slider
                     if (Math.abs(dx) > Math.abs(dy)) {
                         gestureType = 'slide';
-                    } 
-                    // Se moveu mais na vertical -> Arrastar a carta
-                    else {
+                    } else {
                         gestureType = 'drag';
-                        
-                        // Executa o "desencaixe" apenas se a carta estava no slider
                         if (!draggingCard.classList.contains('in-slot')) {
-                            draggingCard.style.width = '140px';
-                            draggingCard.style.height = '210px';
+                            draggingCard.style.width = '120px';
+                            draggingCard.style.height = '180px';
                         }
                         
                         draggingCard.classList.add('dragging');
@@ -440,10 +391,9 @@
                         draggingCard.classList.remove('in-slot');
                     }
                 }
-                return; // Aguarda o próximo tick para rodar a lógica escolhida
+                return;
             }
 
-            // FASE 2: Executa o gesto escolhido
             if (gestureType === 'drag') {
                 draggingCard.style.left = (cardStartX + dx) + 'px';
                 draggingCard.style.top = (cardStartY + dy) + 'px';
@@ -453,34 +403,28 @@
 
         function onPointerUp(e) {
             if (!draggingCard) return;
-
             window.removeEventListener('pointermove', onPointerMove);
             window.removeEventListener('pointerup', onPointerUp);
             window.removeEventListener('pointercancel', onPointerUp);
 
-            // Finaliza o gesto de deslizamento do Slider
             if (gestureType === 'slide') {
                 const dx = e.clientX - startX;
-                const swipeThreshold = 50; // Sensibilidade de empurrar o card
+                const swipeThreshold = 50;
 
                 if (Math.abs(dx) > swipeThreshold) {
                     if (dx > 0) {
-                        currentSliderPos = Math.max(1, currentSliderPos - 1); // Deslizou pra direita -> Carta anterior
+                        currentSliderPos = Math.max(1, currentSliderPos - 1);
                     } else {
-                        currentSliderPos = Math.min(totalCards, currentSliderPos + 1); // Deslizou pra esquerda -> Próxima carta
+                        currentSliderPos = Math.min(totalCards, currentSliderPos + 1);
                     }
                     updateSlider();
                 }
-            } 
-            // Finaliza o gesto de arrastar carta
-            else if (gestureType === 'drag') {
+            } else if (gestureType === 'drag') {
                 const dropSuccess = handleDrop(e.clientX, e.clientY);
                 if (!dropSuccess) {
                     returnToOrigin();
                 }
-            } 
-            // Foi apenas um clique simples (sem arrastar nada)
-            else {
+            } else {
                 if (originalParent === carousel) {
                     const cardId = parseInt(draggingCard.getAttribute('data-card'));
                     if (cardId !== currentSliderPos) {
@@ -506,37 +450,15 @@
             card.style.height = '';
         }
 
-        // função de devolução de rascunho de origem (returnToOrigin):
         function returnToOrigin() {
             resetCardStyling(draggingCard);
             if (originalParent === carousel) {
-                carousel.appendChild(draggingCard); // Volta pro final do slider
+                carousel.appendChild(draggingCard);
                 updateSlider();
             } else {
                 draggingCard.classList.add('in-slot');
                 originalParent.appendChild(draggingCard);
             }
-        }
-
-        function insertCardInCarouselOrder(card) {
-            const cardId = parseInt(card.getAttribute('data-card'));
-            const currentCards = Array.from(carousel.querySelectorAll('.card'));
-            
-            if (currentCards.length === 0) {
-                carousel.appendChild(card);
-                return;
-            }
-
-            let inserted = false;
-            for (let i = 0; i < currentCards.length; i++) {
-                const currentId = parseInt(currentCards[i].getAttribute('data-card'));
-                if (cardId < currentId) {
-                    carousel.insertBefore(card, currentCards[i]);
-                    inserted = true;
-                    break;
-                }
-            }
-            if (!inserted) carousel.appendChild(card);
         }
 
         function checkSlotsHover(mouseX, mouseY) {
@@ -551,7 +473,6 @@
         }
 
         function handleDrop(mouseX, mouseY) {
-            // Drop nos slots (superior)
             for (let slot of slots) {
                 const rect = slot.getBoundingClientRect();
                 if (mouseX >= rect.left && mouseX <= rect.right && mouseY >= rect.top && mouseY <= rect.bottom) {
@@ -559,6 +480,10 @@
                         resetCardStyling(draggingCard);
                         draggingCard.classList.add('in-slot');
                         slot.appendChild(draggingCard);
+
+                        // ✨ Ativa o Brilho de sucesso no Slot
+                        slot.classList.add('drop-success');
+                        setTimeout(() => slot.classList.remove('drop-success'), 600);
 
                         if (originalParent === carousel) {
                             updateSliderAfterRemove();
@@ -568,17 +493,13 @@
                 }
             }
 
-            // Drop no Slider (Inferior)
-           const sliderRect = sliderZone.getBoundingClientRect();
+            const sliderRect = sliderZone.getBoundingClientRect();
             if (mouseX >= sliderRect.left && mouseX <= sliderRect.right && mouseY >= sliderRect.top && mouseY <= sliderRect.bottom) {
                 if (originalParent !== carousel) {
                     resetCardStyling(draggingCard);
-                    
-                    carousel.appendChild(draggingCard); // Joga no final do carrossel fisicamente
-                    
+                    carousel.appendChild(draggingCard);
                     const remaining = carousel.querySelectorAll('.card');
-                    currentSliderPos = remaining.length; // FAZ O SLIDER IR AUTOMATICAMENTE ATÉ A ÚLTIMA CARTA (A que você acabou de soltar)
-
+                    currentSliderPos = remaining.length;
                     updateSlider();
                     return true;
                 }
@@ -590,12 +511,11 @@
         function updateSlider() {
             carousel.style.setProperty('--position', currentSliderPos);
             const cards = carousel.querySelectorAll('.card');
-            totalCards = cards.length; // Atualiza o total de cartas dinamicamente
+            totalCards = cards.length;
 
             cards.forEach((card, index) => {
-                const offset = index + 1; // O offset agora é a posição ATUAL da carta na fila
+                const offset = index + 1;
                 card.style.setProperty('--offset', offset);
-                
                 const abs = Math.abs(currentSliderPos - offset);
                 card.style.setProperty('--abs', abs);
             });
@@ -604,214 +524,135 @@
         function updateSliderAfterRemove() {
             const remainingCards = carousel.querySelectorAll('.card');
             if (remainingCards.length > 0) {
-                // Se a posição do slider ficou além do número de cartas restantes, reajusta para a última
                 if (currentSliderPos > remainingCards.length) {
                     currentSliderPos = remainingCards.length;
                 }
             } else {
                 currentSliderPos = 1;
             }
-            updateSlider(); // Recalcula os novos offsets dinamicamente!
+            updateSlider();
         }
-const horarios = ["2", "8", "4", "5", "3", "6", "7", "2", "4", "9", "2",
-"2", "3", "4", "10", "3", "2", "4", "2", "3"
-];
 
-const disco = document.getElementById("disco");
-const elementoGiro = document.getElementById('giro');
-const slotsData = [];
+        /* =========================================
+           LÓGICA DA ROLETA (Adaptada para Toque)
+           ========================================= */
+        const horarios = ["2", "8", "4", "5", "3", "6", "7", "2", "4", "9", "2", "2", "3", "4", "10", "3", "2", "4", "2", "3"];
+        const disco = document.getElementById("disco");
+        const elementoGiro = document.getElementById('giro');
+        const slotsData = [];
 
-// Configuração Circular
-const inicio = 97; 
-const fim = 442; 
+        const inicio = 97;
+        const fim = 442; 
 
-horarios.forEach((hora, i) => {
-  const el = document.createElement("div");
-  el.className = "horario";
-  el.innerText = hora;
+        horarios.forEach((hora, i) => {
+            const el = document.createElement("div");
+            el.className = "horario";
+            el.innerText = hora;
+            const anguloBase = inicio + (i / (horarios.length - 1)) * (fim - inicio);
 
-  const anguloBase = inicio + (i / (horarios.length - 1)) * (fim - inicio);
+            el.style.transform = `translate(-50%, -50%) rotate(${anguloBase}deg) translate(0, -160px) rotate(-90deg)`;
+            disco.appendChild(el);
+            slotsData.push({ element: el, angle: anguloBase });
+        });
 
-  el.style.transform = `
-    translate(-50%, -50%)
-    rotate(${anguloBase}deg)
-    translate(0, -160px)
-    rotate(-90deg)
-  `;
-  
-  disco.appendChild(el);
-  slotsData.push({ element: el, angle: anguloBase });
-});
+        let grauAtual = 0;
+        let velocidade = 0;
+        let isGiroDragging = false;
+        let ultimoAnguloMouse = 0;
+        const atrito = 0.98;
 
-let grauAtual = 0;
-let velocidade = 0;
-let isDragging = false;
-let ultimoAnguloMouse = 0;
-const atrito = 0.98; 
+        function getAngle(e) {
+            const rect = elementoGiro.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+        }
 
-function getAngle(e) {
-  const rect = elementoGiro.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
-}
+        function atualizarDestaque() {
+            slotsData.forEach(slot => {
+                let anguloVisual = (slot.angle + grauAtual) % 360;
+                if (anguloVisual < 0) anguloVisual += 360;
 
-function atualizarDestaque() {
-  slotsData.forEach(slot => {
-    let anguloVisual = (slot.angle + grauAtual) % 360;
-    if (anguloVisual < 0) anguloVisual += 360;
+                if (Math.abs(anguloVisual - 90) < 10) {
+                    slot.element.classList.add('ativo');
+                } else {
+                    slot.element.classList.remove('ativo');
+                }
+            });
+        }
 
-    // Alvo é 90 graus (bem ao lado do contador)
-    if (Math.abs(anguloVisual - 90) < 10) {
-      slot.element.classList.add('ativo');
-    } else {
-      slot.element.classList.remove('ativo');
-    }
-  });
-}
+        function aplicarMagnetismo() {
+            if (isGiroDragging || Math.abs(velocidade) > 0.3) return;
 
-function aplicarMagnetismo() {
-  if (isDragging || Math.abs(velocidade) > 0.3) return;
+            let menorDistancia = Infinity;
+            slotsData.forEach(slot => {
+                let anguloVisual = (slot.angle + grauAtual) % 360;
+                if (anguloVisual < 0) anguloVisual += 360;
+                
+                let dist = 90 - anguloVisual;
+                if (dist > 180) dist -= 360;
+                if (dist < -180) dist += 360;
 
-  let menorDistancia = Infinity;
+                if (Math.abs(dist) < Math.abs(menorDistancia)) {
+                    menorDistancia = dist;
+                }
+            });
+            grauAtual += menorDistancia * 0.1;
+            velocidade *= 0.85;
+        }
 
-  slotsData.forEach(slot => {
-    let anguloVisual = (slot.angle + grauAtual) % 360;
-    if (anguloVisual < 0) anguloVisual += 360;
-    
-    let dist = 90 - anguloVisual;
-    if (dist > 180) dist -= 360;
-    if (dist < -180) dist += 360;
+        // Pointer Events Unificados (Mouse + Touch) para a roleta
+        elementoGiro.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            isGiroDragging = true;
+            velocidade = 0;
+            ultimoAnguloMouse = getAngle(e);
 
-    if (Math.abs(dist) < Math.abs(menorDistancia)) {
-      menorDistancia = dist;
-    }
-  });
+            window.addEventListener('pointermove', onGiroMove);
+            window.addEventListener('pointerup', onGiroUp);
+        });
 
-  grauAtual += menorDistancia * 0.1;
-  velocidade *= 0.85;
-}
+        function onGiroMove(e) {
+            if (!isGiroDragging) return;
+            const anguloAtualMouse = getAngle(e);
+            let delta = anguloAtualMouse - ultimoAnguloMouse;
+            if (delta > 180) delta -= 360;
+            if (delta < -180) delta += 360;
 
-// Interação
-elementoGiro.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  velocidade = 0;
-  ultimoAnguloMouse = getAngle(e);
-});
+            velocidade = delta;
+            grauAtual += delta;
+            ultimoAnguloMouse = anguloAtualMouse;
+            
+            elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
+            atualizarDestaque();
+        }
 
-window.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  const anguloAtualMouse = getAngle(e);
-  let delta = anguloAtualMouse - ultimoAnguloMouse;
-  if (delta > 180) delta -= 360;
-  if (delta < -180) delta += 360;
+        function onGiroUp() {
+            isGiroDragging = false;
+            window.removeEventListener('pointermove', onGiroMove);
+            window.removeEventListener('pointerup', onGiroUp);
+        }
 
-  velocidade = delta;
-  grauAtual += delta;
-  ultimoAnguloMouse = anguloAtualMouse;
-  
-  elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
-  atualizarDestaque();
-});
+        function animar() {
+            if (!isGiroDragging && Math.abs(velocidade) > 0.01) {
+                velocidade *= atrito;
+                grauAtual += velocidade;
+                elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
+                atualizarDestaque();
+                aplicarMagnetismo();
+            } else if (!isGiroDragging) {
+                aplicarMagnetismo();
+                elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
+                atualizarDestaque();
+            }
+            requestAnimationFrame(animar);
+        }
 
-window.addEventListener('mouseup', () => isDragging = false);
-
-// Loop de Física
-function animar() {
-  if (!isDragging && Math.abs(velocidade) > 0.01) {
-    velocidade *= atrito;
-    grauAtual += velocidade;
-    elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
-    atualizarDestaque();
-    aplicarMagnetismo();
-  } else if (!isDragging) {
-    aplicarMagnetismo();
-    elementoGiro.style.transform = `rotate(${grauAtual}deg)`;
-    atualizarDestaque();
-  }
-  requestAnimationFrame(animar);
-}
-
-function adicionarPowerUpAtivo(emoji, duracao) {
-  const container = document.getElementById("powerUpsAtivos");
-
-  const el = document.createElement("div");
-  el.className = "powerUp";
-  el.innerHTML = `${emoji}<div class="timer"></div>`;
-
-  const timer = el.querySelector(".timer");
-
-  container.appendChild(el);
-
-  let tempo = duracao;
-
-  const intervalo = setInterval(() => {
-    tempo -= 100;
-    timer.style.width = (tempo / duracao * 100) + "%";
-
-    if (tempo <= 0) {
-      clearInterval(intervalo);
-      el.remove();
-    }
-  }, 100);
-}
-
-let cartaSelecionada = null;
-
-function criarCarta(emoji) {
-  const deck = document.getElementById("deck");
-
-  const el = document.createElement("div");
-  el.className = "carta";
-  el.innerText = emoji;
-
-  let dragging = false;
-
-  el.addEventListener("mousedown", () => {
-    dragging = true;
-    cartaSelecionada = el;
-  });
-
-  window.addEventListener("mouseup", (e) => {
-    if (!dragging) return;
-    dragging = false;
-
-    const roleta = document.getElementById("giro").getBoundingClientRect();
-
-    if (
-      e.clientX > roleta.left &&
-      e.clientX < roleta.right &&
-      e.clientY > roleta.top &&
-      e.clientY < roleta.bottom
-    ) {
-      ativarPowerUp(el.innerText);
-      el.remove();
-    }
-  });
-
-  deck.appendChild(el);
-}
-function ativarPowerUp(tipo) {
-  console.log("Ativado:", tipo);
-
-  if (tipo === "🧊") {
-    velocidade *= 0.4;
-    adicionarPowerUpAtivo("🧊", 3000);
-  }
-
-  if (tipo === "🌪️") {
-    velocidade *= 1.8;
-    adicionarPowerUpAtivo("🌪️", 3000);
-  }
-}
-
-window.onload = () => {
-  animar();
-
-};
-
+        window.onload = () => {
+            animar();
+        };
     </script>
 </body>
 </html>
