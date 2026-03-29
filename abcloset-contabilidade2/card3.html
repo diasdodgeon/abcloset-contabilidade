@@ -67,11 +67,16 @@ body {
   border-radius: 15px;
   overflow: hidden;
   backdrop-filter: blur(4px);
+  transition: border 0.3s ease-in-out;
   /*---------------------------*/
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 100px;
+}
+.item:hover, .item:active {
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 10px #FFFFFF, 0 0 20px #FFFFFF, 0 0 30px #FFFFFF;
 }
 
 /* Posicionamento em círculo */
@@ -91,7 +96,8 @@ body {
 
 <body>
 <div style="position: relative; 
-            height: 100vh; 
+            height: 100vh;
+            width: 110vh; 
             display: flex;
             flex-direction: column;
             justify-content: center;
