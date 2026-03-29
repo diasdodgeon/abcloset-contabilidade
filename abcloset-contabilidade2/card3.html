@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Carrossel 3D</title>
+
+<style>
+ /* --- RESET E LAYOUT BASE --- */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+/* --- SIMULADOR DE SMARTPHONE RESPONSIVO --- */
+.phone-container {
+    width: 100%;
+    max-width: 430px; /* Largura máxima de um celular grande */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- CENA E CARROSSEL 3D --- */
+.scene3d {
+    width: 100%;
+    height: 100%;
+    perspective: 1000px; /* Perspectiva do ambiente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel3d {
+    width: 200px; /* Largura base do carrossel */
+    height: 250px; /* Altura base do carrossel */
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.1s linear; /* Suaviza o movimento controlado pelo JS */
+    /* A rotação é aplicada pelo JS: transform: rotateY(Xdeg); */
+}
+
+/* --- ESTILIZAÇÃO DOS CARDS (Baseada no seu código) --- */
+.card3d {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    
+    /* Efeito de vidro transparente */
+    border-top: 2px solid #c7c5c0;
+    border-left: 2px solid #c7c5c0;
+    box-shadow: 5px 5px 12px #00000035;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    
+    /* Layout interno */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    
+    /* Previne seleção de texto durante o arraste */
+    user-select: none;
+    -webkit-user-drag: none;
+
+    /* A posição individual é calculada pelo JS usando a variável --angle */
+    /* transform: rotateY(var(--angle)) translateZ(300px); */
+}
+
+.card-emoji {
+    font-size: 80px;
+}
+
+.card-name {
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone-container">
+    <div class="scene3d">
+        <div class="carousel3d" id="carousel">
+            </div>
+    </div>
+</div>
+<script type="text/javascript">
+// --- CONFIGURAÇÃO DOS PERSONAGENS ---
+const personagens = [
+    { id: 'moribundo', nome: 'Moribundo', sequencia: ["🤒","🥵","🤧","🤢","🤮","😵","💀"] },
+    { id: 'marrento', nome: 'Marrento', sequencia: ["😡","😠","🤬","😤"] },
+    { id: 'superticioso', nome: 'Superticioso', sequencia: ["😨","😱","😰","💀","😢"] },
+    { id: 'caotico', nome: 'Caótico', sequencia: ["🤪","😀","😁","🤡","🤣"] },
+    { id: 'sonolento', nome: 'Sonolento', sequencia: ["😴","🤤","🥱","🤫","😪"] },
+    { id: 'falso', nome: 'Falso', sequencia: ["🤥","😎","😇","😈","🤓","🧐"] }
+];
+
+const carousel = document.getElementById('carousel');
+let totalCards = personagens.length;
+let theta = 360 / totalCards; // Ângulo entre cada card
+let radius = 300; // Raio do carrossel 3D (afastamento do centro)
+
+// --- ESTADO DO MOVIMENTO ---
+let currRotation = 0; // Rotação atual do carrossel
+let startX = 0; // Posição inicial do clique/toque
+let dragging = false; // Define se está havendo arraste
+
+// --- 1. RENDERIZAÇÃO E ANIMAÇÃO ---
+function renderCarousel() {
+    carousel.innerHTML = ''; // Limpa o container
+
+    personagens.forEach((p, i) => {
+        // Cria o elemento do card
+        const card = document.createElement('div');
+        card.className = 'card3d';
+        
+        // Aplica a transformação 3D individualmente baseada no índice
+        const angle = i * theta;
+        card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+        
+        // Conteúdo interno
+        card.innerHTML = `
+            <div class="card-emoji" id="emoji-${p.id}">${p.sequencia[0]}</div>
+            <div class="card-name">${p.nome}</div>
+        `;
+        
+        carousel.appendChild(card);
+        
+        // Inicia o loop de animação do emoji
+        animarEmoji(p);
+    });
+}
+
+function animarEmoji(p) {
+    let frame = 0;
+    setInterval(() => {
+        const el = document.getElementById(`emoji-${p.id}`);
+        if (el) {
+            frame = (frame + 1) % p.sequencia.length;
+            el.textContent = p.sequencia[frame];
+        }
+    }, 300); // Velocidade da animação
+}
+
+// --- 2. CONTROLE DE ARRASTE (Pointer Events) ---
+function handlePointerDown(e) {
+    dragging = true;
+    startX = e.clientX || e.touches?.[0].clientX || 0;
+    carousel.style.transition = 'none'; // Remove transition para resposta imediata
+}
+
+function handlePointerMove(e) {
+    if (!dragging) return;
+    
+    const currX = e.clientX || e.touches?.[0].clientX || 0;
+    const dx = currX - startX;
+    
+    // Sensibilidade do arraste (divisor)
+    currRotation += dx * 0.2; 
+    
+    // Aplica a rotação ao container principal
+    carousel.style.transform = `rotateY(${currRotation}deg)`;
+    
+    startX = currX; // Atualiza a posição base para o próximo frame
+}
+
+function handlePointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    carousel.style.transition = 'transform 0.5s ease-out'; // Readiciona suavidade para o final
+}
+
+// --- 3. INICIALIZAÇÃO ---
+window.addEventListener('load', () => {
+    renderCarousel();
+    
+    // Adiciona ouvintes para Mouse e Touch de forma unificada
+    const container = document.querySelector('.phone-container');
+    container.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+});
+</script>
+
+</body>
+</html>
