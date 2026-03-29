@@ -5,198 +5,198 @@
 <title>Carrossel 3D</title>
 
 <style>
- /* --- RESET E LAYOUT BASE --- */
-* {
-    margin: 0; padding: 0; box-sizing: border-box;
-}
-
 body {
-    background: #000;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: sans-serif;
-    overflow: hidden;
+  margin: 0;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  overflow: hidden;
 }
 
-/* --- SIMULADOR DE SMARTPHONE RESPONSIVO --- */
-.phone-container {
-    width: 100%;
-    max-width: 430px; /* Largura máxima de um celular grande */
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
-
-/* --- CENA E CARROSSEL 3D --- */
-.scene3d {
-    width: 100%;
-    height: 100%;
-    perspective: 1000px; /* Perspectiva do ambiente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.carousel3d {
-    width: 200px; /* Largura base do carrossel */
-    height: 250px; /* Altura base do carrossel */
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.1s linear; /* Suaviza o movimento controlado pelo JS */
-    /* A rotação é aplicada pelo JS: transform: rotateY(Xdeg); */
-}
-
-/* --- ESTILIZAÇÃO DOS CARDS (Baseada no seu código) --- */
-.card3d {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+.disco {
+  width: 800px;
+  height: 800px;
+  background:conic-gradient( 
     
-    /* Efeito de vidro transparente */
-    border-top: 2px solid #c7c5c0;
-    border-left: 2px solid #c7c5c0;
-    box-shadow: 5px 5px 12px #00000035;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 15px;
-    overflow: hidden;
-    backdrop-filter: blur(4px);
-    
-    /* Layout interno */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    padding: 15px;
-    
-    /* Previne seleção de texto durante o arraste */
-    user-select: none;
-    -webkit-user-drag: none;
-
-    /* A posição individual é calculada pelo JS usando a variável --angle */
-    /* transform: rotateY(var(--angle)) translateZ(300px); */
+    #8b2c20 0% 12.5%,
+    #1a1a1a 12.5% 25%,
+    #8b2c20 25% 37.5%,
+    #1a1a1a 37.5% 50%,
+    #8b2c20 50% 62.5%,
+    #1a1a1a 62.5% 75%,
+    #8b2c20 75% 87.5%,
+    #1a1a1a 87.5% 100%
+    )
+      ;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  transition: transform 1s;
+  perspective: 1000px;
+  position: relative;
+  
+  z-index: 1;
 }
 
-.card-emoji {
-    font-size: 80px;
+.disco{
+  transform: scaleY(-0.10);
 }
 
-.card-name {
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
+.carrossel {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  top: 20vh;
+  transform-style: preserve-3d;
+  animation: girar 20s linear infinite;
+  z-index: 2;
+}
+
+.item {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /*efeito de vidro trasparente*/
+  border-top: 2px solid #c7c5c0;
+  border-left: 2px solid #c7c5c0;
+  box-shadow: 5px 5px 12px #00000035;
+  background: #FFFFFF25;
+  border-radius: 15px;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+  /*---------------------------*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 100px;
+}
+
+/* Posicionamento em círculo */
+.item:nth-child(1) { transform: rotateY(0deg) translateZ(300px); }
+.item:nth-child(2) { transform: rotateY(60deg) translateZ(300px); }
+.item:nth-child(3) { transform: rotateY(120deg) translateZ(300px); }
+.item:nth-child(4) { transform: rotateY(180deg) translateZ(300px); }
+.item:nth-child(5) { transform: rotateY(240deg) translateZ(300px); }
+.item:nth-child(6) { transform: rotateY(300deg) translateZ(300px); }
+
+@keyframes girar {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
 }
 </style>
 </head>
 
 <body>
-
-<div class="phone-container">
-    <div class="scene3d">
-        <div class="carousel3d" id="carousel">
-            </div>
-    </div>
+<div style="position: relative; 
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;">
+<div class="carrossel" id="carrossel">
+  <div class="item"><text id="superticioso"></text> </div>
+  <div class="item"><text id="marrento"></text>     </div>
+  <div class="item"><text id="moribundo"></text>    </div>
+  <div class="item"><text id="caotico"></text>      </div>
+  <div class="item"><text id="sonolento"></text>    </div>
+  <div class="item"><text id="falso"></text>        </div>
 </div>
-<script type="text/javascript">
-// --- CONFIGURAÇÃO DOS PERSONAGENS ---
-const personagens = [
-    { id: 'moribundo', nome: 'Moribundo', sequencia: ["🤒","🥵","🤧","🤢","🤮","😵","💀"] },
-    { id: 'marrento', nome: 'Marrento', sequencia: ["😡","😠","🤬","😤"] },
-    { id: 'superticioso', nome: 'Superticioso', sequencia: ["😨","😱","😰","💀","😢"] },
-    { id: 'caotico', nome: 'Caótico', sequencia: ["🤪","😀","😁","🤡","🤣"] },
-    { id: 'sonolento', nome: 'Sonolento', sequencia: ["😴","🤤","🥱","🤫","😪"] },
-    { id: 'falso', nome: 'Falso', sequencia: ["🤥","😎","😇","😈","🤓","🧐"] }
-];
+<div class="disco"></div>
+</div>
+<script>
+// função que permite reproduzir diferentes sequências de emojis:
+const sequencias = {
+  moribundo: ["🤒","🥵","🤧","😩","🤢","🤮","😵","😑","💀"],
 
-const carousel = document.getElementById('carousel');
-let totalCards = personagens.length;
-let theta = 360 / totalCards; // Ângulo entre cada card
-let radius = 300; // Raio do carrossel 3D (afastamento do centro)
+  marrento: ["😡","😠","🤬","😤","😠"],
 
-// --- ESTADO DO MOVIMENTO ---
-let currRotation = 0; // Rotação atual do carrossel
-let startX = 0; // Posição inicial do clique/toque
-let dragging = false; // Define se está havendo arraste
+  superticioso: ["😨","😱","😰","💀","😢","😥","😓"],
 
-// --- 1. RENDERIZAÇÃO E ANIMAÇÃO ---
-function renderCarousel() {
-    carousel.innerHTML = ''; // Limpa o container
+  caotico: ["🤪","😀","😄","😁","🤡","🤣","😆"],
 
-    personagens.forEach((p, i) => {
-        // Cria o elemento do card
-        const card = document.createElement('div');
-        card.className = 'card3d';
-        
-        // Aplica a transformação 3D individualmente baseada no índice
-        const angle = i * theta;
-        card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-        
-        // Conteúdo interno
-        card.innerHTML = `
-            <div class="card-emoji" id="emoji-${p.id}">${p.sequencia[0]}</div>
-            <div class="card-name">${p.nome}</div>
-        `;
-        
-        carousel.appendChild(card);
-        
-        // Inicia o loop de animação do emoji
-        animarEmoji(p);
-    });
+  sonolento: ["😴","🤤","🥱","😩","🤫","😔","😪"],
+
+  falso: ["🤥","😎","😇","😈","🤓","🤠","🤩","🧐","😷","🥳","🤕"]
+};
+
+
+
+
+function reproduzirSequencia(nomeSequencia) {
+  let index = 0;
+  const emojis = sequencias[nomeSequencia];
+
+  if (!emojis) return;
+
+  function reproduzirEmoji() {
+    // CORREÇÃO: use 'const' para que o ID seja local desta função
+    const idElemento = nomeSequencia.toString(); 
+    const texto = document.getElementById(idElemento);
+    
+    if (texto) {
+      index = (index + 1) % emojis.length;
+      texto.textContent = emojis[index];
+    }
+    setTimeout(reproduzirEmoji, 300);
+  }
+
+  reproduzirEmoji();
 }
 
-function animarEmoji(p) {
-    let frame = 0;
-    setInterval(() => {
-        const el = document.getElementById(`emoji-${p.id}`);
-        if (el) {
-            frame = (frame + 1) % p.sequencia.length;
-            el.textContent = p.sequencia[frame];
-        }
-    }, 300); // Velocidade da animação
+function iniciar() {
+  // Inicia todas as sequências de uma vez para dar vida ao menu
+  reproduzirSequencia('superticioso');
+  reproduzirSequencia('marrento');
+  reproduzirSequencia('moribundo');
+  reproduzirSequencia('sonolento');
+  reproduzirSequencia('caotico');
+  reproduzirSequencia('falso');
 }
 
-// --- 2. CONTROLE DE ARRASTE (Pointer Events) ---
-function handlePointerDown(e) {
-    dragging = true;
-    startX = e.clientX || e.touches?.[0].clientX || 0;
-    carousel.style.transition = 'none'; // Remove transition para resposta imediata
+iniciar(); 
+
+
+const disco = document.querySelector('.disco');
+let angulo = 0;
+
+function girar() {
+  angulo += 0.43;
+  disco.style.transform = `
+  scaleY(-0.10)
+  rotate(${angulo}deg)
+  `;
+  requestAnimationFrame(girar);
 }
 
-function handlePointerMove(e) {
-    if (!dragging) return;
-    
-    const currX = e.clientX || e.touches?.[0].clientX || 0;
-    const dx = currX - startX;
-    
-    // Sensibilidade do arraste (divisor)
-    currRotation += dx * 0.2; 
-    
-    // Aplica a rotação ao container principal
-    carousel.style.transform = `rotateY(${currRotation}deg)`;
-    
-    startX = currX; // Atualiza a posição base para o próximo frame
-}
+girar();  
 
-function handlePointerUp() {
-    if (!dragging) return;
-    dragging = false;
-    carousel.style.transition = 'transform 0.5s ease-out'; // Readiciona suavidade para o final
-}
 
-// --- 3. INICIALIZAÇÃO ---
-window.addEventListener('load', () => {
-    renderCarousel();
-    
-    // Adiciona ouvintes para Mouse e Touch de forma unificada
-    const container = document.querySelector('.phone-container');
-    container.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+const carrossel = document.getElementById("carrossel");
+
+let rotacao = 0;
+let segurando = false;
+let inicioX = 0;
+
+document.addEventListener("mousedown", (e) => {
+  segurando = true;
+  inicioX = e.clientX;
+  carrossel.style.animation = "none";
+});
+
+document.addEventListener("mouseup", () => {
+  segurando = false;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (!segurando) return;
+
+  let delta = e.clientX - inicioX;
+  rotacao += delta * 0.3;
+
+  carrossel.style.transform = `rotateY(${rotacao}deg)`;
+  inicioX = e.clientX;
 });
 </script>
 
