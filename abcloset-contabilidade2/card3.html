@@ -2,220 +2,307 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Carrossel 3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Menu de Seleção 3D Profissional</title>
 
 <style>
+/* --- RESET E LAYOUT BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Remove destaque azul no toque */
+}
+
 body {
-  margin: 0;
-  height: 100vh;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1000px;
-  overflow: hidden;
+    background-color: #000;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: system-ui, -apple-system, sans-serif;
+    overflow: hidden; /* Previne scroll da página */
+    position: relative;
 }
 
-.disco {
-  width: 800px;
-  height: 800px;
-  background:conic-gradient( 
-    
-    #8b2c20 0% 12.5%,
-    #1a1a1a 12.5% 25%,
-    #8b2c20 25% 37.5%,
-    #1a1a1a 37.5% 50%,
-    #8b2c20 50% 62.5%,
-    #1a1a1a 62.5% 75%,
-    #8b2c20 75% 87.5%,
-    #1a1a1a 87.5% 100%
-    )
-      ;
-  border-radius: 50%;
-  transform-style: preserve-3d;
-  transition: transform 1s;
-  perspective: 1000px;
-  position: relative;
-  
-  z-index: 1;
+/* --- PERSPECTIVA DO AMBIENTE --- */
+.cena-principal {
+    perspective: 2000px; /* Perspectiva global aumentada para mobile */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-style: preserve-3d;
+    position: relative;
 }
 
-.disco{
-  transform: scaleY(-0.10);
-}
-
+/* --- CARROSSEL SUPERIOR (Conteiner dos Cards) --- */
 .carrossel {
-  width: 220px;
-  height: 220px;
-  position: relative;
-  user-select: none;
-  top: 330px;
-  transform-style: preserve-3d;
-  /*animation: girar 20s linear infinite;*/
-  z-index: 2;
+    width: 220px;
+    height: 220px;
+    position: relative;
+    user-select: none;
+    transform-style: preserve-3d;
+    z-index: 2;
+    /* Transição suave apenas para quando o JS NÃO está arrastando */
+    transition: transform 0.1s linear; 
 }
 
+/* --- ESTILIZAÇÃO DOS CARDS (Sua base com Efeito Vidro) --- */
 .item {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  /*efeito de vidro trasparente*/
-  border-top: 2px solid #c7c5c0;
-  border-left: 2px solid #c7c5c0;
-  box-shadow: 5px 5px 12px #00000035;
-  background: #FFFFFF25;
-  border-radius: 15px;
-  overflow: hidden;
-  backdrop-filter: blur(4px);
-  transition: border 0.3s ease-in-out;
-  /*---------------------------*/
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 100px;
-  user-select: none;
-}
-.item:hover, .item:active {
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 0 10px #FFFFFF, 0 0 20px #FFFFFF, 0 0 30px #FFFFFF;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    
+    /* Efeito de vidro transparente original */
+    border-top: 2px solid #c7c5c0;
+    border-left: 2px solid #c7c5c0;
+    box-shadow: 5px 5px 12px #00000035;
+    background: rgba(255, 255, 255, 0.15); /* #FFFFFF25 mais legível */
+    border-radius: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    
+    /* Layout interno */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+    user-select: none;
+    
+    /* Transições suaves para efeitos visuais */
+    transition: transform 0.1s linear, border 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    
+    /* Garante que o texto interno não capture o toque */
+    pointer-events: none; 
 }
 
-/* Posicionamento em círculo */
-.item:nth-child(1) { transform: rotateY(0deg) translateZ(300px); }
-.item:nth-child(2) { transform: rotateY(60deg) translateZ(300px); }
-.item:nth-child(3) { transform: rotateY(120deg) translateZ(300px); }
-.item:nth-child(4) { transform: rotateY(180deg) translateZ(300px); }
-.item:nth-child(5) { transform: rotateY(240deg) translateZ(300px); }
-.item:nth-child(6) { transform: rotateY(300deg) translateZ(300px); }
+/* --- ✨ EFEITO LUMINOSO (Classe .ativo gerenciada pelo JS) --- */
+/* Removido :hover e :active, aplicando apenas na carta em evidência */
+.item.ativo {
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 0 10px #FFFFFF, 0 0 25px #FFFFFF, 0 0 40px #FFFFFF;
+}
 
-@keyframes girar {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(360deg); }
+/* --- DISCO INFERIOR (Roleta) --- */
+.disco {
+    width: 800px;
+    height: 800px;
+    position: absolute;
+    bottom: -150px; /* Posicionado abaixo do carrossel */
+    
+    /* Seu gradiente conic-gradient original */
+    background: conic-gradient( 
+        #8b2c20 0% 12.5%,
+        #1a1a1a 12.5% 25%,
+        #8b2c20 25% 37.5%,
+        #1a1a1a 37.5% 50%,
+        #8b2c20 50% 62.5%,
+        #1a1a1a 62.5% 75%,
+        #8b2c20 75% 87.5%,
+        #1a1a1a 87.5% 100%
+    );
+    border-radius: 50%;
+    
+    /* Aplica o efeito de disco achatado */
+    transform-style: preserve-3d;
+    transform: rotateX(75deg) rotateY(0deg) rotateZ(0deg); /* Base estática */
+    
+    border: 30px solid #FFFFFF;
+    box-shadow: 0 0 50px #FFFFFF;
+    z-index: 1;
+    
+    /* Mesma transição do carrossel para sincronia */
+    transition: transform 0.1s linear; 
+}
+
+/* Container de controle para a cena unificada */
+.phone-view {
+    width: 100%;
+    max-width: 430px; /* Largura base de smartphone */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    touch-action: none; /* Desabilita scroll nativo do browser */
 }
 
 </style>
 </head>
 
 <body>
-<div style="position: relative; 
-            height: 100vh;
 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transform-style: preserve-3d;">
-<div class="carrossel" id="carrossel">
-  <div class="item"><text id="superticioso"></text> </div>
-  <div class="item"><text id="marrento"></text>     </div>
-  <div class="item"><text id="moribundo"></text>    </div>
-  <div class="item"><text id="caotico"></text>      </div>
-  <div class="item"><text id="sonolento"></text>    </div>
-  <div class="item"><text id="falso"></text>        </div>
+<div class="phone-view">
+    <div class="cena-principal">
+        
+        <div class="carrossel" id="carrossel">
+            <div class="item"><span id="superticioso"></span></div>
+            <div class="item"><span id="marrento"></span></div>
+            <div class="item"><span id="moribundo"></span></div>
+            <div class="item"><span id="caotico"></span></div>
+            <div class="item"><span id="sonolento"></span></div>
+            <div class="item"><span id="falso"></span></div>
+        </div>
+        
+        <div class="disco" id="disco"></div>
+        
+    </div>
 </div>
-<div class="disco"></div>
-</div>
+
 <script>
-// função que permite reproduzir diferentes sequências de emojis:
+// --- CONFIGURAÇÃO DOS PERSONAGENS (Data) ---
 const sequencias = {
-  moribundo: ["🤒","🥵","🤧","😩","🤢","🤮","😵","😑","💀"],
-
-  marrento: ["😡","😠","🤬","😤","😠"],
-
-  superticioso: ["😨","😱","😰","💀","😢","😥","😓"],
-
-  caotico: ["🤪","😀","😄","😁","🤡","🤣","😆"],
-
-  sonolento: ["😴","🤤","🥱","😩","🤫","😔","😪"],
-
-  falso: ["🤥","😎","😇","😈","🤓","🤠","🤩","🧐","😷","🥳","🤕"]
+    superticioso: ["😨","😱","😰","💀","😢","😥","😓"],
+    marrento: ["😡","😠","🤬","😤","😠"],
+    moribundo: ["🤒","🥵","🤧","😩","🤢","🤮","😵","😑","💀"],
+    caotico: ["🤪","😀","😄","😁","🤡","🤣","😆"],
+    sonolento: ["😴","🤤","🥱","😩","🤫","😔","😪"],
+    falso: ["🤥","😎","😇","😈","🤓","🤠","🤩","🧐","😷","🥳","🤕"]
 };
 
+const carousel = document.getElementById("carrossel");
+const disco = document.getElementById("disco");
+const items = carousel.querySelectorAll('.item');
 
+// Configurações do Carrossel 3D
+const TOTAL_ITEMS = items.length; // 6
+const THETA = 360 / TOTAL_ITEMS; // 60 graus por item
+const RADIUS = 300; // translateZ original
 
+// --- ESTADO DO MOVIMENTO (Pointer Events Unificados) ---
+let isDragging = false;
+let startX = 0;
+let currentRotation = 0; // Rotação total acumulada
+let activeIndex = 0; // Índice do card ativo (0 a 5)
 
-function reproduzirSequencia(nomeSequencia) {
-  let index = 0;
-  const emojis = sequencias[nomeSequencia];
+// Inicialização: Posiciona as cartas em círculo matematicamente
+function posicionalInicial() {
+    items.forEach((item, i) => {
+        const angle = i * THETA;
+        item.style.transform = `rotateY(${angle}deg) translateZ(${RADIUS}px)`;
+        // O JS agora controla as transformações individuais, removendo do CSS nth-child
+    });
+    updateCardGlow(0); // Acende o primeiro card
+}
 
-  if (!emojis) return;
-
-  function reproduzirEmoji() {
-    // CORREÇÃO: use 'const' para que o ID seja local desta função
-    const idElemento = nomeSequencia.toString(); 
-    const texto = document.getElementById(idElemento);
+// Atualiza a Rotação Unificada (Carrossel Y | Disco Z)
+function updateRotation(newRotation) {
+    // Aplica rotação ao carrossel
+    carousel.style.transform = `rotateY(${newRotation}deg)`;
     
-    if (texto) {
-      index = (index + 1) % emojis.length;
-      texto.textContent = emojis[index];
+    // Aplica a mesma rotação ao Disco Inferior (eixo Z para rodar plano)
+    // Mantendo o achatamento rotateX(75deg)
+    disco.style.transform = `rotateX(75deg) rotateZ(${-newRotation}deg)`;
+}
+
+// Gerencia a classe de brilho .ativo
+function updateCardGlow(index) {
+    items.forEach((item, i) => {
+        if (i === index) {
+            item.classList.add('ativo');
+        } else {
+            item.classList.remove('ativo');
+        }
+    });
+}
+
+// --- LÓGICA DE GESTOS UNIFICADA (Mouse + Toque) ---
+function onPointerDown(e) {
+    isDragging = true;
+    startX = e.clientX || e.touches?.[0].clientX || 0;
+    
+    // Remove transições para resposta imediata do dedo
+    carousel.style.transition = 'none';
+    disco.style.transition = 'none';
+}
+
+function onPointerMove(e) {
+    if (!isDragging) return;
+    
+    const currentX = e.clientX || e.touches?.[0].clientX || 0;
+    const dx = currentX - startX;
+    
+    // Fator de sensibilidade do arraste (0.3 do seu código)
+    currentRotation += dx * 0.3;
+    
+    updateRotation(currentRotation);
+    
+    startX = currentX; // Atualiza base para o próximo frame
+}
+
+function onPointerUp() {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    // Readiciona transições para o efeito de "snap" (encaixe)
+    carousel.style.transition = 'transform 0.5s ease-out';
+    disco.style.transition = 'transform 0.5s ease-out';
+    
+    // Lógica do SNAP (Giro um por vez):
+    // Calcula para qual card o carrossel deve se alinhar automaticamente.
+    // O JS rounding garante que ele sempre encaixe em um múltiplo de THETA (60deg).
+    
+    let targetRotation = Math.round(currentRotation / THETA) * THETA;
+    currentRotation = targetRotation; // Atualiza estado
+    
+    updateRotation(currentRotation);
+    
+    // Calcula qual card está ativo baseado na rotação final
+    calculateActiveCard();
+}
+
+function calculateActiveCard() {
+    // A rotação total do carrossel dividido por theta nos dá o offset.
+    // Usamos módulo para garantir que fique entre 0 e 5.
+    let indexOffset = ((-currentRotation / THETA) % TOTAL_ITEMS);
+    if (indexOffset < 0) indexOffset += TOTAL_ITEMS; // Corrige rotações negativas
+    
+    activeIndex = Math.round(indexOffset);
+    updateCardGlow(activeIndex);
+}
+
+// --- MOTOR DE ANIMAÇÃO DOS EMOJIS (Seu código original corrigido) ---
+function reproduzirSequencia(nomeSequencia) {
+    let index = 0;
+    const emojis = sequencias[nomeSequencia];
+    if (!emojis) return;
+
+    function reproduzirEmoji() {
+        const spanElemento = document.getElementById(nomeSequencia);
+        if (spanElemento) {
+            index = (index + 1) % emojis.length;
+            spanElemento.textContent = emojis[index];
+        }
+        setTimeout(reproduzirEmoji, 300);
     }
-    setTimeout(reproduzirEmoji, 300);
-  }
-
-  reproduzirEmoji();
+    reproduzirEmoji();
 }
 
-function iniciar() {
-  // Inicia todas as sequências de uma vez para dar vida ao menu
-  reproduzirSequencia('superticioso');
-  reproduzirSequencia('marrento');
-  reproduzirSequencia('moribundo');
-  reproduzirSequencia('sonolento');
-  reproduzirSequencia('caotico');
-  reproduzirSequencia('falso');
+function iniciarAnimações() {
+    reproduzirSequencia('superticioso');
+    reproduzirSequencia('marrento');
+    reproduzirSequencia('moribundo');
+    reproduzirSequencia('sonolento');
+    reproduzirSequencia('caotico');
+    reproduzirSequencia('falso');
 }
 
-iniciar(); 
-
-
-const disco = document.querySelector('.disco');
-let angulo = 0;
-
-function girar() {
-  angulo += 0.43;
-  disco.style.transform = `
-  scaleY(-0.10)
-  rotate(${angulo}deg)
-  `;
-  requestAnimationFrame(girar);
-}
-
-//girar();  
-
-
-const carrossel = document.getElementById("carrossel");
-
-
-let rotacao = 0;
-let segurando = false;
-let inicioX = 0;
-
-document.addEventListener("mousedown", (e) => {
-  segurando = true;
-  inicioX = e.clientX;
-  carrossel.style.animation = "none";
-  disco.style.animation = "none";
-});
-
-document.addEventListener("mouseup", () => {
-  segurando = false;
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (!segurando) return;
-
-  let delta = e.clientX - inicioX;
-  rotacao += delta * 0.3;
-
-  carrossel.style.transform = `rotateY(${rotacao}deg)`;
-  disco.style.transform = `
-  scaleY(-0.10)
-  rotate(${rotacao}deg)
-  `;
-  inicioX = e.clientX;
-});
-
-
+// --- INICIALIZAÇÃO DO SISTEMA ---
+window.onload = () => {
+    posicionalInicial();
+    iniciarAnimações();
+    
+    // Configura os ouvintes unificados no container mobile
+    const container = document.querySelector('.phone-view');
+    container.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    container.addEventListener('pointerleave', onPointerUp); // Segurança
+};
 
 </script>
 
