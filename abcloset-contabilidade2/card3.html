@@ -44,7 +44,7 @@ body {
 .carrossel {
     width: 220px;
     height: 220px;
-    top: 20px;
+    top: 10px;
     position: relative;
     user-select: none;
     transform-style: preserve-3d;
@@ -71,6 +71,7 @@ body {
     
     /* Layout interno */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: 100px;
@@ -95,7 +96,7 @@ body {
     width: 800px;
     height: 800px;
     position: absolute;
-    bottom: -150px; /* Posicionado abaixo do carrossel */
+    bottom: -180px; /* Posicionado abaixo do carrossel */
     
     /* Seu gradiente conic-gradient original */
     background: conic-gradient( 
@@ -144,12 +145,12 @@ body {
     <div class="cena-principal">
         
         <div class="carrossel" id="carrossel">
-            <div class="item"><span id="superticioso"></span></div>
-            <div class="item"><span id="marrento"></span></div>
-            <div class="item"><span id="moribundo"></span></div>
-            <div class="item"><span id="caotico"></span></div>
-            <div class="item"><span id="sonolento"></span></div>
-            <div class="item"><span id="falso"></span></div>
+            <div class="item"><text id="superticioso"></text></div>
+            <div class="item"><text id="marrento"></text></div>
+            <div class="item"><text id="moribundo"></text></div>
+            <div class="item"><text id="caotico"></text></div>
+            <div class="item"><text id="sonolento"></text></div>
+            <div class="item"><text id="falso"></text></div>
         </div>
         
         <div class="disco" id="disco"></div>
