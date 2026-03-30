@@ -30,18 +30,19 @@ body {
 .cena-principal {
     perspective: 2000px; /* Perspectiva global aumentada para mobile */
     width: 100%;
-    height: 100%;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     transform-style: preserve-3d;
     position: relative;
+    
 }
 
 /* --- CARROSSEL SUPERIOR (Conteiner dos Cards) --- */
 .carrossel {
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
     position: relative;
     user-select: none;
     transform-style: preserve-3d;
@@ -88,8 +89,8 @@ body {
 
 /* --- DISCO INFERIOR (Roleta) --- */
 .disco {
-    width: 800px;
-    height: 800px;
+    width: 780px;
+    height: 780px;
     position: absolute;
     bottom: -150px; /* Posicionado abaixo do carrossel */
     
@@ -122,13 +123,14 @@ body {
 .phone-view {
     width: 100%;
     max-width: 430px; /* Largura base de smartphone */
-    height: 100vh;
+    height: 60vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     position: relative;
     touch-action: none; /* Desabilita scroll nativo do browser */
+
 }
 
 </style>
@@ -137,7 +139,7 @@ body {
 <body>
 
 <div class="phone-view">
-    <div class="cena-principal">
+    <div class="cena-principal" >
         
         <div class="carrossel" id="carrossel">
             <div class="item"><span id="superticioso"></span></div>
