@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor P2P</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px;
+  }
+  .container {
+    width: 100%;
+    height: 90vh;
+    background: #FFFFFF25;
+    border-radius: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    border: 2px solid #c7c5c0;
+    box-shadow: inset 15px 0 20px -15px rgba(0,0,0,0.6), inset -15px 0 20px -15px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+  }
+  .container:focus-within {
+    border: 2px solid #FFFFFF;
+    box-shadow: inset 15px 0 20px -15px rgba(0,0,0,0.6), inset -15px 0 20px -15px rgba(0,0,0,0.6), 0 0 15px rgba(255,255,255,0.4);
+  }
+  textarea {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    padding: 15px;
+    font-size: 16px;
+    resize: none;
+    user-select: text;
+  }
+  .toolbar {
+    padding: 10px;
+    background: #00030;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+  }
+  button:active { background: #555; }
+  #connectionCode { font-family: monospace; background: #000; padding: 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="toolbar">
+    <button id="btnSave">Salvar</button>
+    <button id="btnCreate">Criar Conexão</button>
+    <button id="btnJoin">Entrar na Conexão</button>
+    <input id="inputCode" placeholder="Cole o código aqui">
+    <span id="connectionCode"></span>
+  </div>
+  <textarea id="editor" placeholder="Digite aqui..."></textarea>
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+const btnSave = document.getElementById('btnSave');
+const btnCreate = document.getElementById('btnCreate');
+const btnJoin = document.getElementById('btnJoin');
+const inputCode = document.getElementById('inputCode');
+const connectionCode = document.getElementById('connectionCode');
+
+let peerConnection;
+let dataChannel;
+
+// 1. LOCALSTORAGE
+// Carrega texto salvo ao abrir
+editor.value = localStorage.getItem('textoSalvo') || '';
+
+// Salva a cada 2 segundos ou no botão
+function salvarTexto() {
+  localStorage.setItem('textoSalvo', editor.value);
+}
+btnSave.addEventListener('click', salvarTexto);
+editor.addEventListener('input', () => {
+  clearTimeout(window.saveTimeout);
+  window.saveTimeout = setTimeout(salvarTexto, 2000);
+});
+
+// 2. WEBRTC P2P
+const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+async function criarConexao() {
+  peerConnection = new RTCPeerConnection(rtcConfig);
+  dataChannel = peerConnection.createDataChannel('canalTexto');
+  configurarDataChannel();
+
+  const offer = await peerConnection.createOffer();
+  await peerConnection.setLocalDescription(offer);
+  
+  peerConnection.onicecandidate = (e) => {
+    if (e.candidate === null) {
+      // Quando ICE gathering termina, mostra o código
+      connectionCode.textContent = btoa(JSON.stringify(peerConnection.localDescription));
+    }
+  };
+}
+
+async function entrarConexao() {
+  const offer = JSON.parse(atob(inputCode.value));
+  peerConnection = new RTCPeerConnection(rtcConfig);
+  
+  peerConnection.ondatachannel = (e) => {
+    dataChannel = e.channel;
+    configurarDataChannel();
+  };
+
+  await peerConnection.setRemoteDescription(offer);
+  const answer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(answer);
+  
+  // Em um app real você precisaria trocar o answer também via código
+  connectionCode.textContent = 'Cole este answer no outro dispositivo: ' + btoa(JSON.stringify(answer));
+}
+
+function configurarDataChannel() {
+  dataChannel.onopen = () => alert('Conectado!');
+  dataChannel.onmessage = (e) => {
+    editor.value = e.data; // Modo monitor: recebe texto do teclado
+  };
+  // Modo teclado: envia texto ao digitar
+  editor.addEventListener('input', () => {
+    if (dataChannel && dataChannel.readyState === 'open') {
+      dataChannel.send(editor.value);
+    }
+  });
+}
+
+btnCreate.addEventListener('click', criarConexao);
+btnJoin.addEventListener('click', entrarConexao);
+
+// Impede seleção de texto no container inteiro
+document.querySelector('.container').addEventListener('mousedown', e => e.preventDefault());
+document.querySelector('.container').addEventListener('touchstart', e => e.preventDefault());
+</script>
+</body>
+</html>
+</body>
+</html>
