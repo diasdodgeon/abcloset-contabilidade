@@ -155,34 +155,41 @@
     };
 
     // --- MODO MONITOR (RESPOSTA) ---
-    document.getElementById('btnSetMonitor').onclick = async () => {
-        const roomId = document.getElementById('roomInput').value;
-        if (!roomId) return alert("Digite o ID da sala criada pelo teclado");
+document.getElementById('btnSetMonitor').onclick = async () => {
+    const roomId = document.getElementById('roomInput').value;
+    if (!roomId) return alert("Digite o ID da sala criada pelo teclado");
 
-        document.getElementById('setup').style.display = 'none';
-        document.getElementById('monitor-area').style.display = 'block';
-        statusTxt.innerText = "Conectando à sala: " + roomId;
+    const roomRef = doc(db, "rooms", roomId);
+    const roomSnap = await getDoc(roomRef);
 
-        pc.ondatachannel = e => setupDataChannel(e.channel);
+    // VERIFICAÇÃO CRÍTICA: Se a sala não existe ou não tem oferta
+    if (!roomSnap.exists() || !roomSnap.data().offer) {
+        alert("Sala não encontrada ou o Teclado ainda não gerou o sinal. Tente novamente em 2 segundos.");
+        return;
+    }
 
-        const calleeCandidates = collection(db, "rooms", roomId, "calleeCandidates");
-        pc.onicecandidate = e => e.candidate && addDoc(calleeCandidates, e.candidate.toJSON());
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('monitor-area').style.display = 'block';
+    statusTxt.innerText = "Conectando à sala: " + roomId;
 
-        const roomRef = doc(db, "rooms", roomId);
-        const roomSnap = await getDoc(roomRef);
-        const offer = roomSnap.data().offer;
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+    pc.ondatachannel = e => setupDataChannel(e.channel);
 
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        await updateDoc(roomRef, { answer: { type: answer.type, sdp: answer.sdp } });
+    const calleeCandidates = collection(db, "rooms", roomId, "calleeCandidates");
+    pc.onicecandidate = e => e.candidate && addDoc(calleeCandidates, e.candidate.toJSON());
 
-        onSnapshot(collection(db, "rooms", roomId, "callerCandidates"), snap => {
-            snap.docChanges().forEach(change => {
-                if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
-            });
+    const offer = roomSnap.data().offer; // Agora é seguro ler
+    await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await updateDoc(roomRef, { answer: { type: answer.type, sdp: answer.sdp } });
+
+    onSnapshot(collection(db, "rooms", roomId, "callerCandidates"), snap => {
+        snap.docChanges().forEach(change => {
+            if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
         });
-    };
+    });
+};
 
     function setupDataChannel(channel) {
         channel.onopen = () => {
