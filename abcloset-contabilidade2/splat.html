@@ -1,165 +1,246 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<title></title>
-</head>
-<body>
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor P2P</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: system-ui, sans-serif;
-    background: #1a1a1a;
-    color: #fff;
-    padding: 10px;
-  }
-  .container {
-    width: 100%;
-    height: 90vh;
-    background: #FFFFFF25;
-    border-radius: 15px;
-    overflow: hidden;
-    backdrop-filter: blur(4px);
-    border: 2px solid #c7c5c0;
-    box-shadow: inset 15px 0 20px -15px rgba(0,0,0,0.6), inset -15px 0 20px -15px rgba(0,0,0,0.6);
-    display: flex;
-    flex-direction: column;
-  }
-  .container:focus-within {
-    border: 2px solid #FFFFFF;
-    box-shadow: inset 15px 0 20px -15px rgba(0,0,0,0.6), inset -15px 0 20px -15px rgba(0,0,0,0.6), 0 0 15px rgba(255,255,255,0.4);
-  }
-  textarea {
-    flex: 1;
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #fff;
-    padding: 15px;
-    font-size: 16px;
-    resize: none;
-    user-select: text;
-  }
-  .toolbar {
-    padding: 10px;
-    background: #00030;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 8px;
-    background: #333;
-    color: #fff;
-    cursor: pointer;
-  }
-  button:active { background: #555; }
-  #connectionCode { font-family: monospace; background: #000; padding: 5px; border-radius: 5px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Painel de Controle P2P</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+        body {
+            font-family: sans-serif;
+            background: #0f0f0f;
+            color: #eee;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Cabeçalho compacto para configuração */
+        .setup-panel {
+            padding: 10px;
+            background: #1a1a1a;
+            font-size: 12px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .controls { display: flex; gap: 5px; margin-top: 5px; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 4px; }
+        button { background: #444; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 12px; }
+        
+        /* Área Principal (Teclado/Touchpad) */
+        #inputArea {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: radial-gradient(circle at center, #222 0%, #0f0f0f 100%);
+        }
+
+        .key {
+            background: #2a2a2a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px #000;
+            transition: all 0.05s;
+            user-select: none;
+        }
+
+        .key:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px #000;
+            background: #3a3a3a;
+        }
+
+        .status { font-size: 10px; color: #888; text-align: center; margin-top: 5px; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="toolbar">
-    <button id="btnSave">Salvar</button>
-    <button id="btnCreate">Criar Conexão</button>
-    <button id="btnJoin">Entrar na Conexão</button>
-    <input id="inputCode" placeholder="Cole o código aqui">
-    <span id="connectionCode"></span>
-  </div>
-  <textarea id="editor" placeholder="Digite aqui..."></textarea>
+<div class="setup-panel">
+    <div id="statusLabel">Status: Desconectado</div>
+    <div class="controls">
+        <button id="btnCreate">Gerar ID</button>
+        <input id="inputCode" placeholder="Colar código do outro">
+        <button id="btnConnect">Conectar</button>
+    </div>
+    <div id="connectionCode" style="word-break: break-all; margin-top:5px; color: #4CAF50; cursor: pointer;"></div>
+</div>
+
+<div id="inputArea">
+    <div class="key" data-key="A">A</div>
+    <div class="key" data-key="B">B</div>
+    <div class="key" data-key="C">C</div>
+    <div class="key" data-key="D">D</div>
+    <div class="key" data-key="Space" style="grid-column: span 4;">ESPAÇO</div>
+    <div class="key" data-key="Clear" style="grid-column: span 2; background: #442222;">LIMPAR</div>
+    <div class="key" data-key="Enter" style="grid-column: span 2; background: #224422;">ENTER</div>
 </div>
 
 <script>
-const editor = document.getElementById('editor');
-const btnSave = document.getElementById('btnSave');
-const btnCreate = document.getElementById('btnCreate');
-const btnJoin = document.getElementById('btnJoin');
-const inputCode = document.getElementById('inputCode');
-const connectionCode = document.getElementById('connectionCode');
 
-let peerConnection;
-let dataChannel;
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getFirestore, collection, doc, addDoc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-// 1. LOCALSTORAGE
-// Carrega texto salvo ao abrir
-editor.value = localStorage.getItem('textoSalvo') || '';
+    const firebaseConfig = {
+  apiKey: "AIzaSyBWJ97Q-BbC8MX1JCTOxiY5c-DxnkUKKsc",
+  authDomain: "minha-galeria-de-videos.firebaseapp.com",
+  projectId: "minha-galeria-de-videos",
+  storageBucket: "minha-galeria-de-videos.firebasestorage.app",
+  messagingSenderId: "322400887452",
+  appId: "1:322400887452:web:76ff619a2842e42fb7c359"
+};
 
-// Salva a cada 2 segundos ou no botão
-function salvarTexto() {
-  localStorage.setItem('textoSalvo', editor.value);
-}
-btnSave.addEventListener('click', salvarTexto);
-editor.addEventListener('input', () => {
-  clearTimeout(window.saveTimeout);
-  window.saveTimeout = setTimeout(salvarTexto, 2000);
-});
 
-// 2. WEBRTC P2P
-const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-async function criarConexao() {
-  peerConnection = new RTCPeerConnection(rtcConfig);
-  dataChannel = peerConnection.createDataChannel('canalTexto');
-  configurarDataChannel();
+    // --- FUNÇÃO PARA O TECLADO (CRIADOR DA SALA) ---
+    async function startKeyboard(roomId) {
+        const pc = new RTCPeerConnection(rtcConfig);
+        const dc = pc.createDataChannel("inputControl");
+        const roomRef = doc(db, "rooms", roomId);
 
-  const offer = await peerConnection.createOffer();
-  await peerConnection.setLocalDescription(offer);
-  
-  peerConnection.onicecandidate = (e) => {
-    if (e.candidate === null) {
-      // Quando ICE gathering termina, mostra o código
-      connectionCode.textContent = btoa(JSON.stringify(peerConnection.localDescription));
+        // Salvar candidatos ICE locais no Firebase
+        pc.onicecandidate = e => {
+            if (e.candidate) addDoc(collection(roomRef, "callerCandidates"), e.candidate.toJSON());
+        };
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await updateDoc(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
+
+        // Ouvir quando o Monitor responder
+        onSnapshot(roomRef, async snapshot => {
+            const data = snapshot.data();
+            if (!pc.currentRemoteDescription && data?.answer) {
+                await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+            }
+        });
+
+        // Ouvir candidatos do Monitor
+        onSnapshot(collection(roomRef, "calleeCandidates"), snapshot => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+            });
+        });
+
+        return dc; // Use este canal para enviar os dados das teclas
     }
-  };
-}
 
-async function entrarConexao() {
-  const offer = JSON.parse(atob(inputCode.value));
-  peerConnection = new RTCPeerConnection(rtcConfig);
-  
-  peerConnection.ondatachannel = (e) => {
-    dataChannel = e.channel;
-    configurarDataChannel();
-  };
+    // --- FUNÇÃO PARA O MONITOR (QUEM ENTRA NA SALA) ---
+    async function startMonitor(roomId) {
+        const pc = new RTCPeerConnection(rtcConfig);
+        const roomRef = doc(db, "rooms", roomId);
 
-  await peerConnection.setRemoteDescription(offer);
-  const answer = await peerConnection.createAnswer();
-  await peerConnection.setLocalDescription(answer);
-  
-  // Em um app real você precisaria trocar o answer também via código
-  connectionCode.textContent = 'Cole este answer no outro dispositivo: ' + btoa(JSON.stringify(answer));
-}
+        pc.ondatachannel = e => {
+            const dc = e.channel;
+            dc.onmessage = msg => console.log("Tecla recebida:", msg.data);
+        };
 
-function configurarDataChannel() {
-  dataChannel.onopen = () => alert('Conectado!');
-  dataChannel.onmessage = (e) => {
-    editor.value = e.data; // Modo monitor: recebe texto do teclado
-  };
-  // Modo teclado: envia texto ao digitar
-  editor.addEventListener('input', () => {
-    if (dataChannel && dataChannel.readyState === 'open') {
-      dataChannel.send(editor.value);
+        pc.onicecandidate = e => {
+            if (e.candidate) addDoc(collection(roomRef, "calleeCandidates"), e.candidate.toJSON());
+        };
+
+        const roomSnap = await getDoc(roomRef);
+        const offer = roomSnap.data().offer;
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await updateDoc(roomRef, { answer: { type: answer.type, sdp: answer.sdp } });
+
+        onSnapshot(collection(roomRef, "callerCandidates"), snapshot => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+            });
+        });
     }
-  });
-}
 
-btnCreate.addEventListener('click', criarConexao);
-btnJoin.addEventListener('click', entrarConexao);
+    const statusLabel = document.getElementById('statusLabel');
+    const connectionCode = document.getElementById('connectionCode');
+    const inputCode = document.getElementById('inputCode');
+    
+    let pc;
+    let dc;
+    const config = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-// Impede seleção de texto no container inteiro
-document.querySelector('.container').addEventListener('mousedown', e => e.preventDefault());
-document.querySelector('.container').addEventListener('touchstart', e => e.preventDefault());
+    // Inicializa WebRTC
+    function initPeer(isOffer) {
+        pc = new RTCPeerConnection(config);
+
+        if (isOffer) {
+            dc = pc.createDataChannel("chat");
+            setupDataChannel();
+        } else {
+            pc.ondatachannel = (e) => {
+                dc = e.channel;
+                setupDataChannel();
+            };
+        }
+
+        pc.onicecandidate = (e) => {
+            if (!e.candidate) {
+                connectionCode.textContent = btoa(JSON.stringify(pc.localDescription));
+                statusLabel.textContent = "Código pronto! Copie e envie.";
+            }
+        };
+    }
+
+    function setupDataChannel() {
+        dc.onopen = () => {
+            statusLabel.textContent = "CONECTADO!";
+            document.querySelector('.setup-panel').style.background = "#1a331a";
+        };
+        dc.onmessage = (e) => {
+            // Se for o monitor, ele processa a tecla aqui
+            console.log("Recebido:", e.data);
+            if(e.data === "Clear") {
+                 // Lógica para limpar o campo no monitor
+            }
+        };
+    }
+
+    // Ações dos botões
+    document.getElementById('btnCreate').onclick = async () => {
+        initPeer(true);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+    };
+
+    document.getElementById('btnConnect').onclick = async () => {
+        const val = inputCode.value;
+        if (!val) return;
+        
+        const desc = JSON.parse(atob(val));
+        if (!pc) initPeer(false);
+
+        await pc.setRemoteDescription(desc);
+        
+        if (desc.type === 'offer') {
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+        }
+    };
+
+    // Captura de toques nas "teclas"
+    document.querySelectorAll('.key').forEach(el => {
+        el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const key = el.getAttribute('data-key');
+            if (dc && dc.readyState === 'open') {
+                dc.send(key);
+                // Feedback tátil se disponível
+                if (navigator.vibrate) navigator.vibrate(20);
+            }
+        });
+    });
 </script>
-</body>
-</html>
 </body>
 </html>
