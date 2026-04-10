@@ -95,9 +95,16 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+// Procure por esta linha no seu código e garanta que 'doc' esteja nela
 import { 
-    getFirestore, 
-    initializeFirestore // Importe esta função específica
+    initializeFirestore, 
+    doc,           // <--- CERTIFIQUE-SE QUE ESTÁ AQUI
+    setDoc, 
+    updateDoc, 
+    onSnapshot, 
+    getDoc, 
+    collection, 
+    addDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
     // --- CONFIGURAÇÃO FIREBASE (Substitua pelos seus dados) ---
