@@ -95,7 +95,10 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc, onSnapshot, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { 
+    getFirestore, 
+    initializeFirestore // Importe esta função específica
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
     // --- CONFIGURAÇÃO FIREBASE (Substitua pelos seus dados) ---
     const firebaseConfig = {
@@ -108,7 +111,10 @@
 };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+   // Substitua o getFirestore(app) por esta configuração:
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
     const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
     
     let pc = new RTCPeerConnection(rtcConfig);
